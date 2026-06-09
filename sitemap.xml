@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://calcultaxesquebec.ca/</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://calcultaxesquebec.ca/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://calcultaxesquebec.ca/quebec-tax-calculator/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://calcultaxesquebec.ca/"/>
+  </url>
+  <url>
+    <loc>https://calcultaxesquebec.ca/calcul-tps-tvq/</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calcultaxesquebec.ca/calcul-taxe-inverse-quebec/</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://calcultaxesquebec.ca/quebec-tax-calculator/</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://calcultaxesquebec.ca/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://calcultaxesquebec.ca/quebec-tax-calculator/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://calcultaxesquebec.ca/"/>
+  </url>
+  <url>
+    <loc>https://calcultaxesquebec.ca/taux-tps-tvq-quebec/</loc>
+    <lastmod>2026-06-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
