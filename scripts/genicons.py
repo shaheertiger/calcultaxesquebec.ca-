@@ -3,7 +3,7 @@ import zlib, struct, math
 def write_png(path, size, maskable=False):
     W = H = size
     # palette
-    blue = (0x00, 0x57, 0xA8)
+    blue = (0x0A, 0x0A, 0x0A)
     white = (255, 255, 255)
     green = (0x16, 0x7A, 0x3F)
     bg_radius = 0 if maskable else size*0.22  # maskable = full bleed square

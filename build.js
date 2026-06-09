@@ -303,7 +303,7 @@ function layout(page) {
   <title>${page.title}</title>
   <meta name="description" content="${page.desc}">
   <link rel="canonical" href="${url}">${alternates}
-  <meta name="theme-color" content="#0057A8">
+  <meta name="theme-color" content="#0A0A0A">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="format-detection" content="telephone=no">
 
