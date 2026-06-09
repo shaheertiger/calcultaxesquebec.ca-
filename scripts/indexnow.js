@@ -20,6 +20,12 @@ const PATHS = [
   "/calcul-taxe-inverse-quebec/",
   "/quebec-tax-calculator/",
   "/taux-tps-tvq-quebec/",
+  "/blog/",
+  "/comment-calculer-tps-tvq-quebec/",
+  "/comment-retirer-taxes-prix-quebec/",
+  "/taxe-quebec-2026/",
+  "/difference-tps-tvq/",
+  "/prix-avant-taxes-quebec/",
   "/sitemap.xml"
 ];
 

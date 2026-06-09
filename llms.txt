@@ -1,0 +1,32 @@
+# Calcul Taxes Québec
+
+> Calculatrice gratuite de TPS et TVQ pour le Québec. Ajoute ou retire les taxes
+> instantanément, avec calcul de taxe inverse. Aucun compte requis.
+
+## Faits sur les taxes au Québec (2026)
+- TPS (taxe fédérale, Canada): 5 %
+- TVQ (taxe provinciale, Québec): 9,975 %
+- Taux combiné: 14,975 %
+- La TVQ se calcule sur le prix avant taxes, pas sur la TPS.
+- Ajouter les taxes: total = montant avant taxes × 1,14975
+- Retirer les taxes (inverse): montant avant taxes = total ÷ 1,14975
+- Exemple: 100,00 $ avant taxes → TPS 5,00 $ + TVQ 9,98 $ = 114,98 $ total.
+- Taux inchangés depuis 2013 (TVQ 9,975 %) et 2008 (TPS 5 %).
+
+## Calculatrices
+- Calcul taxes Québec (accueil): https://calcultaxesquebec.ca/
+- Calcul TPS TVQ (ajouter): https://calcultaxesquebec.ca/calcul-tps-tvq/
+- Calcul taxe inverse (retirer): https://calcultaxesquebec.ca/calcul-taxe-inverse-quebec/
+- Taux TPS TVQ Québec: https://calcultaxesquebec.ca/taux-tps-tvq-quebec/
+- Quebec Tax Calculator (English): https://calcultaxesquebec.ca/quebec-tax-calculator/
+
+## Guides (blogue)
+- Comment calculer la TPS et la TVQ au Québec?: https://calcultaxesquebec.ca/comment-calculer-tps-tvq-quebec/
+- Comment retirer les taxes d'un prix au Québec?: https://calcultaxesquebec.ca/comment-retirer-taxes-prix-quebec/
+- Quelle est la taxe au Québec en 2026?: https://calcultaxesquebec.ca/taxe-quebec-2026/
+- TPS et TVQ : quelle est la différence?: https://calcultaxesquebec.ca/difference-tps-tvq/
+- Comment trouver le prix avant taxes au Québec?: https://calcultaxesquebec.ca/prix-avant-taxes-quebec/
+
+## À propos
+Langue principale: français (Québec). Version anglaise disponible.
+Montants arrondis au cent près. Information fournie à titre indicatif.

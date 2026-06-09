@@ -22,13 +22,15 @@ const NAV = {
     { href: "/calcul-tps-tvq/", label: "Calcul TPS TVQ" },
     { href: "/calcul-taxe-inverse-quebec/", label: "Taxe inverse" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ" },
+    { href: "/blog/", label: "Blogue" },
     { href: "/quebec-tax-calculator/", label: "English" }
   ],
   en: [
     { href: "/quebec-tax-calculator/", label: "Home" },
     { href: "/calcul-tps-tvq/", label: "Calcul TPS TVQ" },
     { href: "/calcul-taxe-inverse-quebec/", label: "Taxe inverse" },
-    { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ" }
+    { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ" },
+    { href: "/blog/", label: "Blogue" }
   ]
 };
 
@@ -333,7 +335,7 @@ function layout(page) {
 
   <link rel="preload" href="/assets/css/styles.css" as="style">
   <link rel="stylesheet" href="/assets/css/styles.css">
-  ${schemaFor(page)}
+  ${page.schemaHtml || schemaFor(page)}
   <script>
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   </script>
@@ -345,11 +347,11 @@ ${header(lang, page.url)}
   ${breadcrumbs(lang, page.crumbs)}
   <div class="hero">
     <h1>${page.h1}</h1>
-    <p class="intro">${page.intro}</p>
+    ${page.intro ? `<p class="intro">${page.intro}</p>` : ""}
   </div>
-  ${calcCard(lang, page.mode)}
+  ${page.showCalc === false ? "" : calcCard(lang, page.mode)}
 ${page.body}
-${internalLinks(lang, page.url)}
+${page.hideLinks ? "" : internalLinks(lang, page.url)}
 ${faqSection(lang, page.faqs)}
 </main>
 ${footer(lang)}
@@ -571,10 +573,397 @@ pages.push({
   </section>`
 });
 
+/* ================================== BLOG =================================== */
+
+const BLOG = "/blog/";
+
+function answerBox(lang, html) {
+  const tag = lang === "en" ? "Quick answer" : "Réponse rapide";
+  return `<div class="answer"><span class="tag">${tag}</span>${html}</div>`;
+}
+function keyFacts(lang, rows) {
+  const title = lang === "en" ? "Key facts" : "Faits clés";
+  return `<section class="keyfacts" aria-label="${title}"><h2>${title}</h2><ul>${rows
+    .map((r) => `<li><span>${r.k}</span><b>${r.v}</b></li>`)
+    .join("")}</ul></section>`;
+}
+function postCta(href, label, text) {
+  return `<div class="cta"><p>${text}</p><a href="${href}">${label}</a></div>`;
+}
+
+function postSchema(post) {
+  const url = SITE + post.url;
+  const inLang = post.lang === "en" ? "en-CA" : "fr-CA";
+  const graph = [
+    { "@type": "WebSite", "@id": SITE + "/#website", url: SITE + "/", name: "Calcul Taxes Québec", inLanguage: "fr-CA", publisher: { "@id": SITE + "/#org" } },
+    { "@type": "Organization", "@id": SITE + "/#org", name: "Calcul Taxes Québec", url: SITE + "/", logo: { "@type": "ImageObject", url: SITE + "/icons/icon-512.png" } },
+    {
+      "@type": "BlogPosting",
+      "@id": url + "#article",
+      headline: stripTags(post.h1),
+      name: stripTags(post.title),
+      description: post.desc,
+      inLanguage: inLang,
+      datePublished: post.datePublished,
+      dateModified: post.dateModified || BUILD_DATE,
+      author: { "@id": SITE + "/#org" },
+      publisher: { "@id": SITE + "/#org" },
+      image: SITE + "/icons/og-image.png",
+      mainEntityOfPage: url,
+      isPartOf: { "@id": SITE + BLOG + "#blog" }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": url + "#breadcrumb",
+      itemListElement: post.crumbs.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: SITE + c.href }))
+    }
+  ];
+  if (post.howto) {
+    graph.push({
+      "@type": "HowTo",
+      "@id": url + "#howto",
+      name: post.howto.name,
+      inLanguage: inLang,
+      step: post.howto.steps.map((s, i) => ({ "@type": "HowToStep", position: i + 1, name: s.name, text: stripTags(s.text) }))
+    });
+  }
+  if (post.faqs && post.faqs.length) {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": url + "#faq",
+      mainEntity: post.faqs.map((f) => ({ "@type": "Question", name: stripTags(f.q), acceptedAnswer: { "@type": "Answer", text: stripTags(f.a) } }))
+    });
+  }
+  return jsonLd({ "@context": "https://schema.org", "@graph": graph });
+}
+
+/* raw post data */
+const POSTS_RAW = [
+  {
+    url: "/comment-calculer-tps-tvq-quebec/",
+    short: "Calculer la TPS et la TVQ",
+    title: "Comment calculer la TPS et la TVQ au Québec? | Guide 2026",
+    desc: "Comment calculer la TPS (5 %) et la TVQ (9,975 %) au Québec : la formule simple, le raccourci ×1,14975 et un exemple détaillé sur 100 $.",
+    h1: "Comment calculer la TPS et la TVQ au Québec?",
+    intro: "La méthode exacte, la formule et un exemple chiffré.",
+    datePublished: "2026-01-08",
+    answer:
+      "<p>Pour calculer les taxes au Québec, ajoutez <strong>5&nbsp;% de TPS</strong> et <strong>9,975&nbsp;% de TVQ</strong> au montant avant taxes. Les deux taxes se calculent sur le prix avant taxes. Le raccourci&nbsp;: multipliez le montant par <strong>1,14975</strong> pour obtenir directement le total avec taxes.</p>",
+    facts: [
+      { k: "TPS", v: "5 %" },
+      { k: "TVQ", v: "9,975 %" },
+      { k: "Taux combiné", v: "14,975 %" },
+      { k: "100 $ avant taxes", v: "114,98 $" }
+    ],
+    cta: postCta("/calcul-tps-tvq/", "Ouvrir la calculatrice TPS TVQ", "Pas envie de calculer à la main? La calculatrice ajoute la TPS et la TVQ instantanément."),
+    howto: {
+      name: "Calculer la TPS et la TVQ au Québec",
+      steps: [
+        { name: "Calculer la TPS", text: "Multipliez le montant avant taxes par 0,05 (5 %)." },
+        { name: "Calculer la TVQ", text: "Multipliez le même montant avant taxes par 0,09975 (9,975 %)." },
+        { name: "Additionner", text: "Additionnez le montant avant taxes, la TPS et la TVQ pour obtenir le total." }
+      ]
+    },
+    sections: `    <h2>Explication simple</h2>
+    <p>Au Québec, deux taxes s'ajoutent au prix de la plupart des produits et services&nbsp;: la <strong>TPS</strong> (taxe fédérale, 5&nbsp;%) et la <strong>TVQ</strong> (taxe provinciale, 9,975&nbsp;%). Les deux s'appliquent sur le <strong>même</strong> montant&nbsp;: le prix avant taxes. La TVQ ne se calcule pas sur la TPS.</p>
+    <h2>La formule</h2>
+    <div class="formula">TPS&nbsp;=&nbsp;montant&nbsp;×&nbsp;0,05
+TVQ&nbsp;=&nbsp;montant&nbsp;×&nbsp;0,09975
+Total&nbsp;=&nbsp;montant&nbsp;+&nbsp;TPS&nbsp;+&nbsp;TVQ
+
+Raccourci&nbsp;:&nbsp;Total&nbsp;=&nbsp;montant&nbsp;×&nbsp;1,14975</div>
+    <h2>Exemple avec 100&nbsp;$</h2>
+    <table class="data-table">
+      <thead><tr><th>Élément</th><th>Montant</th></tr></thead>
+      <tbody>
+        <tr><td>Montant avant taxes</td><td>100,00&nbsp;$</td></tr>
+        <tr><td>TPS (5&nbsp;%)</td><td>5,00&nbsp;$</td></tr>
+        <tr><td>TVQ (9,975&nbsp;%)</td><td>9,98&nbsp;$</td></tr>
+        <tr><td>Total avec taxes</td><td>114,98&nbsp;$</td></tr>
+      </tbody>
+    </table>
+    <p>La TVQ exacte sur 100&nbsp;$ est de 9,975&nbsp;$, arrondie à 9,98&nbsp;$. Les montants affichés sont arrondis au cent.</p>
+    <h2>Erreurs fréquentes</h2>
+    <ul>
+      <li><strong>Calculer la TVQ sur le montant + TPS.</strong> La TVQ se calcule sur le prix avant taxes seulement.</li>
+      <li><strong>Utiliser un ancien taux de TVQ</strong> (comme 9,5&nbsp;%). Le taux est de 9,975&nbsp;% depuis 2013.</li>
+      <li><strong>Arrondir trop tôt.</strong> Calculez chaque taxe, puis arrondissez le résultat final au cent.</li>
+    </ul>
+    <h2>Quand utiliser la calculatrice</h2>
+    <p>Pour une facture, un devis ou une dépense, la <a href="/calcul-tps-tvq/">calculatrice TPS TVQ</a> évite les erreurs d'arrondi. Si votre prix inclut déjà les taxes, utilisez plutôt le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>. Pour les taux à jour, voyez les <a href="/taux-tps-tvq-quebec/">taux TPS TVQ au Québec</a>.</p>`,
+    faqs: [
+      { q: "Quel est le taux combiné de la TPS et de la TVQ?", a: "Le taux combiné est de 14,975 %&nbsp;: 5 % de TPS plus 9,975 % de TVQ, sur la plupart des produits et services taxables." },
+      { q: "Comment calculer rapidement le total avec taxes?", a: "Multipliez le montant avant taxes par 1,14975. Par exemple, 100 $ × 1,14975 = 114,98 $." },
+      { q: "La TVQ est-elle calculée sur la TPS?", a: "Non. La TVQ de 9,975 % se calcule sur le prix de vente avant taxes, pas sur le montant incluant la TPS." }
+    ]
+  },
+
+  {
+    url: "/comment-retirer-taxes-prix-quebec/",
+    short: "Retirer les taxes d'un prix",
+    title: "Comment retirer les taxes d'un prix au Québec? | Calcul inverse",
+    desc: "Retirer la TPS et la TVQ d'un prix taxes incluses au Québec : divisez par 1,14975. Formule du calcul de taxe inverse et exemple sur 114,98 $.",
+    h1: "Comment retirer les taxes d'un prix au Québec?",
+    intro: "La formule du calcul inverse, expliquée simplement.",
+    datePublished: "2026-01-10",
+    answer:
+      "<p>Pour retirer les taxes d'un prix au Québec, <strong>divisez le total par 1,14975</strong>. Le résultat est le montant avant taxes. Sur un prix de 114,98&nbsp;$ taxes incluses, le montant avant taxes est de 100,00&nbsp;$, dont 5,00&nbsp;$ de TPS et 9,98&nbsp;$ de TVQ.</p>",
+    facts: [
+      { k: "Diviseur", v: "1,14975" },
+      { k: "114,98 $ taxes incl.", v: "100,00 $ net" },
+      { k: "TPS comprise", v: "5,00 $" },
+      { k: "TVQ comprise", v: "9,98 $" }
+    ],
+    cta: postCta("/calcul-taxe-inverse-quebec/", "Ouvrir le calcul de taxe inverse", "Entrez un prix taxes incluses et voyez le montant avant taxes, la TPS et la TVQ."),
+    howto: {
+      name: "Retirer la TPS et la TVQ d'un prix au Québec",
+      steps: [
+        { name: "Trouver le montant avant taxes", text: "Divisez le prix taxes incluses par 1,14975." },
+        { name: "Calculer la TPS comprise", text: "Multipliez le montant avant taxes par 0,05." },
+        { name: "Calculer la TVQ comprise", text: "Multipliez le montant avant taxes par 0,09975." }
+      ]
+    },
+    sections: `    <h2>Pourquoi diviser par 1,14975</h2>
+    <p>Un prix taxes incluses représente 114,975&nbsp;% du prix avant taxes (100&nbsp;% + 5&nbsp;% de TPS + 9,975&nbsp;% de TVQ). Pour revenir au montant de base, on divise donc par 1,14975. On ne soustrait pas simplement 14,975&nbsp;% du total&nbsp;: ce calcul donne un résultat trop bas.</p>
+    <h2>La formule</h2>
+    <div class="formula">Montant avant taxes&nbsp;=&nbsp;Total&nbsp;÷&nbsp;1,14975
+TPS&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,05
+TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
+    <h2>Exemple avec 114,98&nbsp;$</h2>
+    <table class="data-table">
+      <thead><tr><th>Élément</th><th>Montant</th></tr></thead>
+      <tbody>
+        <tr><td>Prix taxes incluses</td><td>114,98&nbsp;$</td></tr>
+        <tr><td>Montant avant taxes</td><td>100,00&nbsp;$</td></tr>
+        <tr><td>TPS comprise (5&nbsp;%)</td><td>5,00&nbsp;$</td></tr>
+        <tr><td>TVQ comprise (9,975&nbsp;%)</td><td>9,98&nbsp;$</td></tr>
+      </tbody>
+    </table>
+    <h2>Erreurs fréquentes</h2>
+    <ul>
+      <li><strong>Soustraire 14,975&nbsp;% du total.</strong> Ça sous-estime le prix avant taxes. Il faut diviser, pas soustraire.</li>
+      <li><strong>Diviser par 1,15.</strong> Le bon diviseur est 1,14975, pas 1,15.</li>
+      <li><strong>Un écart de quelques cents</strong> est normal&nbsp;: comme le prix original a été arrondi au cent, le calcul inverse peut différer légèrement.</li>
+    </ul>
+    <h2>Quand l'utiliser</h2>
+    <p>Pratique pour séparer les taxes d'un reçu, remplir une dépense ou vérifier une facture. Faites-le automatiquement avec le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>. Pour l'opération inverse, voyez <a href="/comment-calculer-tps-tvq-quebec/">comment calculer la TPS et la TVQ</a>.</p>`,
+    faqs: [
+      { q: "Par combien diviser pour enlever les taxes au Québec?", a: "Divisez le prix taxes incluses par 1,14975 pour obtenir le montant avant taxes." },
+      { q: "Pourquoi ne pas simplement soustraire 14,975 %?", a: "Parce que le 14,975 % s'applique au montant avant taxes, pas au total. Soustraire ce pourcentage du total donne un résultat trop bas; il faut diviser par 1,14975." },
+      { q: "Le résultat est-il exact au cent près?", a: "Il est très proche. Un écart de un ou deux cents peut survenir parce que le prix d'origine a déjà été arrondi." }
+    ]
+  },
+
+  {
+    url: "/taxe-quebec-2026/",
+    short: "Taxe au Québec en 2026",
+    title: "Quelle est la taxe au Québec en 2026? | TPS, TVQ et taux combiné",
+    desc: "En 2026, la taxe au Québec est de 5 % (TPS) plus 9,975 % (TVQ), pour un taux combiné de 14,975 % sur la plupart des biens et services.",
+    h1: "Quelle est la taxe au Québec en 2026?",
+    intro: "Les taux en vigueur et ce qui s'applique.",
+    datePublished: "2026-01-05",
+    answer:
+      "<p>En 2026, la taxe de vente au Québec est de <strong>5&nbsp;% de TPS</strong> (taxe fédérale) plus <strong>9,975&nbsp;% de TVQ</strong> (taxe provinciale), pour un <strong>taux combiné de 14,975&nbsp;%</strong> sur la plupart des produits et services taxables. Ces taux sont inchangés depuis 2013.</p>",
+    facts: [
+      { k: "TPS (fédérale)", v: "5 %" },
+      { k: "TVQ (provinciale)", v: "9,975 %" },
+      { k: "Taux combiné", v: "14,975 %" },
+      { k: "En vigueur", v: "2026" }
+    ],
+    cta: postCta("/taux-tps-tvq-quebec/", "Voir les taux et calculer", "Consultez les taux TPS TVQ et calculez les taxes sur n'importe quel montant."),
+    sections: `    <h2>Les deux taxes au Québec</h2>
+    <p>La <strong>TPS</strong> (taxe sur les produits et services) est fédérale et s'élève à 5&nbsp;%. La <strong>TVQ</strong> (taxe de vente du Québec) est provinciale et s'élève à 9,975&nbsp;%. Les deux s'appliquent sur le prix avant taxes&nbsp;; la TVQ ne se calcule pas sur la TPS.</p>
+    <h2>Le taux combiné de 14,975&nbsp;%</h2>
+    <p>Additionnées, les deux taxes donnent 14,975&nbsp;%. C'est ce taux combiné qui sert d'estimation rapide&nbsp;: un article de 100&nbsp;$ coûte 114,98&nbsp;$ taxes incluses.</p>
+    <h2>Exemples de taxes en 2026</h2>
+    <table class="data-table">
+      <thead><tr><th>Avant taxes</th><th>Total taxes incluses</th></tr></thead>
+      <tbody>
+        <tr><td>10,00&nbsp;$</td><td>11,50&nbsp;$</td></tr>
+        <tr><td>50,00&nbsp;$</td><td>57,49&nbsp;$</td></tr>
+        <tr><td>100,00&nbsp;$</td><td>114,98&nbsp;$</td></tr>
+        <tr><td>1 000,00&nbsp;$</td><td>1 149,75&nbsp;$</td></tr>
+      </tbody>
+    </table>
+    <h2>Ce qui n'a pas changé en 2026</h2>
+    <p>La TVQ est passée à 9,975&nbsp;% en 2013 et la TPS est à 5&nbsp;% depuis 2008. Aucun changement de taux n'est entré en vigueur pour 2026. Certains produits (par exemple plusieurs aliments de base) sont détaxés ou exonérés et ne portent pas ces taxes.</p>
+    <p>Pour calculer un montant précis, utilisez la <a href="/calcul-tps-tvq/">calculatrice TPS TVQ</a> ou la page des <a href="/taux-tps-tvq-quebec/">taux TPS TVQ au Québec</a>.</p>`,
+    faqs: [
+      { q: "Quel est le taux de taxe au Québec en 2026?", a: "5 % de TPS et 9,975 % de TVQ, soit un taux combiné de 14,975 % sur la plupart des biens et services taxables." },
+      { q: "Les taux de taxes ont-ils changé en 2026?", a: "Non. La TPS reste à 5 % et la TVQ à 9,975 %, des taux inchangés depuis 2013." },
+      { q: "Tous les produits sont-ils taxés au Québec?", a: "Non. Certains biens et services, comme plusieurs aliments de base, sont détaxés ou exonérés de TPS et de TVQ." }
+    ]
+  },
+
+  {
+    url: "/difference-tps-tvq/",
+    short: "Différence TPS et TVQ",
+    title: "TPS et TVQ : quelle est la différence? | Fédérale vs provinciale",
+    desc: "La TPS est la taxe fédérale de 5 % (Canada); la TVQ est la taxe provinciale de 9,975 % (Québec). Qui les perçoit, différences et exemple.",
+    h1: "TPS et TVQ : quelle est la différence?",
+    intro: "Fédérale contre provinciale, en clair.",
+    datePublished: "2026-01-12",
+    answer:
+      "<p>La <strong>TPS</strong> (taxe sur les produits et services) est la taxe <strong>fédérale</strong> de 5&nbsp;% perçue pour le gouvernement du Canada. La <strong>TVQ</strong> (taxe de vente du Québec) est la taxe <strong>provinciale</strong> de 9,975&nbsp;% du Québec. Les deux sont perçues par Revenu Québec et s'appliquent sur le prix avant taxes.</p>",
+    facts: [
+      { k: "TPS — fédérale", v: "5 %" },
+      { k: "TVQ — provinciale", v: "9,975 %" },
+      { k: "Perçues par", v: "Revenu Québec" },
+      { k: "Base de calcul", v: "Prix avant taxes" }
+    ],
+    cta: postCta("/calcul-tps-tvq/", "Calculer la TPS et la TVQ", "Voyez la TPS et la TVQ séparément sur n'importe quel montant."),
+    sections: `    <h2>La TPS : la taxe fédérale</h2>
+    <p>La TPS s'applique partout au Canada au taux de 5&nbsp;%. Elle revient au gouvernement fédéral. Au Québec, c'est Revenu Québec qui l'administre et la perçoit.</p>
+    <h2>La TVQ : la taxe provinciale</h2>
+    <p>La TVQ est propre au Québec, au taux de 9,975&nbsp;%. Elle revient au gouvernement provincial. Elle se calcule sur le prix de vente avant taxes, comme la TPS.</p>
+    <h2>Comparaison rapide</h2>
+    <table class="data-table">
+      <thead><tr><th>Taxe</th><th>Taux</th></tr></thead>
+      <tbody>
+        <tr><td>TPS — fédérale (Canada)</td><td>5&nbsp;%</td></tr>
+        <tr><td>TVQ — provinciale (Québec)</td><td>9,975&nbsp;%</td></tr>
+        <tr><td>Combiné</td><td>14,975&nbsp;%</td></tr>
+      </tbody>
+    </table>
+    <h2>Est-ce que la TVQ est calculée sur la TPS?</h2>
+    <p>Non. Depuis 2013, la TVQ se calcule sur le prix avant taxes, et non sur le montant incluant la TPS. Les deux taxes s'appliquent à la même base.</p>
+    <h2>Pourquoi deux taxes?</h2>
+    <p>Le Canada est un système à deux paliers&nbsp;: une taxe fédérale (TPS) et une taxe provinciale (la TVQ au Québec). D'autres provinces utilisent une taxe harmonisée (TVH), mais le Québec garde sa TVQ distincte. Pour additionner les deux, utilisez la <a href="/calcul-tps-tvq/">calculatrice TPS TVQ</a>.</p>`,
+    faqs: [
+      { q: "Quelle est la différence entre la TPS et la TVQ?", a: "La TPS est la taxe fédérale de 5 % du Canada; la TVQ est la taxe provinciale de 9,975 % du Québec. Les deux s'ajoutent au prix avant taxes." },
+      { q: "Qui perçoit la TPS et la TVQ au Québec?", a: "Au Québec, Revenu Québec perçoit les deux taxes, puis remet la portion fédérale au gouvernement du Canada." },
+      { q: "La TVQ s'applique-t-elle sur la TPS?", a: "Non. La TVQ se calcule sur le prix avant taxes, pas sur le montant incluant la TPS." }
+    ]
+  },
+
+  {
+    url: "/prix-avant-taxes-quebec/",
+    short: "Prix avant taxes",
+    title: "Comment trouver le prix avant taxes au Québec? | Méthode simple",
+    desc: "Pour trouver le prix avant taxes au Québec, divisez le prix taxes incluses par 1,14975. Méthode, formule et tableau de référence.",
+    h1: "Comment trouver le prix avant taxes au Québec?",
+    intro: "La méthode et un tableau de référence prêt à l'emploi.",
+    datePublished: "2026-01-14",
+    answer:
+      "<p>Pour trouver le prix avant taxes au Québec, <strong>divisez le prix taxes incluses par 1,14975</strong>. Par exemple, un total de 57,49&nbsp;$ correspond à un prix avant taxes d'environ 50,00&nbsp;$. C'est le même calcul que la taxe inverse.</p>",
+    facts: [
+      { k: "Diviseur", v: "1,14975" },
+      { k: "11,50 $ → net", v: "10,00 $" },
+      { k: "57,49 $ → net", v: "50,00 $" },
+      { k: "114,98 $ → net", v: "100,00 $" }
+    ],
+    cta: postCta("/calcul-taxe-inverse-quebec/", "Trouver le prix avant taxes", "Entrez un total taxes incluses et obtenez le prix avant taxes au cent près."),
+    sections: `    <h2>La méthode</h2>
+    <p>Un prix taxes incluses vaut 114,975&nbsp;% du prix avant taxes. Pour retrouver le montant net, on divise donc le total par 1,14975. Inutile de séparer la TPS et la TVQ d'abord&nbsp;: une seule division suffit.</p>
+    <h2>La formule</h2>
+    <div class="formula">Prix avant taxes&nbsp;=&nbsp;Prix taxes incluses&nbsp;÷&nbsp;1,14975</div>
+    <h2>Tableau de référence</h2>
+    <table class="data-table">
+      <thead><tr><th>Prix taxes incluses</th><th>Prix avant taxes</th></tr></thead>
+      <tbody>
+        <tr><td>11,50&nbsp;$</td><td>10,00&nbsp;$</td></tr>
+        <tr><td>22,98&nbsp;$</td><td>19,99&nbsp;$</td></tr>
+        <tr><td>57,49&nbsp;$</td><td>50,00&nbsp;$</td></tr>
+        <tr><td>114,98&nbsp;$</td><td>100,00&nbsp;$</td></tr>
+        <tr><td>1 149,75&nbsp;$</td><td>1 000,00&nbsp;$</td></tr>
+      </tbody>
+    </table>
+    <h2>Pourquoi un écart de quelques cents</h2>
+    <p>Le prix affiché en magasin a déjà été arrondi au cent. En remontant au prix avant taxes, on peut donc tomber à un ou deux cents près du montant exact. C'est normal et sans conséquence pour la plupart des usages.</p>
+    <h2>Cas pratiques</h2>
+    <p>Utile pour une dépense professionnelle, un remboursement ou une comptabilité simple. La <a href="/calcul-taxe-inverse-quebec/">calculatrice de taxe inverse</a> fait le calcul et sépare la TPS et la TVQ. Pour ajouter les taxes à un prix, voyez <a href="/comment-calculer-tps-tvq-quebec/">comment calculer la TPS et la TVQ</a>.</p>`,
+    faqs: [
+      { q: "Comment calculer le prix avant taxes au Québec?", a: "Divisez le prix taxes incluses par 1,14975. Le résultat est le prix avant taxes." },
+      { q: "Quel est le prix avant taxes de 100 $ taxes incluses?", a: "Environ 86,98 $ : 100 ÷ 1,14975 ≈ 86,98 $ avant taxes." },
+      { q: "Est-ce le même calcul que la taxe inverse?", a: "Oui. Trouver le prix avant taxes et faire un calcul de taxe inverse, c'est la même opération : diviser par 1,14975." }
+    ]
+  }
+];
+
+/* turn raw posts into renderable page objects */
+const FR_DATE = { "01": "janvier", "06": "juin" };
+function frMonth(iso) {
+  const [, m] = iso.split("-");
+  return FR_DATE[m] || "2026";
+}
+const posts = POSTS_RAW.map((p) => {
+  const crumbs = [
+    { name: "Accueil", href: "/" },
+    { name: "Blogue", href: BLOG },
+    { name: p.short, href: p.url }
+  ];
+  const meta = `Mis à jour en ${frMonth(BUILD_DATE)} ${UPDATED_YEAR}`;
+  const body =
+    `  <p class="post-meta">${meta}</p>\n` +
+    `  ${answerBox("fr", p.answer)}\n` +
+    `  ${keyFacts("fr", p.facts)}\n` +
+    `  ${p.cta}\n` +
+    `  <article class="prose">\n${p.sections}\n  </article>`;
+  return {
+    url: p.url,
+    out: p.url.replace(/^\//, "").replace(/\/$/, "") + "/index.html",
+    lang: "fr",
+    showCalc: false,
+    title: p.title,
+    desc: p.desc,
+    h1: p.h1,
+    intro: p.intro,
+    crumbs,
+    faqs: p.faqs,
+    body,
+    schemaHtml: postSchema({ ...p, crumbs, lang: "fr" })
+  };
+});
+
+/* blog index */
+const blogIndex = {
+  url: BLOG,
+  out: "blog/index.html",
+  lang: "fr",
+  showCalc: false,
+  hideLinks: false,
+  title: "Blogue — Calcul Taxes Québec | TPS, TVQ et taxe inverse",
+  desc: "Guides simples et directs sur les taxes au Québec : calcul de la TPS et de la TVQ, taxe inverse, prix avant taxes et taux en vigueur.",
+  h1: "Blogue",
+  intro: "Des guides courts et précis sur la TPS, la TVQ et le calcul des taxes au Québec.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Blogue", href: BLOG }],
+  faqs: null,
+  body:
+    `  <div class="post-list">\n` +
+    POSTS_RAW.map((p) => `    <a href="${p.url}"><h2>${p.short}</h2><p>${p.desc}</p></a>`).join("\n") +
+    `\n  </div>`,
+  schemaHtml: jsonLd({
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "WebSite", "@id": SITE + "/#website", url: SITE + "/", name: "Calcul Taxes Québec", inLanguage: "fr-CA", publisher: { "@id": SITE + "/#org" } },
+      { "@type": "Organization", "@id": SITE + "/#org", name: "Calcul Taxes Québec", url: SITE + "/", logo: { "@type": "ImageObject", url: SITE + "/icons/icon-512.png" } },
+      {
+        "@type": "Blog",
+        "@id": SITE + BLOG + "#blog",
+        url: SITE + BLOG,
+        name: "Blogue — Calcul Taxes Québec",
+        inLanguage: "fr-CA",
+        blogPost: POSTS_RAW.map((p) => ({ "@type": "BlogPosting", headline: stripTags(p.h1), url: SITE + p.url, datePublished: p.datePublished, dateModified: BUILD_DATE }))
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": SITE + BLOG + "#breadcrumb",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Accueil", item: SITE + "/" },
+          { "@type": "ListItem", position: 2, name: "Blogue", item: SITE + BLOG }
+        ]
+      }
+    ]
+  })
+};
+
+/* all blog routes get rendered through the standard layout */
+const blogPages = [blogIndex, ...posts];
+
 /* --------------------------------- write ---------------------------------- */
 
 const root = __dirname;
-pages.forEach((p) => {
+[...pages, ...blogPages].forEach((p) => {
   const html = layout(p);
   const outPath = path.join(root, p.out);
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
@@ -585,7 +974,7 @@ pages.forEach((p) => {
 /* sitemap.xml */
 const sitemap =
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n` +
-  pages
+  [...pages, ...blogPages]
     .map((p) => {
       let alt = "";
       if (p.url === "/" || p.url === "/quebec-tax-calculator/") {
@@ -594,13 +983,46 @@ const sitemap =
           `\n    <xhtml:link rel="alternate" hreflang="en-CA" href="${SITE}/quebec-tax-calculator/"/>` +
           `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/"/>`;
       }
-      const priority = p.url === "/" ? "1.0" : "0.8";
+      const priority = p.url === "/" ? "1.0" : p.url.startsWith(BLOG) ? "0.6" : "0.8";
       return `  <url>\n    <loc>${SITE}${p.url}</loc>\n    <lastmod>${BUILD_DATE}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${priority}</priority>${alt}\n  </url>`;
     })
     .join("\n") +
   `\n</urlset>\n`;
 fs.writeFileSync(path.join(root, "sitemap.xml"), sitemap);
 console.log("wrote sitemap.xml");
+
+/* llms.txt — concise, quotable summary for AI answer engines (GEO/AEO) */
+const llms = `# Calcul Taxes Québec
+
+> Calculatrice gratuite de TPS et TVQ pour le Québec. Ajoute ou retire les taxes
+> instantanément, avec calcul de taxe inverse. Aucun compte requis.
+
+## Faits sur les taxes au Québec (${UPDATED_YEAR})
+- TPS (taxe fédérale, Canada): 5 %
+- TVQ (taxe provinciale, Québec): 9,975 %
+- Taux combiné: 14,975 %
+- La TVQ se calcule sur le prix avant taxes, pas sur la TPS.
+- Ajouter les taxes: total = montant avant taxes × 1,14975
+- Retirer les taxes (inverse): montant avant taxes = total ÷ 1,14975
+- Exemple: 100,00 $ avant taxes → TPS 5,00 $ + TVQ 9,98 $ = 114,98 $ total.
+- Taux inchangés depuis 2013 (TVQ 9,975 %) et 2008 (TPS 5 %).
+
+## Calculatrices
+- Calcul taxes Québec (accueil): ${SITE}/
+- Calcul TPS TVQ (ajouter): ${SITE}/calcul-tps-tvq/
+- Calcul taxe inverse (retirer): ${SITE}/calcul-taxe-inverse-quebec/
+- Taux TPS TVQ Québec: ${SITE}/taux-tps-tvq-quebec/
+- Quebec Tax Calculator (English): ${SITE}/quebec-tax-calculator/
+
+## Guides (blogue)
+${POSTS_RAW.map((p) => `- ${stripTags(p.h1)}: ${SITE}${p.url}`).join("\n")}
+
+## À propos
+Langue principale: français (Québec). Version anglaise disponible.
+Montants arrondis au cent près. Information fournie à titre indicatif.
+`;
+fs.writeFileSync(path.join(root, "llms.txt"), llms);
+console.log("wrote llms.txt");
 
 /* robots.txt */
 const robots = `User-agent: *
