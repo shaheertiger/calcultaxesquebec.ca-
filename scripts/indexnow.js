@@ -30,30 +30,48 @@ const payload = JSON.stringify({
   urlList: PATHS.map((p) => SITE + p)
 });
 
-const req = https.request(
-  {
-    host: "api.indexnow.org",
-    path: "/indexnow",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Content-Length": Buffer.byteLength(payload)
-    }
-  },
-  (res) => {
-    let body = "";
-    res.on("data", (c) => (body += c));
-    res.on("end", () => {
-      console.log("IndexNow HTTP", res.statusCode);
-      if (body) console.log(body);
-      // 200 / 202 = accepted. 422 = key/URL mismatch. 403 = key not verified.
-      process.exit(res.statusCode >= 200 && res.statusCode < 300 ? 0 : 1);
+// Submit to Bing directly plus the shared IndexNow hub (which also notifies
+// Yandex, Seznam, Naver…). Submitting one endpoint normally fans out to all,
+// but Bing is pinged explicitly as requested.
+const ENDPOINTS = [
+  { host: "www.bing.com", path: "/indexnow", label: "Bing" },
+  { host: "api.indexnow.org", path: "/indexnow", label: "IndexNow hub" }
+];
+
+function submit(ep) {
+  return new Promise((resolve) => {
+    const req = https.request(
+      {
+        host: ep.host,
+        path: ep.path,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Content-Length": Buffer.byteLength(payload)
+        }
+      },
+      (res) => {
+        let body = "";
+        res.on("data", (c) => (body += c));
+        res.on("end", () => {
+          const ok = res.statusCode >= 200 && res.statusCode < 300;
+          console.log(`${ep.label} (${ep.host}) → HTTP ${res.statusCode}${body ? " " + body.trim() : ""}`);
+          // 200 / 202 = accepted. 422 = key/URL mismatch. 403 = key not verified.
+          resolve(ok);
+        });
+      }
+    );
+    req.on("error", (e) => {
+      console.error(`${ep.label} request failed:`, e.message);
+      resolve(false);
     });
-  }
-);
-req.on("error", (e) => {
-  console.error("IndexNow request failed:", e.message);
-  process.exit(1);
-});
-req.write(payload);
-req.end();
+    req.write(payload);
+    req.end();
+  });
+}
+
+(async () => {
+  console.log(`Submitting ${PATHS.length} URLs for ${HOST}…`);
+  const results = await Promise.all(ENDPOINTS.map(submit));
+  process.exit(results.some(Boolean) ? 0 : 1);
+})();

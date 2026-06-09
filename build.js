@@ -9,6 +9,7 @@ const path = require("path");
 const SITE = "https://calcultaxesquebec.ca";
 const UPDATED_YEAR = "2026";
 const BUILD_DATE = "2026-06-09";
+const DATE_PUBLISHED = "2026-01-01";
 
 /* ----------------------------- shared partials ---------------------------- */
 
@@ -240,6 +241,8 @@ function schemaFor(page) {
     browserRequirements: "Requires JavaScript.",
     inLanguage: page.lang === "en" ? "en-CA" : "fr-CA",
     description: page.desc,
+    datePublished: DATE_PUBLISHED,
+    dateModified: BUILD_DATE,
     offers: { "@type": "Offer", price: "0", priceCurrency: "CAD" },
     featureList:
       page.lang === "en"
@@ -422,8 +425,8 @@ pages.push({
   out: "index.html",
   lang: "fr",
   mode: "add",
-  title: "Calcul Taxes Québec | Calculatrice TPS TVQ Simple",
-  desc: "Calculez rapidement la TPS et la TVQ au Québec. Entrez un montant avant ou avec taxes et obtenez le total instantanément.",
+  title: "Calcul Taxes Québec 2026 | Calculatrice TPS TVQ Simple",
+  desc: "Calculez rapidement la TPS et la TVQ au Québec en 2026. Entrez un montant avant ou avec taxes et obtenez le total instantanément. Taux à jour : TPS 5 %, TVQ 9,975 %.",
   h1: "Calcul Taxes Québec",
   intro:
     "Entrez un montant et voyez instantanément la TPS, la TVQ et le total avec taxes. Simple, rapide et fait pour le Québec.",
@@ -458,8 +461,8 @@ pages.push({
   out: "calcul-tps-tvq/index.html",
   lang: "fr",
   mode: "add",
-  title: "Calcul TPS TVQ | Calculatrice Québec Rapide",
-  desc: "Calculez la TPS et la TVQ en quelques secondes. Entrez un montant et obtenez le sous-total, la TPS, la TVQ et le total avec taxes.",
+  title: "Calcul TPS TVQ 2026 | Calculatrice Québec Rapide",
+  desc: "Calculez la TPS et la TVQ en quelques secondes avec les taux 2026. Entrez un montant et obtenez le sous-total, la TPS, la TVQ et le total avec taxes.",
   h1: "Calcul TPS TVQ",
   intro:
     "Entrez un montant et obtenez le sous-total, la TPS, la TVQ et le total avec taxes. Une calculatrice TPS/TVQ rapide, pensée pour le Québec.",
@@ -484,8 +487,8 @@ pages.push({
   out: "calcul-taxe-inverse-quebec/index.html",
   lang: "fr",
   mode: "remove",
-  title: "Calcul Taxe Inverse Québec | Retirer TPS TVQ",
-  desc: "Retirez rapidement la TPS et la TVQ d'un prix avec taxes incluses. Entrez le total et voyez le montant avant taxes.",
+  title: "Calcul Taxe Inverse Québec 2026 | Retirer TPS TVQ",
+  desc: "Retirez rapidement la TPS et la TVQ d'un prix avec taxes incluses (taux 2026). Entrez le total et voyez le montant avant taxes.",
   h1: "Calcul Taxe Inverse Québec",
   intro:
     "Vous avez un prix avec taxes incluses? Entrez le total et la calculatrice vous donne le montant avant taxes, la TPS et la TVQ.",
@@ -512,8 +515,8 @@ pages.push({
   out: "quebec-tax-calculator/index.html",
   lang: "en",
   mode: "add",
-  title: "Quebec Tax Calculator | GST QST Calculator",
-  desc: "Calculate Quebec GST and QST instantly. Enter a price before or after tax and get the subtotal, GST, QST, and total.",
+  title: "Quebec Tax Calculator 2026 | GST QST Calculator",
+  desc: "Calculate Quebec GST and QST instantly with up-to-date 2026 rates. Enter a price before or after tax and get the subtotal, GST, QST, and total.",
   h1: "Quebec Tax Calculator",
   intro:
     "Enter an amount and instantly calculate Quebec GST, QST, and the total with tax. Simple, fast, and made for Quebec.",
