@@ -25,6 +25,7 @@ instantané et excellents Core Web Vitals.
 | `/calcul-taxe-inverse-quebec/` | calcul taxe inverse |
 | `/calculateur-de-taxes-quebec/` | calculateur de taxes |
 | `/tps-tvq-en-ligne/` | tps tvq en ligne |
+| `/calcul-salaire-net-quebec/` | calcul salaire net / salaire brut en net |
 | `/quebec-tax-calculator/` | tax calculator quebec (EN) |
 | `/taux-tps-tvq-quebec/` | taux tps tvq |
 
@@ -69,6 +70,29 @@ python3 -m http.server 8080
 Déployez le contenu de ce dossier tel quel sur n'importe quel hébergeur
 statique (Netlify, Vercel, Cloudflare Pages, GitHub Pages, S3…). Aucune étape
 de build n'est requise côté serveur.
+
+## Calculatrice de salaire net (brut → net)
+
+`/calcul-salaire-net-quebec/` estime la paie nette d'un salarié québécois à partir du
+salaire brut. Le moteur (`assets/js/salary.js`) applique les **paramètres 2026** :
+
+| Élément | Valeur 2026 |
+|---------|-------------|
+| RRQ — exemption / MGA / MSGA | 3 500 $ / 74 600 $ / 85 000 $ |
+| RRQ — taux (base + 1er suppl.) / RRQ2 | 5,30 % + 1,00 % = 6,30 % / 4,00 % |
+| Assurance-emploi (Québec) | 1,30 % jusqu'à 68 900 $ |
+| RQAP (salarié) | 0,430 % jusqu'à 103 000 $ |
+| Impôt fédéral | 14 / 20,5 / 26 / 29 / 33 % (paliers 58 523 / 117 045 / 181 440 / 258 482 $) |
+| Montant personnel de base fédéral | 16 452 $ (min. 14 829 $), abattement Québec 16,5 % |
+| Montant canadien pour emploi | 1 501 $ |
+| Impôt du Québec | 14 / 19 / 24 / 25,75 % (paliers 54 345 / 108 680 / 132 245 $) |
+| Montant personnel de base — Québec | 18 952 $ |
+
+C'est une **estimation** (particulier salarié, revenu d'emploi, crédits de base ; sans
+REER, avantages imposables ni crédits familiaux). Sources : Retraite Québec / Revenu
+Québec (RRQ, RQAP), Canada.ca (assurance-emploi, impôt fédéral), TaxTips.ca (paliers
+2026). Mettez à jour les constantes de `salary.js` (et la table de `build.js`) à chaque
+indexation annuelle.
 
 ## SEO Bing / IndexNow
 

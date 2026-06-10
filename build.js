@@ -29,6 +29,7 @@ const NAV = {
     { href: "/", label: "Accueil" },
     { href: "/calcul-tps-tvq/", label: "Calcul TPS TVQ" },
     { href: "/calcul-taxe-inverse-quebec/", label: "Taxe inverse" },
+    { href: "/calcul-salaire-net-quebec/", label: "Salaire net" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ" },
     { href: "/blog/", label: "Blogue" },
     { href: "/quebec-tax-calculator/", label: "English" }
@@ -37,6 +38,7 @@ const NAV = {
     { href: "/quebec-tax-calculator/", label: "Home" },
     { href: "/calcul-tps-tvq/", label: "Calcul TPS TVQ" },
     { href: "/calcul-taxe-inverse-quebec/", label: "Taxe inverse" },
+    { href: "/calcul-salaire-net-quebec/", label: "Salaire net" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ" },
     { href: "/blog/", label: "Blogue" }
   ]
@@ -163,6 +165,72 @@ function fmtZero(lang) {
   return lang === "en" ? "$0.00" : "0,00&nbsp;$";
 }
 
+function salaryCard(lang) {
+  const fr = lang !== "en";
+  const z = fmtZero(lang);
+  const L = fr
+    ? {
+        label: "Salaire brut", placeholder: "0,00", per: "Période de paie",
+        year: "Par année", month: "Par mois", biweek: "Aux 2 semaines", week: "Par semaine", hour: "Par heure",
+        hours: "Heures / semaine", net: "Salaire net", gross: "Salaire brut", fed: "Impôt fédéral",
+        qc: "Impôt du Québec", qpp: "RRQ (Régime de rentes)", ei: "Assurance-emploi", qpip: "RQAP",
+        ded: "Retenues totales", rate: "Taux d'imposition effectif", copy: "Copier le résultat", clear: "Effacer",
+        note: "Estimation pour un particulier salarié au Québec (crédits de base, taux 2026). À titre indicatif."
+      }
+    : {
+        label: "Gross pay", placeholder: "0.00", per: "Pay period",
+        year: "Per year", month: "Per month", biweek: "Every 2 weeks", week: "Per week", hour: "Per hour",
+        hours: "Hours / week", net: "Net pay", gross: "Gross pay", fed: "Federal tax",
+        qc: "Quebec tax", qpp: "QPP (pension plan)", ei: "Employment Insurance", qpip: "QPIP",
+        ded: "Total deductions", rate: "Effective tax rate", copy: "Copy result", clear: "Clear",
+        note: "Estimate for a single salaried Quebec resident (basic credits, 2026 rates). For guidance only."
+      };
+  return `<div class="card calc salary" data-salary>
+    <div class="field">
+      <label for="salary">${L.label}</label>
+      <div class="input-money">
+        <input id="salary" data-sal-input type="text" inputmode="decimal" autocomplete="off"
+               enterkeyhint="done" placeholder="${L.placeholder}">
+        <span class="cur" aria-hidden="true">$</span>
+      </div>
+      <div class="freq">
+        <select data-sal-freq aria-label="${L.per}">
+          <option value="year" selected>${L.year}</option>
+          <option value="month">${L.month}</option>
+          <option value="biweek">${L.biweek}</option>
+          <option value="week">${L.week}</option>
+          <option value="hour">${L.hour}</option>
+        </select>
+        <label class="hours" data-sal-hourswrap hidden>${L.hours}
+          <input data-sal-hours type="text" inputmode="decimal" autocomplete="off" value="40">
+        </label>
+      </div>
+    </div>
+    <div class="result" aria-live="polite">
+      <div class="total-box">
+        <span class="lbl">${L.net}</span>
+        <span class="amt" data-sal-out="net">${z}</span>
+        <span class="sub" data-sal-out="netperiod"></span>
+      </div>
+      <div class="breakdown">
+        <div class="row"><span class="k">${L.gross}</span><span class="v" data-sal-out="gross">${z}</span></div>
+        <div class="row"><span class="k">${L.fed}</span><span class="v" data-sal-out="fed">${z}</span></div>
+        <div class="row"><span class="k">${L.qc}</span><span class="v" data-sal-out="qc">${z}</span></div>
+        <div class="row"><span class="k">${L.qpp}</span><span class="v" data-sal-out="qpp">${z}</span></div>
+        <div class="row"><span class="k">${L.ei}</span><span class="v" data-sal-out="ei">${z}</span></div>
+        <div class="row"><span class="k">${L.qpip}</span><span class="v" data-sal-out="qpip">${z}</span></div>
+        <div class="row total"><span class="k">${L.ded}</span><span class="v" data-sal-out="deductions">${z}</span></div>
+      </div>
+      <div class="rate-row"><span>${L.rate}</span><b data-sal-out="rate">0&nbsp;%</b></div>
+      <div class="actions">
+        <button type="button" class="btn-copy" data-sal-copy>${L.copy}</button>
+        <button type="button" class="btn-clear" data-sal-clear>${L.clear}</button>
+      </div>
+      <p class="note">${L.note}</p>
+    </div>
+  </div>`;
+}
+
 function breadcrumbs(lang, items) {
   // items: [{name, href}] ; last has no link rendered as current
   const lis = items
@@ -198,6 +266,7 @@ function internalLinks(lang, currentPath) {
     { href: "/calcul-taxe-inverse-quebec/", label: "Calcul Taxe Inverse Québec", subFr: "Retirer les taxes d'un prix", subEn: "Remove tax from a price" },
     { href: "/calculateur-de-taxes-quebec/", label: "Calculateur de taxes Québec", subFr: "TPS, TVQ et total en un clic", subEn: "GST, QST and total in one click" },
     { href: "/tps-tvq-en-ligne/", label: "TPS TVQ en ligne", subFr: "Calculatrice gratuite et instantanée", subEn: "Free, instant online calculator" },
+    { href: "/calcul-salaire-net-quebec/", label: "Calcul salaire net Québec", subFr: "Salaire brut en net (impôts, RRQ…)", subEn: "Gross-to-net pay (tax, QPP…)" },
     { href: "/quebec-tax-calculator/", label: "Quebec Tax Calculator", subFr: "Version anglaise", subEn: "English version" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ Québec", subFr: "TPS 5 %, TVQ 9,975 %", subEn: "GST 5%, QST 9.975%" }
   ].filter((l) => l.href !== currentPath);
@@ -257,9 +326,10 @@ function schemaFor(page) {
     dateModified: BUILD_DATE,
     offers: { "@type": "Offer", price: "0", priceCurrency: "CAD" },
     featureList:
-      page.lang === "en"
+      page.featureList ||
+      (page.lang === "en"
         ? ["Add GST and QST", "Remove tax (reverse)", "Quebec number formatting"]
-        : ["Ajouter la TPS et la TVQ", "Retirer les taxes (inverse)", "Format québécois"]
+        : ["Ajouter la TPS et la TVQ", "Retirer les taxes (inverse)", "Format québécois"])
   });
 
   // Breadcrumb
@@ -365,7 +435,7 @@ ${page.hideLinks ? "" : internalLinks(lang, page.url)}
 ${faqSection(lang, page.faqs)}
 </main>
 ${footer(lang)}
-<script src="/assets/js/calculator.js" defer></script>
+<script src="/assets/js/calculator.js" defer></script>${(page.extraJs || []).map((src) => `\n<script src="${src}" defer></script>`).join("")}
 </body>
 </html>
 `;
@@ -657,6 +727,70 @@ pages.push({
     </ul>
     <h2>Ajouter ou retirer les taxes en ligne</h2>
     <p>Choisissez «&nbsp;Ajouter les taxes&nbsp;» pour un prix avant taxes, ou «&nbsp;Retirer les taxes&nbsp;» pour un prix taxes incluses. Pour la version dédiée au calcul inverse, voyez le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>, ou le <a href="/calcul-tps-tvq/">calcul TPS TVQ</a> pour ajouter les taxes.</p>
+  </section>`
+});
+
+// 8. /calcul-salaire-net-quebec/ (FR) — net-pay (brut → net) calculator
+pages.push({
+  url: "/calcul-salaire-net-quebec/",
+  out: "calcul-salaire-net-quebec/index.html",
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/salary.js"],
+  featureList: ["Salaire brut en net", "Impôt fédéral et du Québec", "RRQ, assurance-emploi et RQAP", "Net par période de paie"],
+  title: "Calcul Salaire Net Québec 2026 | Salaire Brut en Net",
+  desc: "Calculez votre salaire net au Québec à partir du brut (taux 2026). Impôt fédéral et provincial, RRQ, assurance-emploi et RQAP, net par mois ou par paie.",
+  h1: "Calcul salaire net Québec",
+  intro:
+    "Entrez votre salaire brut et obtenez votre salaire net au Québec : impôt fédéral et provincial, RRQ, assurance-emploi et RQAP, avec le net par période de paie.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul salaire net Québec", href: "/calcul-salaire-net-quebec/" }],
+  faqs: [
+    { q: "Comment passer du salaire brut au salaire net au Québec?", a: "On soustrait du salaire brut l'impôt fédéral, l'impôt du Québec, la cotisation au RRQ (Régime de rentes du Québec), l'assurance-emploi et le RQAP. Ce qui reste est le salaire net, c'est-à-dire le montant déposé sur votre paie." },
+    { q: "Quelles retenues sont prélevées sur la paie au Québec en 2026?", a: "Cinq retenues principales&nbsp;: l'impôt fédéral, l'impôt du Québec, le RRQ (6,3&nbsp;% jusqu'à 74&nbsp;600&nbsp;$, plus 4&nbsp;% jusqu'à 85&nbsp;000&nbsp;$), l'assurance-emploi (1,30&nbsp;% jusqu'à 68&nbsp;900&nbsp;$) et le RQAP (0,430&nbsp;% jusqu'à 103&nbsp;000&nbsp;$)." },
+    { q: "Le calcul du salaire net est-il exact?", a: "C'est une estimation fiable pour un particulier salarié avec les crédits de base. Le montant réel peut varier selon vos crédits, déductions (REER, pension), avantages imposables ou votre situation familiale." },
+    { q: "Quel est le salaire net de 60 000 $ au Québec?", a: "Pour un salaire brut de 60&nbsp;000&nbsp;$ en 2026, le salaire net est d'environ 45&nbsp;857&nbsp;$ par année, soit près de 3&nbsp;821&nbsp;$ par mois, après un total de retenues d'environ 23,6&nbsp;%." },
+    { q: "Pourquoi l'assurance-emploi est-elle plus basse au Québec?", a: "Parce que le Québec administre son propre régime parental (le RQAP). Le taux d'assurance-emploi y est donc réduit (1,30&nbsp;% en 2026) et une cotisation distincte au RQAP s'ajoute." }
+  ],
+  body:
+    salaryCard("fr") +
+    `
+  <div class="card info-card">
+    <div class="rate-pills">
+      <span class="pill">RRQ <b>6,3&nbsp;%</b></span>
+      <span class="pill">Assurance-emploi <b>1,30&nbsp;%</b></span>
+      <span class="pill">RQAP <b>0,430&nbsp;%</b></span>
+    </div>
+    <p>Au Québec, votre salaire brut est réduit par l'impôt fédéral, l'impôt provincial et trois cotisations sociales (RRQ, assurance-emploi, RQAP). Le calculateur applique les paramètres 2026 et estime le net déposé sur votre paie.</p>
+    <span class="updated">Taux 2026 — Dernière mise à jour&nbsp;: ${UPDATED_YEAR}</span>
+  </div>
+  <section class="content" aria-labelledby="how-net">
+    <h2 id="how-net">Comment passer du salaire brut au salaire net</h2>
+    <p>Le salaire net est ce qu'il reste du salaire brut une fois retirées les retenues obligatoires. Au Québec, on soustrait l'impôt fédéral, l'impôt du Québec, la cotisation au RRQ, l'assurance-emploi (AE) et le RQAP.</p>
+    <h2>Ce qui est retenu sur votre paie en 2026</h2>
+    <ul class="benefits">
+      <li>Impôt fédéral — barème de 14&nbsp;% à 33&nbsp;%, moins l'abattement du Québec (16,5&nbsp;%)</li>
+      <li>Impôt du Québec — barème de 14&nbsp;% à 25,75&nbsp;%</li>
+      <li>RRQ — 6,3&nbsp;% sur le salaire entre 3&nbsp;500&nbsp;$ et 74&nbsp;600&nbsp;$, puis 4&nbsp;% jusqu'à 85&nbsp;000&nbsp;$</li>
+      <li>Assurance-emploi — 1,30&nbsp;% jusqu'à 68&nbsp;900&nbsp;$ (taux réduit du Québec)</li>
+      <li>RQAP — 0,430&nbsp;% jusqu'à 103&nbsp;000&nbsp;$</li>
+    </ul>
+    <h2>Salaire net selon le salaire brut (2026)</h2>
+    <p>Estimations annuelles pour un particulier salarié au Québec avec les crédits de base&nbsp;:</p>
+    <table class="data-table">
+      <thead><tr><th>Salaire brut</th><th>Salaire net</th><th>Net / mois</th><th>Retenues</th></tr></thead>
+      <tbody>
+        <tr><td>30 000&nbsp;$</td><td>25 595&nbsp;$</td><td>2 133&nbsp;$</td><td>14,7&nbsp;%</td></tr>
+        <tr><td>40 000&nbsp;$</td><td>32 429&nbsp;$</td><td>2 702&nbsp;$</td><td>18,9&nbsp;%</td></tr>
+        <tr><td>50 000&nbsp;$</td><td>39 264&nbsp;$</td><td>3 272&nbsp;$</td><td>21,5&nbsp;%</td></tr>
+        <tr><td>60 000&nbsp;$</td><td>45 857&nbsp;$</td><td>3 821&nbsp;$</td><td>23,6&nbsp;%</td></tr>
+        <tr><td>75 000&nbsp;$</td><td>54 627&nbsp;$</td><td>4 552&nbsp;$</td><td>27,2&nbsp;%</td></tr>
+        <tr><td>100 000&nbsp;$</td><td>70 262&nbsp;$</td><td>5 855&nbsp;$</td><td>29,7&nbsp;%</td></tr>
+      </tbody>
+    </table>
+    <h2>Ce que l'estimation ne comprend pas</h2>
+    <p>Le calcul suppose un revenu d'emploi seul et les crédits personnels de base. Il ne tient pas compte des cotisations REER ou de régime de retraite, des avantages imposables, des crédits familiaux, des revenus d'autres sources ni des situations particulières. Pour un calcul officiel, consultez Revenu Québec et l'Agence du revenu du Canada.</p>
+    <h2>Calculer les taxes plutôt que le salaire</h2>
+    <p>Vous cherchez plutôt à calculer les taxes de vente? Utilisez le <a href="/calcul-tps-tvq/">calcul TPS TVQ</a> ou le <a href="/calculateur-de-taxes-quebec/">calculateur de taxes Québec</a>.</p>
   </section>`
 });
 
@@ -1094,10 +1228,20 @@ const llms = `# Calcul Taxes Québec
 - Exemple: 100,00 $ avant taxes → TPS 5,00 $ + TVQ 9,98 $ = 114,98 $ total.
 - Taux inchangés depuis 2013 (TVQ 9,975 %) et 2008 (TPS 5 %).
 
+## Salaire net (paie, ${UPDATED_YEAR})
+- Salaire net = salaire brut − impôt fédéral − impôt du Québec − RRQ − assurance-emploi − RQAP.
+- RRQ: 6,3 % entre 3 500 $ et 74 600 $, puis 4 % jusqu'à 85 000 $.
+- Assurance-emploi (Québec): 1,30 % jusqu'à 68 900 $.
+- RQAP: 0,430 % jusqu'à 103 000 $.
+- Exemple: 60 000 $ brut ≈ 45 857 $ net/an (~3 821 $/mois), soit ~23,6 % de retenues.
+
 ## Calculatrices
 - Calcul taxes Québec (accueil): ${SITE}/
 - Calcul TPS TVQ (ajouter): ${SITE}/calcul-tps-tvq/
 - Calcul taxe inverse (retirer): ${SITE}/calcul-taxe-inverse-quebec/
+- Calculateur de taxes Québec: ${SITE}/calculateur-de-taxes-quebec/
+- TPS TVQ en ligne: ${SITE}/tps-tvq-en-ligne/
+- Calcul salaire net Québec (brut → net): ${SITE}/calcul-salaire-net-quebec/
 - Taux TPS TVQ Québec: ${SITE}/taux-tps-tvq-quebec/
 - Quebec Tax Calculator (English): ${SITE}/quebec-tax-calculator/
 
