@@ -23,6 +23,8 @@ instantané et excellents Core Web Vitals.
 | `/` | calcul taxes quebec |
 | `/calcul-tps-tvq/` | calcul tps tvq |
 | `/calcul-taxe-inverse-quebec/` | calcul taxe inverse |
+| `/calculateur-de-taxes-quebec/` | calculateur de taxes |
+| `/tps-tvq-en-ligne/` | tps tvq en ligne |
 | `/quebec-tax-calculator/` | tax calculator quebec (EN) |
 | `/taux-tps-tvq-quebec/` | taux tps tvq |
 
@@ -67,6 +69,26 @@ python3 -m http.server 8080
 Déployez le contenu de ce dossier tel quel sur n'importe quel hébergeur
 statique (Netlify, Vercel, Cloudflare Pages, GitHub Pages, S3…). Aucune étape
 de build n'est requise côté serveur.
+
+## SEO Bing / IndexNow
+
+Le site suit les recommandations des Bing Webmaster Guidelines&nbsp;:
+
+- **robots.txt** accueille explicitement `Bingbot` et déclare le sitemap.
+- **Balise robots** : `index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1`.
+- **Données structurées** Schema.org (WebApplication, FAQ, BreadcrumbList…), reconnues par Bing.
+- **IndexNow** : la clé est servie à la racine (`/74d5a7f9a4cb4affadf38a391aa7dcff.txt`).
+  Après un déploiement, notifiez Bing instantanément :
+
+  ```bash
+  node build.js                 # régénère le sitemap
+  node scripts/indexnow.js      # soumet toutes les URLs du sitemap à IndexNow
+  node scripts/indexnow.js /tps-tvq-en-ligne/   # ou seulement certaines pages
+  ```
+
+- **Vérification Bing Webmaster Tools** : collez votre code dans la constante
+  `BING_VERIFICATION` de `build.js` puis relancez `node build.js` pour émettre la
+  balise `msvalidate.01` sur toutes les pages.
 
 ## Taux utilisés
 
