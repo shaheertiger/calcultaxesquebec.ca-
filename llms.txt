@@ -13,10 +13,20 @@
 - Exemple: 100,00 $ avant taxes → TPS 5,00 $ + TVQ 9,98 $ = 114,98 $ total.
 - Taux inchangés depuis 2013 (TVQ 9,975 %) et 2008 (TPS 5 %).
 
+## Salaire net (paie, 2026)
+- Salaire net = salaire brut − impôt fédéral − impôt du Québec − RRQ − assurance-emploi − RQAP.
+- RRQ: 6,3 % entre 3 500 $ et 74 600 $, puis 4 % jusqu'à 85 000 $.
+- Assurance-emploi (Québec): 1,30 % jusqu'à 68 900 $.
+- RQAP: 0,430 % jusqu'à 103 000 $.
+- Exemple: 60 000 $ brut ≈ 45 857 $ net/an (~3 821 $/mois), soit ~23,6 % de retenues.
+
 ## Calculatrices
 - Calcul taxes Québec (accueil): https://calcultaxesquebec.ca/
 - Calcul TPS TVQ (ajouter): https://calcultaxesquebec.ca/calcul-tps-tvq/
 - Calcul taxe inverse (retirer): https://calcultaxesquebec.ca/calcul-taxe-inverse-quebec/
+- Calculateur de taxes Québec: https://calcultaxesquebec.ca/calculateur-de-taxes-quebec/
+- TPS TVQ en ligne: https://calcultaxesquebec.ca/tps-tvq-en-ligne/
+- Calcul salaire net Québec (brut → net): https://calcultaxesquebec.ca/calcul-salaire-net-quebec/
 - Taux TPS TVQ Québec: https://calcultaxesquebec.ca/taux-tps-tvq-quebec/
 - Quebec Tax Calculator (English): https://calcultaxesquebec.ca/quebec-tax-calculator/
 
