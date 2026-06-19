@@ -36,6 +36,14 @@
 - Quelle est la taxe au Québec en 2026?: https://calcultaxesquebec.ca/taxe-quebec-2026/
 - TPS et TVQ : quelle est la différence?: https://calcultaxesquebec.ca/difference-tps-tvq/
 - Comment trouver le prix avant taxes au Québec?: https://calcultaxesquebec.ca/prix-avant-taxes-quebec/
+- Quels produits n'ont pas de TPS/TVQ au Québec?: https://calcultaxesquebec.ca/produits-sans-taxes-quebec/
+- Taxable, détaxé ou exonéré : quelle différence au Québec?: https://calcultaxesquebec.ca/taxable-detaxe-exonere-quebec/
+- À partir de combien faut-il s'inscrire à la TPS/TVQ?: https://calcultaxesquebec.ca/seuil-inscription-tps-tvq-quebec/
+- TPS TVQ pour travailleurs autonomes : guide simple: https://calcultaxesquebec.ca/tps-tvq-travailleur-autonome/
+- Comment calculer les taxes sur une facture au Québec?: https://calcultaxesquebec.ca/calcul-taxes-facture-quebec/
+- Taxes incluses vs taxes en sus : comprendre le prix final: https://calcultaxesquebec.ca/taxes-incluses-vs-taxes-en-sus/
+- Comment calculer un rabais avant ou après taxes au Québec?: https://calcultaxesquebec.ca/calcul-rabais-taxes-quebec/
+- Tableau TPS TVQ Québec : montants courants: https://calcultaxesquebec.ca/tableau-tps-tvq-quebec/
 
 ## À propos
 Langue principale: français (Québec). Version anglaise disponible.
