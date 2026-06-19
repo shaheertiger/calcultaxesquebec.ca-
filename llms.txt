@@ -13,10 +13,20 @@
 - Exemple: 100,00 $ avant taxes → TPS 5,00 $ + TVQ 9,98 $ = 114,98 $ total.
 - Taux inchangés depuis 2013 (TVQ 9,975 %) et 2008 (TPS 5 %).
 
+## Salaire net (paie, 2026)
+- Salaire net = salaire brut − impôt fédéral − impôt du Québec − RRQ − assurance-emploi − RQAP.
+- RRQ: 6,3 % entre 3 500 $ et 74 600 $, puis 4 % jusqu'à 85 000 $.
+- Assurance-emploi (Québec): 1,30 % jusqu'à 68 900 $.
+- RQAP: 0,430 % jusqu'à 103 000 $.
+- Exemple: 60 000 $ brut ≈ 45 857 $ net/an (~3 821 $/mois), soit ~23,6 % de retenues.
+
 ## Calculatrices
 - Calcul taxes Québec (accueil): https://calcultaxesquebec.ca/
 - Calcul TPS TVQ (ajouter): https://calcultaxesquebec.ca/calcul-tps-tvq/
 - Calcul taxe inverse (retirer): https://calcultaxesquebec.ca/calcul-taxe-inverse-quebec/
+- Calculateur de taxes Québec: https://calcultaxesquebec.ca/calculateur-de-taxes-quebec/
+- TPS TVQ en ligne: https://calcultaxesquebec.ca/tps-tvq-en-ligne/
+- Calcul salaire net Québec (brut → net): https://calcultaxesquebec.ca/calcul-salaire-net-quebec/
 - Taux TPS TVQ Québec: https://calcultaxesquebec.ca/taux-tps-tvq-quebec/
 - Quebec Tax Calculator (English): https://calcultaxesquebec.ca/quebec-tax-calculator/
 
@@ -26,6 +36,14 @@
 - Quelle est la taxe au Québec en 2026?: https://calcultaxesquebec.ca/taxe-quebec-2026/
 - TPS et TVQ : quelle est la différence?: https://calcultaxesquebec.ca/difference-tps-tvq/
 - Comment trouver le prix avant taxes au Québec?: https://calcultaxesquebec.ca/prix-avant-taxes-quebec/
+- Quels produits n'ont pas de TPS/TVQ au Québec?: https://calcultaxesquebec.ca/produits-sans-taxes-quebec/
+- Taxable, détaxé ou exonéré : quelle différence au Québec?: https://calcultaxesquebec.ca/taxable-detaxe-exonere-quebec/
+- À partir de combien faut-il s'inscrire à la TPS/TVQ?: https://calcultaxesquebec.ca/seuil-inscription-tps-tvq-quebec/
+- TPS TVQ pour travailleurs autonomes : guide simple: https://calcultaxesquebec.ca/tps-tvq-travailleur-autonome/
+- Comment calculer les taxes sur une facture au Québec?: https://calcultaxesquebec.ca/calcul-taxes-facture-quebec/
+- Taxes incluses vs taxes en sus : comprendre le prix final: https://calcultaxesquebec.ca/taxes-incluses-vs-taxes-en-sus/
+- Comment calculer un rabais avant ou après taxes au Québec?: https://calcultaxesquebec.ca/calcul-rabais-taxes-quebec/
+- Tableau TPS TVQ Québec : montants courants: https://calcultaxesquebec.ca/tableau-tps-tvq-quebec/
 
 ## À propos
 Langue principale: français (Québec). Version anglaise disponible.
