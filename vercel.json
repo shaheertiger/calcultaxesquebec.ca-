@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    { "source": "/calcul-tps-tvq/", "destination": "/", "permanent": true },
+    { "source": "/calcul-tps-tvq", "destination": "/", "permanent": true },
+    { "source": "/calculateur-de-taxes-quebec/", "destination": "/", "permanent": true },
+    { "source": "/calculateur-de-taxes-quebec", "destination": "/", "permanent": true },
+    { "source": "/tps-tvq-en-ligne/", "destination": "/", "permanent": true },
+    { "source": "/tps-tvq-en-ligne", "destination": "/", "permanent": true }
+  ]
+}

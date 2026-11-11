@@ -6,9 +6,11 @@
 const fs = require("fs");
 const path = require("path");
 
-const SITE = "https://calcultaxesquebec.ca";
+/* Vercel's primary domain is www (the apex 308s to it), so every canonical, hreflang and sitemap URL
+ * must use www. Pointing canonicals at the apex sent Google to a redirect on every page (Nov 2026 fix). */
+const SITE = "https://www.calcultaxesquebec.ca";
 const UPDATED_YEAR = "2026";
-const BUILD_DATE = "2026-06-10";
+const BUILD_DATE = "2026-11-11";
 const DATE_PUBLISHED = "2026-01-01";
 
 /* Bing Webmaster Tools site verification (content of the msvalidate.01 meta).
@@ -27,20 +29,19 @@ const LOGO_SVG =
 const NAV = {
   fr: [
     { href: "/", label: "Accueil" },
-    { href: "/calcul-tps-tvq/", label: "Calcul TPS TVQ" },
     { href: "/calcul-taxe-inverse-quebec/", label: "Taxe inverse" },
     { href: "/calcul-salaire-net-quebec/", label: "Salaire net" },
+    { href: "/calcul-taxe-de-bienvenue-quebec/", label: "Taxe de bienvenue" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ" },
     { href: "/blog/", label: "Blogue" },
     { href: "/quebec-tax-calculator/", label: "English" }
   ],
   en: [
-    { href: "/quebec-tax-calculator/", label: "Home" },
-    { href: "/calcul-tps-tvq/", label: "Calcul TPS TVQ" },
-    { href: "/calcul-taxe-inverse-quebec/", label: "Taxe inverse" },
-    { href: "/calcul-salaire-net-quebec/", label: "Salaire net" },
-    { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ" },
-    { href: "/blog/", label: "Blogue" }
+    { href: "/quebec-tax-calculator/", label: "Sales tax" },
+    { href: "/reverse-tax-calculator-quebec/", label: "Reverse tax" },
+    { href: "/quebec-income-tax-calculator/", label: "Income tax" },
+    { href: "/quebec-welcome-tax-calculator/", label: "Welcome tax" },
+    { href: "/", label: "Français" }
   ]
 };
 
@@ -261,15 +262,21 @@ ${blocks}
 
 function internalLinks(lang, currentPath) {
   const fr = lang !== "en";
-  const all = [
-    { href: "/calcul-tps-tvq/", label: "Calcul TPS TVQ", subFr: "Ajouter la TPS et la TVQ", subEn: "Add GST and QST" },
-    { href: "/calcul-taxe-inverse-quebec/", label: "Calcul Taxe Inverse Québec", subFr: "Retirer les taxes d'un prix", subEn: "Remove tax from a price" },
-    { href: "/calculateur-de-taxes-quebec/", label: "Calculateur de taxes Québec", subFr: "TPS, TVQ et total en un clic", subEn: "GST, QST and total in one click" },
-    { href: "/tps-tvq-en-ligne/", label: "TPS TVQ en ligne", subFr: "Calculatrice gratuite et instantanée", subEn: "Free, instant online calculator" },
-    { href: "/calcul-salaire-net-quebec/", label: "Calcul salaire net Québec", subFr: "Salaire brut en net (impôts, RRQ…)", subEn: "Gross-to-net pay (tax, QPP…)" },
-    { href: "/quebec-tax-calculator/", label: "Quebec Tax Calculator", subFr: "Version anglaise", subEn: "English version" },
-    { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ Québec", subFr: "TPS 5 %, TVQ 9,975 %", subEn: "GST 5%, QST 9.975%" }
-  ].filter((l) => l.href !== currentPath);
+  const all = (fr ? [
+    { href: "/", label: "Calcul taxes Québec", sub: "Ajouter la TPS et la TVQ" },
+    { href: "/calcul-taxe-inverse-quebec/", label: "Calcul taxe inverse Québec", sub: "Retirer les taxes d'un prix" },
+    { href: "/calcul-salaire-net-quebec/", label: "Calcul salaire net Québec", sub: "Salaire brut en net (impôts, RRQ…)" },
+    { href: "/calcul-taxe-de-bienvenue-quebec/", label: "Calcul taxe de bienvenue", sub: "Droits de mutation 2026, Montréal et Québec" },
+    { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ Québec", sub: "TPS 5 %, TVQ 9,975 %" },
+    { href: "/quebec-tax-calculator/", label: "Quebec Tax Calculator", sub: "Version anglaise" }
+  ] : [
+    { href: "/quebec-tax-calculator/", label: "Quebec Sales Tax Calculator", sub: "Add GST and QST" },
+    { href: "/reverse-tax-calculator-quebec/", label: "Reverse Tax Calculator Quebec", sub: "Remove tax from a price" },
+    { href: "/quebec-income-tax-calculator/", label: "Quebec Income Tax Calculator", sub: "Salary after tax, 2026" },
+    { href: "/quebec-welcome-tax-calculator/", label: "Quebec Welcome Tax Calculator", sub: "Land transfer tax, 2026 brackets" },
+    { href: "/", label: "Calcul taxes Québec", sub: "Version française" }
+  ]).map((l) => ({ ...l, subFr: l.sub, subEn: l.sub }))
+  .filter((l) => l.href !== currentPath);
   const title = fr ? "Autres calculatrices et ressources" : "Other calculators and resources";
   const links = all
     .map(
@@ -373,7 +380,13 @@ function layout(page) {
 
   // hreflang alternates between FR home and EN page; subpages reference themselves + x-default
   let alternates = "";
-  if (page.url === "/" || page.url === "/quebec-tax-calculator/") {
+  if (page.pair) {
+    const [fr, en] = page.pair;
+    alternates =
+      `\n  <link rel="alternate" hreflang="fr-CA" href="${SITE}${fr}">` +
+      `\n  <link rel="alternate" hreflang="en-CA" href="${SITE}${en}">` +
+      `\n  <link rel="alternate" hreflang="x-default" href="${SITE}${fr}">`;
+  } else if (page.url === "/" || page.url === "/quebec-tax-calculator/") {
     alternates =
       `\n  <link rel="alternate" hreflang="fr-CA" href="${SITE}/">` +
       `\n  <link rel="alternate" hreflang="en-CA" href="${SITE}/quebec-tax-calculator/">` +
@@ -501,6 +514,101 @@ const FAQ_EN = [
   { q: "Is the QST calculated on the GST?", a: "No. The QST is calculated on the selling price before taxes, not on the amount including the GST." }
 ];
 
+
+/* ------------------------- computed answer blocks (Nov 2026) -------------------------
+ * EatBetter-style: the answer with numbers first, then tables computed from the real formula,
+ * so every page carries figures no other page has. */
+const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+const money = (n, lang) =>
+  lang === "en"
+    ? "$" + n.toLocaleString("en-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    : n.toLocaleString("fr-CA", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/ | | /g, "&nbsp;") + "&nbsp;$";
+const moneyInt = (n, lang) =>
+  lang === "en" ? "$" + n.toLocaleString("en-CA", { maximumFractionDigits: 0 }) : n.toLocaleString("fr-CA", { maximumFractionDigits: 0 }).replace(/ | | /g, "&nbsp;") + "&nbsp;$";
+function addTax(x) { const g = r2(x * 0.05), q = r2(x * 0.09975); return { base: x, g, q, total: r2(x + g + q) }; }
+function removeTax(t) { const base = r2(t / 1.14975), g = r2(base * 0.05), q = r2(base * 0.09975); return { total: t, base, g, q }; }
+
+function quickAnswer(lang, html) {
+  return `  <div class="answer"><span class="tag">${lang === "en" ? "Quick answer" : "Réponse rapide"}</span>${html}</div>`;
+}
+
+function addTable(lang, amounts) {
+  const fr = lang !== "en";
+  const rows = amounts.map((a) => { const t = addTax(a); return `<tr><td>${money(a, lang)}</td><td>${money(t.g, lang)}</td><td>${money(t.q, lang)}</td><td>${money(t.total, lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Avant taxes" : "Before tax"}</th><th>${fr ? "TPS 5&nbsp;%" : "GST 5%"}</th><th>${fr ? "TVQ 9,975&nbsp;%" : "QST 9.975%"}</th><th>${fr ? "Total avec taxes" : "Total with tax"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+
+function removeTable(lang, totals) {
+  const fr = lang !== "en";
+  const rows = totals.map((t) => { const x = removeTax(t); return `<tr><td>${money(t, lang)}</td><td>${money(x.g, lang)}</td><td>${money(x.q, lang)}</td><td>${money(x.base, lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Prix taxes incluses" : "Price with tax"}</th><th>${fr ? "TPS incluse" : "GST included"}</th><th>${fr ? "TVQ incluse" : "QST included"}</th><th>${fr ? "Prix avant taxes" : "Price before tax"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+
+/* Welcome tax (droits de mutation), 2026 brackets.
+ * Province: quebec.ca (0.5 % to 62 900 $, 1 % to 315 000 $, 1.5 % above).
+ * Montréal: montreal.ca (2 % to 1 104 700 $, 2.5 % to 2 136 500 $, 3.5 % to 3 113 000 $, 4 % above, from 552 300 $).
+ * Ville de Québec: ville.quebec.qc.ca (2.5 % from 500 000 $ to 750 000 $, 3 % above). */
+const WT = {
+  standard: [[62900, 0.005], [315000, 0.01], [Infinity, 0.015]],
+  montreal: [[62900, 0.005], [315000, 0.01], [552300, 0.015], [1104700, 0.02], [2136500, 0.025], [3113000, 0.035], [Infinity, 0.04]],
+  quebecCity: [[62900, 0.005], [315000, 0.01], [500000, 0.015], [750000, 0.025], [Infinity, 0.03]]
+};
+function welcomeTax(base, table) { let prev = 0, tax = 0; for (const [cap, rate] of table) { if (base > prev) tax += (Math.min(base, cap) - prev) * rate; prev = cap; } return r2(tax); }
+/* First-buyer refundable credit announced April 2026: 100 % of the first 5 000 $ + 25 % of the next 3 500 $ (max 5 875 $), homes under 1 M$. */
+function firstBuyerCredit(tax, price) { if (price >= 1000000) return 0; return r2(Math.min(tax, 5000) + Math.max(0, Math.min(tax - 5000, 3500)) * 0.25); }
+
+function welcomeTable(lang, prices) {
+  const fr = lang !== "en";
+  const rows = prices.map((p) => {
+    const st = welcomeTax(p, WT.standard), mtl = welcomeTax(p, WT.montreal), qc = welcomeTax(p, WT.quebecCity);
+    return `<tr><td>${moneyInt(p, lang)}</td><td>${money(st, lang)}</td><td>${money(mtl, lang)}</td><td>${money(qc, lang)}</td></tr>`;
+  }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Prix d'achat" : "Purchase price"}</th><th>${fr ? "Barème provincial" : "Provincial scale"}</th><th>Montréal</th><th>${fr ? "Ville de Québec" : "Quebec City"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+
+function welcomeCard(lang) {
+  const fr = lang !== "en";
+  return `<div class="card calc" data-wt>
+    <div class="field">
+      <label for="wt-price">${fr ? "Prix d'achat (ou valeur au rôle si plus élevée)" : "Purchase price (or assessed value if higher)"}</label>
+      <div class="input-money"><input id="wt-price" data-wt-price type="text" inputmode="decimal" autocomplete="off" placeholder="${fr ? "450 000" : "450,000"}"><span class="cur" aria-hidden="true">$</span></div>
+    </div>
+    <div class="field">
+      <label for="wt-city">${fr ? "Municipalité" : "Municipality"}</label>
+      <select id="wt-city" data-wt-city>
+        <option value="standard">${fr ? "Barème provincial (la plupart des villes)" : "Provincial scale (most municipalities)"}</option>
+        <option value="montreal">Montréal</option>
+        <option value="quebecCity">${fr ? "Ville de Québec" : "Quebec City"}</option>
+      </select>
+    </div>
+    <label class="check"><input type="checkbox" data-wt-first> ${fr ? "Premier achat (crédit d'impôt 2026)" : "First-time buyer (2026 tax credit)"}</label>
+    <div class="result" aria-live="polite">
+      <div class="total-box"><span class="lbl">${fr ? "Taxe de bienvenue" : "Welcome tax"}</span><span class="amt" data-wt-out="tax">${fmtZero(lang)}</span></div>
+      <div class="breakdown">
+        <div class="row"><span class="k">${fr ? "Crédit premier acheteur" : "First-buyer credit"}</span><span class="v" data-wt-out="credit">${fmtZero(lang)}</span></div>
+        <div class="row"><span class="k">${fr ? "Coût net" : "Net cost"}</span><span class="v" data-wt-out="net">${fmtZero(lang)}</span></div>
+      </div>
+      <p class="note">${fr ? "Tranches 2026. Une municipalité peut fixer des taux plus élevés au-delà de 500 000 $; vérifiez auprès de la vôtre." : "2026 brackets. A municipality can set higher rates above $500,000; check with yours."}</p>
+    </div>
+  </div>
+  <script>window.WT=${JSON.stringify({ standard: WT.standard.map(([c, r]) => [c === Infinity ? null : c, r]), montreal: WT.montreal.map(([c, r]) => [c === Infinity ? null : c, r]), quebecCity: WT.quebecCity.map(([c, r]) => [c === Infinity ? null : c, r]) })};</script>`;
+}
+
 /* --------------------------------- pages ---------------------------------- */
 
 const pages = [];
@@ -511,16 +619,26 @@ pages.push({
   out: "index.html",
   lang: "fr",
   mode: "add",
-  title: "Calcul Taxes Québec 2026 | Calculatrice TPS TVQ Simple",
-  desc: "Calculez rapidement la TPS et la TVQ au Québec en 2026. Entrez un montant avant ou avec taxes et obtenez le total instantanément. Taux à jour : TPS 5 %, TVQ 9,975 %.",
+  title: "Calcul Taxes Québec 2026 : TPS 5 % + TVQ 9,975 % = 14,975 %",
+  desc: "Calcul des taxes au Québec en 2026 : TPS 5 % et TVQ 9,975 %, soit 14,975 %. 100 $ avant taxes = 114,98 $. Ajoutez ou retirez les taxes instantanément.",
   h1: "Calcul Taxes Québec",
   intro:
     "Entrez un montant et voyez instantanément la TPS, la TVQ et le total avec taxes. Simple, rapide et fait pour le Québec.",
   crumbs: [{ name: "Accueil", href: "/" }],
-  faqs: FAQ_HOME,
+  faqs: FAQ_HOME.concat([
+    { q: "Combien de taxes sur 100 $ au Québec?", a: "Sur 100&nbsp;$ avant taxes, la TPS est de 5,00&nbsp;$ et la TVQ de 9,98&nbsp;$, soit 14,98&nbsp;$ de taxes et un total de 114,98&nbsp;$." },
+    { q: "Comment calculer 15 % de taxes au Québec?", a: "Le taux réel n'est pas 15&nbsp;% mais 14,975&nbsp;%. Multipliez le prix par 1,14975 pour obtenir le total. Arrondir à 15&nbsp;% surestime les taxes de 2,5&nbsp;cents par 100&nbsp;$." },
+    { q: "Quels produits ne sont pas taxés au Québec?", a: "Les produits alimentaires de base (épicerie), les médicaments sur ordonnance, la plupart des loyers résidentiels et certains services de santé et d'éducation sont détaxés ou exonérés. Les plats préparés, l'alcool, les boissons gazeuses et les grignotines sont taxables." }
+  ]),
   body:
+    quickAnswer("fr", "<p>Au Québec en 2026, on ajoute <b>5&nbsp;% de TPS</b> et <b>9,975&nbsp;% de TVQ</b> au prix avant taxes, soit <b>14,975&nbsp;%</b>. Multipliez par 1,14975&nbsp;: 100&nbsp;$ devient 114,98&nbsp;$. Pour retirer les taxes, divisez par 1,14975.</p>") +
     TRUST_FR +
     `
+  <section class="content" aria-labelledby="table-title">
+    <h2 id="table-title">Combien de taxes sur 10&nbsp;$, 100&nbsp;$ ou 1&nbsp;000&nbsp;$?</h2>
+    <p>Taxes calculées avec les taux 2026, arrondies au cent comme sur une facture&nbsp;:</p>
+${addTable("fr", [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000, 10000])}
+  </section>
   <section class="content" aria-labelledby="reverse-title">
     <h2 id="reverse-title">Retirer les taxes d'un prix</h2>
     <p>Vous avez un prix avec taxes incluses? Choisissez «&nbsp;Retirer les taxes&nbsp;» dans la calculatrice, entrez le total et obtenez le montant avant taxes, la TPS et la TVQ. Pour une page dédiée, consultez le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>.</p>
@@ -541,47 +659,31 @@ pages.push({
   </section>`
 });
 
-// 2. /calcul-tps-tvq/ (FR)
-pages.push({
-  url: "/calcul-tps-tvq/",
-  out: "calcul-tps-tvq/index.html",
-  lang: "fr",
-  mode: "add",
-  title: "Calcul TPS TVQ 2026 | Calculatrice Québec Rapide",
-  desc: "Calculez la TPS et la TVQ en quelques secondes avec les taux 2026. Entrez un montant et obtenez le sous-total, la TPS, la TVQ et le total avec taxes.",
-  h1: "Calcul TPS TVQ",
-  intro:
-    "Entrez un montant et obtenez le sous-total, la TPS, la TVQ et le total avec taxes. Une calculatrice TPS/TVQ rapide, pensée pour le Québec.",
-  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul TPS TVQ", href: "/calcul-tps-tvq/" }],
-  faqs: FAQ_TPSTVQ,
-  body:
-    TRUST_FR +
-    `
-  <section class="content" aria-labelledby="how-title">
-    <h2 id="how-title">Comment calculer la TPS et la TVQ</h2>
-    <p>Pour calculer la TPS et la TVQ, multipliez le montant avant taxes par 5&nbsp;% pour la TPS, puis par 9,975&nbsp;% pour la TVQ. Le total avec taxes correspond au montant avant taxes additionné de la TPS et de la TVQ.</p>
-    <h3>Exemple sur 100&nbsp;$</h3>
-    <p>Sur un montant de 100,00&nbsp;$&nbsp;: la TPS est de 5,00&nbsp;$, la TVQ est de 9,98&nbsp;$ et le total avec taxes est de 114,98&nbsp;$.</p>
-    <h2>Ajouter ou retirer les taxes</h2>
-    <p>Utilisez «&nbsp;Ajouter les taxes&nbsp;» pour partir d'un prix avant taxes, ou «&nbsp;Retirer les taxes&nbsp;» pour un prix avec taxes incluses. Pour retirer les taxes, voyez le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>.</p>
-  </section>`
-});
-
 // 3. /calcul-taxe-inverse-quebec/ (FR)
 pages.push({
   url: "/calcul-taxe-inverse-quebec/",
   out: "calcul-taxe-inverse-quebec/index.html",
+  pair: ["/calcul-taxe-inverse-quebec/", "/reverse-tax-calculator-quebec/"],
   lang: "fr",
   mode: "remove",
-  title: "Calcul Taxe Inverse Québec 2026 | Retirer TPS TVQ",
-  desc: "Retirez rapidement la TPS et la TVQ d'un prix avec taxes incluses (taux 2026). Entrez le total et voyez le montant avant taxes.",
+  title: "Calcul Taxe Inverse Québec 2026 : Total ÷ 1,14975",
+  desc: "Calcul taxes inversé 2026 : divisez le prix taxes incluses par 1,14975. 114,98 $ = 100 $ avant taxes, 5,00 $ de TPS et 9,98 $ de TVQ. Calculatrice instantanée.",
   h1: "Calcul Taxe Inverse Québec",
   intro:
     "Vous avez un prix avec taxes incluses? Entrez le total et la calculatrice vous donne le montant avant taxes, la TPS et la TVQ.",
   crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul Taxe Inverse Québec", href: "/calcul-taxe-inverse-quebec/" }],
-  faqs: FAQ_INVERSE,
+  faqs: FAQ_INVERSE.concat([
+    { q: "Comment calculer le montant avant taxes de 50 $?", a: "Divisez 50&nbsp;$ par 1,14975&nbsp;: le prix avant taxes est de 43,49&nbsp;$, dont 2,17&nbsp;$ de TPS et 4,34&nbsp;$ de TVQ incluses." },
+    { q: "Quel pourcentage de taxes est inclus dans un prix au Québec?", a: "Environ 13,02&nbsp;% d'un prix taxes incluses est constitué de taxes (14,975 ÷ 114,975). Retirer 14,975&nbsp;% du total est une erreur courante&nbsp;: on obtiendrait un montant trop bas." }
+  ]),
   body:
+    quickAnswer("fr", "<p>Pour retirer les taxes d'un prix au Québec, <b>divisez le total par 1,14975</b>. Exemple&nbsp;: 114,98&nbsp;$ ÷ 1,14975 = <b>100,00&nbsp;$ avant taxes</b>, dont 5,00&nbsp;$ de TPS et 9,98&nbsp;$ de TVQ. Environ 13&nbsp;% d'un prix taxes incluses, c'est des taxes.</p>") +
     TRUST_FR +
+    `
+  <section class="content" aria-labelledby="rtable-title">
+    <h2 id="rtable-title">Prix avant taxes pour les montants courants</h2>
+${removeTable("fr", [5, 10, 20, 50, 100, 150, 200, 250, 500, 1000, 1500, 2000, 5000])}
+  </section>` +
     `
   <section class="content" aria-labelledby="rev-title">
     <h2 id="rev-title">Retirer les taxes d'un prix</h2>
@@ -591,7 +693,7 @@ pages.push({
     <h2>Pourquoi un petit écart est possible</h2>
     <p>Comme les taxes sont arrondies au cent, le montant avant taxes obtenu par calcul inverse peut différer de quelques cents du prix original. Les montants sont arrondis au cent près.</p>
     <h2>Calculer dans l'autre sens</h2>
-    <p>Pour ajouter les taxes à un prix avant taxes, utilisez le <a href="/calcul-tps-tvq/">calcul TPS TVQ</a>.</p>
+    <p>Pour ajouter les taxes à un prix avant taxes, utilisez le <a href="/">calcul TPS TVQ</a>.</p>
   </section>`
 });
 
@@ -601,15 +703,25 @@ pages.push({
   out: "quebec-tax-calculator/index.html",
   lang: "en",
   mode: "add",
-  title: "Quebec Tax Calculator 2026 | GST QST Calculator",
-  desc: "Calculate Quebec GST and QST instantly with up-to-date 2026 rates. Enter a price before or after tax and get the subtotal, GST, QST, and total.",
-  h1: "Quebec Tax Calculator",
+  title: "Quebec Sales Tax Calculator 2026: GST 5% + QST 9.975%",
+  desc: "Quebec sales tax in 2026 is 14.975%: GST 5% plus QST 9.975%. $100 before tax = $114.98. Add or remove Quebec tax instantly with this free calculator.",
+  h1: "Quebec Sales Tax Calculator",
   intro:
     "Enter an amount and instantly calculate Quebec GST, QST, and the total with tax. Simple, fast, and made for Quebec.",
   crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }],
-  faqs: FAQ_EN,
+  faqs: FAQ_EN.concat([
+    { q: "How much is tax on $100 in Quebec?", a: "On $100 before tax, the GST is $5.00 and the QST is $9.98, so you pay $14.98 in tax and $114.98 in total." },
+    { q: "Is Quebec sales tax 15%?", a: "Almost: the combined rate is 14.975%, not 15%. Multiply the price by 1.14975 to get the total." },
+    { q: "What is not taxed in Quebec?", a: "Basic groceries, prescription drugs, most residential rent and some health and education services are zero-rated or exempt. Prepared meals, alcohol, soft drinks and snacks are taxable." }
+  ]),
   body:
+    quickAnswer("en", "<p>Quebec adds <b>5% GST</b> and <b>9.975% QST</b> to the price before tax: <b>14.975%</b> in total. Multiply by 1.14975: $100 becomes $114.98. To remove tax, divide by 1.14975.</p>") +
     TRUST_EN +
+    `
+  <section class="content" aria-labelledby="entable-title">
+    <h2 id="entable-title">How much tax on $10, $100 or $1,000 in Quebec?</h2>
+${addTable("en", [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000, 10000])}
+  </section>` +
     `
   <section class="content" aria-labelledby="how-en">
     <h2 id="how-en">How to calculate Quebec sales tax</h2>
@@ -653,92 +765,16 @@ pages.push({
   </section>`
 });
 
-// 6. /calculateur-de-taxes-quebec/ (FR) — targets "calculateur de taxes" cluster
-pages.push({
-  url: "/calculateur-de-taxes-quebec/",
-  out: "calculateur-de-taxes-quebec/index.html",
-  lang: "fr",
-  mode: "add",
-  title: "Calculateur de Taxes Québec 2026 | TPS TVQ en un clic",
-  desc: "Calculateur de taxes pour le Québec : entrez un montant et obtenez la TPS (5 %), la TVQ (9,975 %) et le total. Ajoute ou retire les taxes, taux 2026.",
-  h1: "Calculateur de taxes Québec",
-  intro:
-    "Un calculateur de taxes simple pour le Québec : entrez un montant et obtenez instantanément la TPS, la TVQ et le total avec taxes, ou faites le calcul inverse.",
-  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calculateur de taxes Québec", href: "/calculateur-de-taxes-quebec/" }],
-  faqs: [
-    { q: "Comment fonctionne le calculateur de taxes?", a: "Entrez un montant&nbsp;: le calculateur applique 5&nbsp;% de TPS et 9,975&nbsp;% de TVQ sur le prix avant taxes, puis affiche le sous-total, chaque taxe et le total. En mode «&nbsp;Retirer les taxes&nbsp;», il part d'un prix taxes incluses." },
-    { q: "Le calculateur de taxes est-il gratuit?", a: "Oui. Le calculateur est entièrement gratuit, sans inscription ni publicité, et fonctionne directement dans le navigateur." },
-    { q: "Quel taux de taxe le calculateur utilise-t-il?", a: "Les taux courants du Québec&nbsp;: TPS 5&nbsp;% et TVQ 9,975&nbsp;%, soit un taux combiné de 14,975&nbsp;% sur la plupart des produits et services taxables." },
-    { q: "Puis-je calculer le montant avant taxes?", a: "Oui. Choisissez «&nbsp;Retirer les taxes&nbsp;» et entrez le prix taxes incluses&nbsp;: le calculateur divise par 1,14975 pour retrouver le montant avant taxes." }
-  ],
-  body:
-    TRUST_FR +
-    `
-  <section class="content" aria-labelledby="use-title">
-    <h2 id="use-title">Un calculateur de taxes pensé pour le Québec</h2>
-    <p>Ce calculateur de taxes additionne la TPS et la TVQ sur n'importe quel montant, sans calcul manuel ni risque d'erreur d'arrondi. Il sépare clairement chaque taxe pour vos factures, devis et dépenses.</p>
-    <h2>Table de référence des taxes</h2>
-    <table class="data-table">
-      <thead><tr><th>Montant avant taxes</th><th>TPS (5&nbsp;%)</th><th>TVQ (9,975&nbsp;%)</th><th>Total avec taxes</th></tr></thead>
-      <tbody>
-        <tr><td>20,00&nbsp;$</td><td>1,00&nbsp;$</td><td>2,00&nbsp;$</td><td>23,00&nbsp;$</td></tr>
-        <tr><td>50,00&nbsp;$</td><td>2,50&nbsp;$</td><td>4,99&nbsp;$</td><td>57,49&nbsp;$</td></tr>
-        <tr><td>100,00&nbsp;$</td><td>5,00&nbsp;$</td><td>9,98&nbsp;$</td><td>114,98&nbsp;$</td></tr>
-        <tr><td>500,00&nbsp;$</td><td>25,00&nbsp;$</td><td>49,88&nbsp;$</td><td>574,88&nbsp;$</td></tr>
-        <tr><td>1 000,00&nbsp;$</td><td>50,00&nbsp;$</td><td>99,75&nbsp;$</td><td>1 149,75&nbsp;$</td></tr>
-      </tbody>
-    </table>
-    <h2>Ajouter ou retirer les taxes</h2>
-    <p>Utilisez «&nbsp;Ajouter les taxes&nbsp;» pour partir d'un prix avant taxes, ou «&nbsp;Retirer les taxes&nbsp;» pour un prix taxes incluses. Pour un calcul détaillé pas à pas, voyez <a href="/comment-calculer-tps-tvq-quebec/">comment calculer la TPS et la TVQ</a> ou les <a href="/taux-tps-tvq-quebec/">taux TPS TVQ au Québec</a>.</p>
-  </section>`
-});
-
-// 7. /tps-tvq-en-ligne/ (FR) — targets "tps tvq en ligne" / online intent
-pages.push({
-  url: "/tps-tvq-en-ligne/",
-  out: "tps-tvq-en-ligne/index.html",
-  lang: "fr",
-  mode: "add",
-  title: "Calculatrice TPS TVQ en ligne 2026 | Gratuite et instantanée",
-  desc: "Calculatrice TPS TVQ en ligne, gratuite et instantanée. Calculez les taxes du Québec depuis votre mobile ou ordinateur, sans inscription. Taux 2026.",
-  h1: "Calculatrice TPS TVQ en ligne",
-  intro:
-    "Calculez la TPS et la TVQ en ligne, directement dans votre navigateur. Gratuit, instantané, sans inscription et utilisable sur mobile.",
-  crumbs: [{ name: "Accueil", href: "/" }, { name: "TPS TVQ en ligne", href: "/tps-tvq-en-ligne/" }],
-  faqs: [
-    { q: "La calculatrice TPS TVQ en ligne est-elle gratuite?", a: "Oui. Elle est entièrement gratuite, sans compte ni publicité. Vous entrez un montant et le résultat s'affiche immédiatement." },
-    { q: "Faut-il installer une application?", a: "Non. La calculatrice fonctionne directement dans le navigateur. Vous pouvez aussi l'ajouter à votre écran d'accueil pour l'utiliser comme une appli, même hors ligne." },
-    { q: "Fonctionne-t-elle sur téléphone mobile?", a: "Oui. L'interface est pensée pour le mobile avec un clavier numérique, des montants rapides et un affichage clair de la TPS, de la TVQ et du total." },
-    { q: "Mes montants sont-ils enregistrés?", a: "Non. Le calcul se fait localement dans votre navigateur. Aucun montant n'est envoyé ni conservé." }
-  ],
-  body:
-    TRUST_FR +
-    `
-  <section class="content" aria-labelledby="online-title">
-    <h2 id="online-title">Calculer la TPS et la TVQ en ligne, instantanément</h2>
-    <p>Pas besoin d'installer quoi que ce soit&nbsp;: entrez un montant et la calculatrice affiche la TPS (5&nbsp;%), la TVQ (9,975&nbsp;%) et le total pendant que vous tapez. Le calcul se fait dans votre navigateur, sans envoi de données.</p>
-    <h2>Sur mobile comme sur ordinateur</h2>
-    <ul class="benefits">
-      <li>Clavier numérique sur mobile</li>
-      <li>Montants rapides en un toucher</li>
-      <li>Résultat copiable</li>
-      <li>Aucune inscription</li>
-      <li>Fonctionne hors ligne une fois ouverte</li>
-    </ul>
-    <h2>Ajouter ou retirer les taxes en ligne</h2>
-    <p>Choisissez «&nbsp;Ajouter les taxes&nbsp;» pour un prix avant taxes, ou «&nbsp;Retirer les taxes&nbsp;» pour un prix taxes incluses. Pour la version dédiée au calcul inverse, voyez le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>, ou le <a href="/calcul-tps-tvq/">calcul TPS TVQ</a> pour ajouter les taxes.</p>
-  </section>`
-});
-
 // 8. /calcul-salaire-net-quebec/ (FR) — net-pay (brut → net) calculator
 pages.push({
   url: "/calcul-salaire-net-quebec/",
   out: "calcul-salaire-net-quebec/index.html",
+  pair: ["/calcul-salaire-net-quebec/", "/quebec-income-tax-calculator/"],
   lang: "fr",
   showCalc: false,
   extraJs: ["/assets/js/salary.js"],
   featureList: ["Salaire brut en net", "Impôt fédéral et du Québec", "RRQ, assurance-emploi et RQAP", "Net par période de paie"],
-  title: "Calcul Salaire Net Québec 2026 | Salaire Brut en Net",
+  title: "Calcul Salaire Net Québec 2026 : 60 000 $ brut = 45 857 $ net",
   desc: "Calculez votre salaire net au Québec à partir du brut (taux 2026). Impôt fédéral et provincial, RRQ, assurance-emploi et RQAP, net par mois ou par paie.",
   h1: "Calcul salaire net Québec",
   intro:
@@ -790,7 +826,181 @@ pages.push({
     <h2>Ce que l'estimation ne comprend pas</h2>
     <p>Le calcul suppose un revenu d'emploi seul et les crédits personnels de base. Il ne tient pas compte des cotisations REER ou de régime de retraite, des avantages imposables, des crédits familiaux, des revenus d'autres sources ni des situations particulières. Pour un calcul officiel, consultez Revenu Québec et l'Agence du revenu du Canada.</p>
     <h2>Calculer les taxes plutôt que le salaire</h2>
-    <p>Vous cherchez plutôt à calculer les taxes de vente? Utilisez le <a href="/calcul-tps-tvq/">calcul TPS TVQ</a> ou le <a href="/calculateur-de-taxes-quebec/">calculateur de taxes Québec</a>.</p>
+    <p>Vous cherchez plutôt à calculer les taxes de vente? Utilisez le <a href="/">calcul TPS TVQ</a> ou le <a href="/">calculateur de taxes Québec</a>.</p>
+  </section>`
+});
+
+
+// EN reverse — "reverse tax calculator quebec" cluster (~3,850 searches/month, KD 2–21)
+pages.push({
+  url: "/reverse-tax-calculator-quebec/",
+  out: "reverse-tax-calculator-quebec/index.html",
+  pair: ["/calcul-taxe-inverse-quebec/", "/reverse-tax-calculator-quebec/"],
+  lang: "en",
+  mode: "remove",
+  title: "Reverse Tax Calculator Quebec 2026: Total ÷ 1.14975",
+  desc: "Remove Quebec GST and QST from a tax-included price: divide by 1.14975. $114.98 = $100 before tax, $5.00 GST and $9.98 QST. Free reverse sales tax calculator.",
+  h1: "Reverse Tax Calculator Quebec",
+  intro: "Enter a price that already includes tax and get the amount before tax, plus the GST and QST it contains.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Reverse Tax Calculator Quebec", href: "/reverse-tax-calculator-quebec/" }],
+  faqs: [
+    { q: "How do you reverse calculate Quebec sales tax?", a: "Divide the tax-included price by 1.14975. The result is the price before tax; 5% of it is the GST and 9.975% of it is the QST." },
+    { q: "What is the price before tax of $50 in Quebec?", a: "$50 ÷ 1.14975 = $43.49 before tax, with $2.17 of GST and $4.34 of QST included." },
+    { q: "What percentage of a Quebec price is tax?", a: "About 13.02% of a tax-included price is tax (14.975 ÷ 114.975). Taking 14.975% off the total is a common mistake that gives too low a number." },
+    { q: "Why is my reverse calculation off by a cent?", a: "Each tax is rounded to the cent on the original bill, so working backwards can differ by a cent or two from the shelf price." },
+    { q: "Does the reverse calculator work for HST provinces?", a: "No. It uses Quebec's GST (5%) and QST (9.975%). HST provinces use one harmonized rate, for example 13% in Ontario." }
+  ],
+  body:
+    quickAnswer("en", "<p>To take tax out of a Quebec price, <b>divide the total by 1.14975</b>. Example: $114.98 ÷ 1.14975 = <b>$100.00 before tax</b>, which includes $5.00 GST and $9.98 QST. About 13% of any tax-included Quebec price is tax.</p>") +
+    TRUST_EN +
+    `
+  <section class="content" aria-labelledby="rev-en-table">
+    <h2 id="rev-en-table">Price before tax for common Quebec totals</h2>
+${removeTable("en", [5, 10, 20, 50, 100, 150, 200, 250, 500, 1000, 1500, 2000, 5000])}
+    <h2>Reverse vs forward: which do you need?</h2>
+    <p>Use reverse when you have a receipt or a price that already includes tax and need the amount before tax, for an expense report, a bookkeeping entry or an input tax credit claim. To add tax to a price, use the <a href="/quebec-tax-calculator/">Quebec sales tax calculator</a>.</p>
+    <h2>Why not just subtract 14.975%?</h2>
+    <p>Tax was added on the price before tax, so it must be removed by dividing. On $114.98, subtracting 14.975% gives $97.76, which is $2.24 too low. Dividing by 1.14975 gives the correct $100.00.</p>
+  </section>`
+});
+
+// EN income tax — "quebec income tax calculator" cluster (~8,300 searches/month)
+pages.push({
+  url: "/quebec-income-tax-calculator/",
+  out: "quebec-income-tax-calculator/index.html",
+  pair: ["/calcul-salaire-net-quebec/", "/quebec-income-tax-calculator/"],
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/salary.js"],
+  featureList: ["Gross to net pay", "Federal and Quebec income tax", "QPP, EI and QPIP", "Net pay per pay period"],
+  title: "Quebec Income Tax Calculator 2026: $60,000 Salary = $45,857 Net",
+  desc: "Quebec income tax calculator for 2026: enter your salary to see federal and Quebec tax, QPP, EI and QPIP, and your take-home pay per year, month or paycheque.",
+  h1: "Quebec Income Tax Calculator 2026",
+  intro: "Enter your gross salary to estimate federal and Quebec income tax, payroll deductions and your take-home pay.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Quebec Income Tax Calculator", href: "/quebec-income-tax-calculator/" }],
+  faqs: [
+    { q: "How much tax do I pay on $60,000 in Quebec?", a: "On a $60,000 salary in 2026, total deductions (federal and Quebec income tax, QPP, EI and QPIP) are about $14,143, leaving roughly $45,857 a year, or $3,821 a month." },
+    { q: "Why does Quebec have two income tax returns?", a: "Quebec collects its own provincial income tax through Revenu Québec, so residents file a federal return with the CRA and a provincial return (TP-1) with Revenu Québec." },
+    { q: "What is the Quebec abatement?", a: "Quebec residents get a 16.5% reduction of basic federal tax, because Quebec funds some programs that the federal government funds elsewhere." },
+    { q: "What payroll deductions come off a Quebec paycheque?", a: "Federal income tax, Quebec income tax, the Quebec Pension Plan (QPP), Employment Insurance at Quebec's reduced rate, and the Quebec Parental Insurance Plan (QPIP)." },
+    { q: "Is this calculator exact?", a: "It is an estimate for a single salaried employee with basic credits. RRSP contributions, pension plans, taxable benefits and family credits change the real amount." }
+  ],
+  body:
+    quickAnswer("en", "<p>On a <b>$60,000</b> salary in Quebec in 2026, you take home about <b>$45,857</b> a year ($3,821 a month) after federal and Quebec income tax, QPP, EI and QPIP: about 23.6% in deductions.</p>") +
+    salaryCard("en") +
+    `
+  <div class="card info-card">
+    <div class="rate-pills">
+      <span class="pill">QPP <b>6.3%</b></span>
+      <span class="pill">EI <b>1.30%</b></span>
+      <span class="pill">QPIP <b>0.430%</b></span>
+    </div>
+    <p>Quebec residents pay federal tax (reduced by the 16.5% Quebec abatement), Quebec income tax, and three payroll contributions. The calculator uses 2026 parameters.</p>
+    <span class="updated">2026 rates</span>
+  </div>
+  <section class="content" aria-labelledby="inc-table">
+    <h2 id="inc-table">Take-home pay by salary in Quebec (2026)</h2>
+    <table class="data-table">
+      <thead><tr><th>Gross salary</th><th>Take-home pay</th><th>Per month</th><th>Deductions</th></tr></thead>
+      <tbody>
+        <tr><td>$30,000</td><td>$25,595</td><td>$2,133</td><td>14.7%</td></tr>
+        <tr><td>$40,000</td><td>$32,429</td><td>$2,702</td><td>18.9%</td></tr>
+        <tr><td>$50,000</td><td>$39,264</td><td>$3,272</td><td>21.5%</td></tr>
+        <tr><td>$60,000</td><td>$45,857</td><td>$3,821</td><td>23.6%</td></tr>
+        <tr><td>$75,000</td><td>$54,627</td><td>$4,552</td><td>27.2%</td></tr>
+        <tr><td>$100,000</td><td>$70,262</td><td>$5,855</td><td>29.7%</td></tr>
+      </tbody>
+    </table>
+    <h2>2026 Quebec payroll contributions</h2>
+    <ul class="benefits">
+      <li>QPP: 6.3% on earnings between $3,500 and $74,600, then 4% up to $85,000</li>
+      <li>Employment Insurance: 1.30% up to $68,900 (Quebec's reduced rate)</li>
+      <li>QPIP: 0.430% up to $103,000</li>
+      <li>Federal tax: brackets from 14% to 33%, less the 16.5% Quebec abatement</li>
+      <li>Quebec tax: brackets from 14% to 25.75%</li>
+    </ul>
+    <h2>What the estimate leaves out</h2>
+    <p>It assumes employment income only and basic personal credits. RRSP or pension contributions, taxable benefits, family credits and other income change the result. For official figures, see Revenu Québec and the Canada Revenue Agency.</p>
+  </section>`
+});
+
+// Welcome tax FR — "taxe de bienvenue" / "welcome tax" (KD 4–9)
+const WT_PRICES = [200000, 250000, 300000, 350000, 400000, 450000, 500000, 600000, 750000, 1000000, 1500000];
+pages.push({
+  url: "/calcul-taxe-de-bienvenue-quebec/",
+  out: "calcul-taxe-de-bienvenue-quebec/index.html",
+  pair: ["/calcul-taxe-de-bienvenue-quebec/", "/quebec-welcome-tax-calculator/"],
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/welcome.js"],
+  featureList: ["Droits de mutation 2026", "Barèmes Montréal et Ville de Québec", "Crédit premier acheteur"],
+  title: `Calcul Taxe de Bienvenue Québec 2026 : 500 000 $ = ${Math.round(welcomeTax(500000, WT.standard)).toLocaleString("fr-CA")} $`,
+  desc: "Calculez la taxe de bienvenue 2026 au Québec : 0,5 % jusqu'à 62 900 $, 1 % jusqu'à 315 000 $, 1,5 % au-delà. Barèmes de Montréal et de Québec et crédit premier acheteur.",
+  h1: "Calcul de la taxe de bienvenue au Québec (2026)",
+  intro: "Entrez le prix d'achat pour obtenir les droits de mutation 2026, selon le barème provincial, de Montréal ou de la Ville de Québec, et le crédit pour premier acheteur.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul taxe de bienvenue", href: "/calcul-taxe-de-bienvenue-quebec/" }],
+  faqs: [
+    { q: "Comment calculer la taxe de bienvenue en 2026?", a: "On applique 0,5&nbsp;% sur les premiers 62&nbsp;900&nbsp;$, 1&nbsp;% de 62&nbsp;900&nbsp;$ à 315&nbsp;000&nbsp;$ et 1,5&nbsp;% au-delà, sur le plus élevé du prix d'achat ou de la valeur au rôle." },
+    { q: "Combien coûte la taxe de bienvenue sur une maison de 500 000 $?", a: `Environ ${Math.round(welcomeTax(500000, WT.standard)).toLocaleString("fr-CA")}&nbsp;$ selon le barème provincial 2026, le même montant à Montréal et à Québec, car leurs taux plus élevés commencent au-delà de 500&nbsp;000&nbsp;$ ou 552&nbsp;300&nbsp;$.` },
+    { q: "La taxe de bienvenue est-elle remboursée aux premiers acheteurs?", a: "Oui, depuis 2026&nbsp;: un crédit d'impôt remboursable couvre 100&nbsp;% des premiers 5&nbsp;000&nbsp;$ de droits et 25&nbsp;% des 3&nbsp;500&nbsp;$ suivants, jusqu'à 5&nbsp;875&nbsp;$, pour une propriété de moins de 1&nbsp;M$." },
+    { q: "Quand paie-t-on la taxe de bienvenue?", a: "La municipalité envoie le compte quelques semaines ou mois après l'inscription de l'acte de vente. Elle est généralement payable dans les 30 jours." },
+    { q: "Pourquoi Montréal est-elle plus chère?", a: "Montréal ajoute des tranches au-delà de 552&nbsp;300&nbsp;$&nbsp;: 2&nbsp;%, 2,5&nbsp;%, 3,5&nbsp;% puis 4&nbsp;% au-delà de 3&nbsp;113&nbsp;000&nbsp;$." }
+  ],
+  body:
+    quickAnswer("fr", `<p>En 2026, la taxe de bienvenue est de <b>0,5&nbsp;%</b> jusqu'à 62&nbsp;900&nbsp;$, <b>1&nbsp;%</b> jusqu'à 315&nbsp;000&nbsp;$ et <b>1,5&nbsp;%</b> au-delà. Sur une propriété de 500&nbsp;000&nbsp;$, c'est <b>${money(welcomeTax(500000, WT.standard), "fr")}</b>. Les premiers acheteurs peuvent récupérer jusqu'à 5&nbsp;875&nbsp;$.</p>`) +
+    welcomeCard("fr") +
+    `
+  <section class="content" aria-labelledby="wt-table">
+    <h2 id="wt-table">Taxe de bienvenue selon le prix (2026)</h2>
+${welcomeTable("fr", WT_PRICES)}
+    <h2>Barème 2026 des droits de mutation</h2>
+    <ul class="benefits">
+      <li>0,5&nbsp;% sur la tranche jusqu'à 62&nbsp;900&nbsp;$</li>
+      <li>1&nbsp;% de 62&nbsp;900&nbsp;$ à 315&nbsp;000&nbsp;$</li>
+      <li>1,5&nbsp;% au-delà de 315&nbsp;000&nbsp;$ (barème provincial)</li>
+      <li>Montréal&nbsp;: 2&nbsp;% de 552&nbsp;300&nbsp;$ à 1&nbsp;104&nbsp;700&nbsp;$, 2,5&nbsp;% jusqu'à 2&nbsp;136&nbsp;500&nbsp;$, 3,5&nbsp;% jusqu'à 3&nbsp;113&nbsp;000&nbsp;$, 4&nbsp;% au-delà</li>
+      <li>Ville de Québec&nbsp;: 2,5&nbsp;% de 500&nbsp;000&nbsp;$ à 750&nbsp;000&nbsp;$, 3&nbsp;% au-delà</li>
+    </ul>
+    <p>Sources&nbsp;: Québec.ca (droits sur les mutations immobilières), montreal.ca, ville.quebec.qc.ca. D'autres villes, comme Laval, peuvent aussi avoir des taux plus élevés au-delà de 500&nbsp;000&nbsp;$&nbsp;: vérifiez auprès de votre municipalité. En 2027, les tranches passent à 64&nbsp;400&nbsp;$ et 322&nbsp;600&nbsp;$.</p>
+  </section>`
+});
+
+pages.push({
+  url: "/quebec-welcome-tax-calculator/",
+  out: "quebec-welcome-tax-calculator/index.html",
+  pair: ["/calcul-taxe-de-bienvenue-quebec/", "/quebec-welcome-tax-calculator/"],
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/welcome.js"],
+  featureList: ["2026 land transfer duties", "Montreal and Quebec City scales", "First-time buyer credit"],
+  title: `Quebec Welcome Tax Calculator 2026: $500,000 Home = $${Math.round(welcomeTax(500000, WT.standard)).toLocaleString("en-CA")}`,
+  desc: "Calculate Quebec's 2026 welcome tax (land transfer duties): 0.5% to $62,900, 1% to $315,000, 1.5% above, plus Montreal and Quebec City scales and the first-buyer credit.",
+  h1: "Quebec Welcome Tax Calculator (2026)",
+  intro: "Enter the purchase price to get 2026 transfer duties on the provincial, Montreal or Quebec City scale, and the first-time buyer credit.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Quebec Welcome Tax Calculator", href: "/quebec-welcome-tax-calculator/" }],
+  faqs: [
+    { q: "How is the welcome tax calculated in Quebec?", a: "In 2026: 0.5% on the first $62,900, 1% from $62,900 to $315,000 and 1.5% above, applied to the higher of the purchase price or the assessed value." },
+    { q: "How much is the welcome tax on a $500,000 house?", a: `About $${Math.round(welcomeTax(500000, WT.standard)).toLocaleString("en-CA")} on the 2026 provincial scale. Montreal and Quebec City give the same amount at $500,000 because their higher rates start above $552,300 and $500,000.` },
+    { q: "Do first-time buyers get the welcome tax back?", a: "Since 2026, a refundable tax credit repays 100% of the first $5,000 of duties and 25% of the next $3,500, up to $5,875, for homes under $1 million." },
+    { q: "When do you pay the welcome tax?", a: "The municipality sends the bill a few weeks or months after the deed is registered; it is usually due within 30 days." },
+    { q: "Is the welcome tax the same as land transfer tax?", a: "Yes. \"Welcome tax\" is the common name for Quebec's duties on transfers of immovables (droits de mutation), paid to the municipality." }
+  ],
+  body:
+    quickAnswer("en", `<p>In 2026, Quebec's welcome tax is <b>0.5%</b> up to $62,900, <b>1%</b> up to $315,000 and <b>1.5%</b> above. On a $500,000 home that's <b>${money(welcomeTax(500000, WT.standard), "en")}</b>. First-time buyers can get up to $5,875 back.</p>`) +
+    welcomeCard("en") +
+    `
+  <section class="content" aria-labelledby="wt-en-table">
+    <h2 id="wt-en-table">Welcome tax by home price (2026)</h2>
+${welcomeTable("en", WT_PRICES)}
+    <h2>2026 brackets</h2>
+    <ul class="benefits">
+      <li>0.5% on the portion up to $62,900</li>
+      <li>1% from $62,900 to $315,000</li>
+      <li>1.5% above $315,000 (provincial scale)</li>
+      <li>Montreal: 2% from $552,300 to $1,104,700, 2.5% to $2,136,500, 3.5% to $3,113,000, 4% above</li>
+      <li>Quebec City: 2.5% from $500,000 to $750,000, 3% above</li>
+    </ul>
+    <p>Sources: Québec.ca (transfer duties), montreal.ca, ville.quebec.qc.ca. Other cities such as Laval may also charge higher rates above $500,000; check with your municipality. In 2027 the brackets rise to $64,400 and $322,600.</p>
   </section>`
 });
 
@@ -876,7 +1086,7 @@ const POSTS_RAW = [
       { k: "Taux combiné", v: "14,975 %" },
       { k: "100 $ avant taxes", v: "114,98 $" }
     ],
-    cta: postCta("/calcul-tps-tvq/", "Ouvrir la calculatrice TPS TVQ", "Pas envie de calculer à la main? La calculatrice ajoute la TPS et la TVQ instantanément."),
+    cta: postCta("/", "Ouvrir la calculatrice TPS TVQ", "Pas envie de calculer à la main? La calculatrice ajoute la TPS et la TVQ instantanément."),
     howto: {
       name: "Calculer la TPS et la TVQ au Québec",
       steps: [
@@ -911,7 +1121,7 @@ Raccourci&nbsp;:&nbsp;Total&nbsp;=&nbsp;montant&nbsp;×&nbsp;1,14975</div>
       <li><strong>Arrondir trop tôt.</strong> Calculez chaque taxe, puis arrondissez le résultat final au cent.</li>
     </ul>
     <h2>Quand utiliser la calculatrice</h2>
-    <p>Pour une facture, un devis ou une dépense, la <a href="/calcul-tps-tvq/">calculatrice TPS TVQ</a> évite les erreurs d'arrondi. Si votre prix inclut déjà les taxes, utilisez plutôt le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>. Pour les taux à jour, voyez les <a href="/taux-tps-tvq-quebec/">taux TPS TVQ au Québec</a>.</p>`,
+    <p>Pour une facture, un devis ou une dépense, la <a href="/">calculatrice TPS TVQ</a> évite les erreurs d'arrondi. Si votre prix inclut déjà les taxes, utilisez plutôt le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>. Pour les taux à jour, voyez les <a href="/taux-tps-tvq-quebec/">taux TPS TVQ au Québec</a>.</p>`,
     faqs: [
       { q: "Quel est le taux combiné de la TPS et de la TVQ?", a: "Le taux combiné est de 14,975 %&nbsp;: 5 % de TPS plus 9,975 % de TVQ, sur la plupart des produits et services taxables." },
       { q: "Comment calculer rapidement le total avec taxes?", a: "Multipliez le montant avant taxes par 1,14975. Par exemple, 100 $ × 1,14975 = 114,98 $." },
@@ -1008,7 +1218,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
     </table>
     <h2>Ce qui n'a pas changé en 2026</h2>
     <p>La TVQ est passée à 9,975&nbsp;% en 2013 et la TPS est à 5&nbsp;% depuis 2008. Aucun changement de taux n'est entré en vigueur pour 2026. Certains produits (par exemple plusieurs aliments de base) sont détaxés ou exonérés et ne portent pas ces taxes.</p>
-    <p>Pour calculer un montant précis, utilisez la <a href="/calcul-tps-tvq/">calculatrice TPS TVQ</a> ou la page des <a href="/taux-tps-tvq-quebec/">taux TPS TVQ au Québec</a>.</p>`,
+    <p>Pour calculer un montant précis, utilisez la <a href="/">calculatrice TPS TVQ</a> ou la page des <a href="/taux-tps-tvq-quebec/">taux TPS TVQ au Québec</a>.</p>`,
     faqs: [
       { q: "Quel est le taux de taxe au Québec en 2026?", a: "5 % de TPS et 9,975 % de TVQ, soit un taux combiné de 14,975 % sur la plupart des biens et services taxables." },
       { q: "Les taux de taxes ont-ils changé en 2026?", a: "Non. La TPS reste à 5 % et la TVQ à 9,975 %, des taux inchangés depuis 2013." },
@@ -1032,7 +1242,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
       { k: "Perçues par", v: "Revenu Québec" },
       { k: "Base de calcul", v: "Prix avant taxes" }
     ],
-    cta: postCta("/calcul-tps-tvq/", "Calculer la TPS et la TVQ", "Voyez la TPS et la TVQ séparément sur n'importe quel montant."),
+    cta: postCta("/", "Calculer la TPS et la TVQ", "Voyez la TPS et la TVQ séparément sur n'importe quel montant."),
     sections: `    <h2>La TPS : la taxe fédérale</h2>
     <p>La TPS s'applique partout au Canada au taux de 5&nbsp;%. Elle revient au gouvernement fédéral. Au Québec, c'est Revenu Québec qui l'administre et la perçoit.</p>
     <h2>La TVQ : la taxe provinciale</h2>
@@ -1049,7 +1259,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
     <h2>Est-ce que la TVQ est calculée sur la TPS?</h2>
     <p>Non. Depuis 2013, la TVQ se calcule sur le prix avant taxes, et non sur le montant incluant la TPS. Les deux taxes s'appliquent à la même base.</p>
     <h2>Pourquoi deux taxes?</h2>
-    <p>Le Canada est un système à deux paliers&nbsp;: une taxe fédérale (TPS) et une taxe provinciale (la TVQ au Québec). D'autres provinces utilisent une taxe harmonisée (TVH), mais le Québec garde sa TVQ distincte. Pour additionner les deux, utilisez la <a href="/calcul-tps-tvq/">calculatrice TPS TVQ</a>.</p>`,
+    <p>Le Canada est un système à deux paliers&nbsp;: une taxe fédérale (TPS) et une taxe provinciale (la TVQ au Québec). D'autres provinces utilisent une taxe harmonisée (TVH), mais le Québec garde sa TVQ distincte. Pour additionner les deux, utilisez la <a href="/">calculatrice TPS TVQ</a>.</p>`,
     faqs: [
       { q: "Quelle est la différence entre la TPS et la TVQ?", a: "La TPS est la taxe fédérale de 5 % du Canada; la TVQ est la taxe provinciale de 9,975 % du Québec. Les deux s'ajoutent au prix avant taxes." },
       { q: "Qui perçoit la TPS et la TVQ au Québec?", a: "Au Québec, Revenu Québec perçoit les deux taxes, puis remet la portion fédérale au gouvernement du Canada." },
@@ -1198,7 +1408,12 @@ const sitemap =
   [...pages, ...blogPages]
     .map((p) => {
       let alt = "";
-      if (p.url === "/" || p.url === "/quebec-tax-calculator/") {
+      if (p.pair) {
+        alt =
+          `\n    <xhtml:link rel="alternate" hreflang="fr-CA" href="${SITE}${p.pair[0]}"/>` +
+          `\n    <xhtml:link rel="alternate" hreflang="en-CA" href="${SITE}${p.pair[1]}"/>` +
+          `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}${p.pair[0]}"/>`;
+      } else if (p.url === "/" || p.url === "/quebec-tax-calculator/") {
         alt =
           `\n    <xhtml:link rel="alternate" hreflang="fr-CA" href="${SITE}/"/>` +
           `\n    <xhtml:link rel="alternate" hreflang="en-CA" href="${SITE}/quebec-tax-calculator/"/>` +
@@ -1237,10 +1452,7 @@ const llms = `# Calcul Taxes Québec
 
 ## Calculatrices
 - Calcul taxes Québec (accueil): ${SITE}/
-- Calcul TPS TVQ (ajouter): ${SITE}/calcul-tps-tvq/
 - Calcul taxe inverse (retirer): ${SITE}/calcul-taxe-inverse-quebec/
-- Calculateur de taxes Québec: ${SITE}/calculateur-de-taxes-quebec/
-- TPS TVQ en ligne: ${SITE}/tps-tvq-en-ligne/
 - Calcul salaire net Québec (brut → net): ${SITE}/calcul-salaire-net-quebec/
 - Taux TPS TVQ Québec: ${SITE}/taux-tps-tvq-quebec/
 - Quebec Tax Calculator (English): ${SITE}/quebec-tax-calculator/

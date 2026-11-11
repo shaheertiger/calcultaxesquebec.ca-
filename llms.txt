@@ -21,21 +21,18 @@
 - Exemple: 60 000 $ brut ≈ 45 857 $ net/an (~3 821 $/mois), soit ~23,6 % de retenues.
 
 ## Calculatrices
-- Calcul taxes Québec (accueil): https://calcultaxesquebec.ca/
-- Calcul TPS TVQ (ajouter): https://calcultaxesquebec.ca/calcul-tps-tvq/
-- Calcul taxe inverse (retirer): https://calcultaxesquebec.ca/calcul-taxe-inverse-quebec/
-- Calculateur de taxes Québec: https://calcultaxesquebec.ca/calculateur-de-taxes-quebec/
-- TPS TVQ en ligne: https://calcultaxesquebec.ca/tps-tvq-en-ligne/
-- Calcul salaire net Québec (brut → net): https://calcultaxesquebec.ca/calcul-salaire-net-quebec/
-- Taux TPS TVQ Québec: https://calcultaxesquebec.ca/taux-tps-tvq-quebec/
-- Quebec Tax Calculator (English): https://calcultaxesquebec.ca/quebec-tax-calculator/
+- Calcul taxes Québec (accueil): https://www.calcultaxesquebec.ca/
+- Calcul taxe inverse (retirer): https://www.calcultaxesquebec.ca/calcul-taxe-inverse-quebec/
+- Calcul salaire net Québec (brut → net): https://www.calcultaxesquebec.ca/calcul-salaire-net-quebec/
+- Taux TPS TVQ Québec: https://www.calcultaxesquebec.ca/taux-tps-tvq-quebec/
+- Quebec Tax Calculator (English): https://www.calcultaxesquebec.ca/quebec-tax-calculator/
 
 ## Guides (blogue)
-- Comment calculer la TPS et la TVQ au Québec?: https://calcultaxesquebec.ca/comment-calculer-tps-tvq-quebec/
-- Comment retirer les taxes d'un prix au Québec?: https://calcultaxesquebec.ca/comment-retirer-taxes-prix-quebec/
-- Quelle est la taxe au Québec en 2026?: https://calcultaxesquebec.ca/taxe-quebec-2026/
-- TPS et TVQ : quelle est la différence?: https://calcultaxesquebec.ca/difference-tps-tvq/
-- Comment trouver le prix avant taxes au Québec?: https://calcultaxesquebec.ca/prix-avant-taxes-quebec/
+- Comment calculer la TPS et la TVQ au Québec?: https://www.calcultaxesquebec.ca/comment-calculer-tps-tvq-quebec/
+- Comment retirer les taxes d'un prix au Québec?: https://www.calcultaxesquebec.ca/comment-retirer-taxes-prix-quebec/
+- Quelle est la taxe au Québec en 2026?: https://www.calcultaxesquebec.ca/taxe-quebec-2026/
+- TPS et TVQ : quelle est la différence?: https://www.calcultaxesquebec.ca/difference-tps-tvq/
+- Comment trouver le prix avant taxes au Québec?: https://www.calcultaxesquebec.ca/prix-avant-taxes-quebec/
 
 ## À propos
 Langue principale: français (Québec). Version anglaise disponible.

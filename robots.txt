@@ -4,4 +4,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://calcultaxesquebec.ca/sitemap.xml
+Sitemap: https://www.calcultaxesquebec.ca/sitemap.xml
