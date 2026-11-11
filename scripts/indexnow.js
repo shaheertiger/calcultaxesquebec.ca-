@@ -3,7 +3,7 @@
  *
  * Usage:
  *   node scripts/indexnow.js                     # submit every URL in sitemap.xml
- *   node scripts/indexnow.js /tps-tvq-en-ligne/  # submit specific path(s)/URL(s)
+ *   node scripts/indexnow.js /calcul-taxe-inverse-quebec/  # submit specific path(s)/URL(s)
  *
  * URLs are read from sitemap.xml (run `node build.js` first) so the list never
  * drifts out of sync. The key file 74d5a7f9a4cb4affadf38a391aa7dcff.txt must be

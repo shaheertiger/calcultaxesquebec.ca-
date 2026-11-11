@@ -309,6 +309,7 @@ section.content p { color: var(--muted); margin: 0 0 12px; }
 .cta a::after { content: "→"; }
 
 .post-meta { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin: 0 0 18px; }
+.prose .disclaimer { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line, #e5e5e5); padding-top: 12px; margin-top: 22px; }
 
 .post-list { display: grid; gap: 0; border-top: 1.5px solid var(--ink); margin-top: 10px; }
 .post-list a {
