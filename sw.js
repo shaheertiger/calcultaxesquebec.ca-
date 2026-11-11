@@ -1,17 +1,19 @@
 /* Calcul Taxes Québec — service worker (offline-ready, cache-first for assets) */
-const CACHE = "ctq-v2";
+const CACHE = "ctq-v3";
 const ASSETS = [
   "/",
-  "/calcul-tps-tvq/",
   "/calcul-taxe-inverse-quebec/",
-  "/calculateur-de-taxes-quebec/",
-  "/tps-tvq-en-ligne/",
   "/calcul-salaire-net-quebec/",
+  "/calcul-taxe-de-bienvenue-quebec/",
+  "/reverse-tax-calculator-quebec/",
+  "/quebec-income-tax-calculator/",
+  "/quebec-welcome-tax-calculator/",
   "/quebec-tax-calculator/",
   "/taux-tps-tvq-quebec/",
   "/assets/css/styles.css",
   "/assets/js/calculator.js",
   "/assets/js/salary.js",
+  "/assets/js/welcome.js",
   "/manifest.webmanifest",
   "/favicon.svg",
   "/icons/icon-192.png",
