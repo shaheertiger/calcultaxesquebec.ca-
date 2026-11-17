@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.calcultaxesquebec.ca/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/"/>
@@ -11,7 +11,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/calcul-taxe-inverse-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxe-inverse-quebec/"/>
@@ -20,7 +20,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/quebec-tax-calculator/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/"/>
@@ -29,13 +29,16 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/taux-tps-tvq-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/taux-tps-tvq-quebec/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/quebec-tax-rate/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/taux-tps-tvq-quebec/"/>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/calcul-salaire-net-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-salaire-net-quebec/"/>
@@ -44,7 +47,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/reverse-tax-calculator-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxe-inverse-quebec/"/>
@@ -53,7 +56,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/quebec-income-tax-calculator/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-salaire-net-quebec/"/>
@@ -62,7 +65,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/calcul-taxe-de-bienvenue-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxe-de-bienvenue-quebec/"/>
@@ -71,7 +74,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/quebec-welcome-tax-calculator/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxe-de-bienvenue-quebec/"/>
@@ -79,86 +82,137 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/calcul-taxe-de-bienvenue-quebec/"/>
   </url>
   <url>
+    <loc>https://www.calcultaxesquebec.ca/tranches-imposition-quebec/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/tranches-imposition-quebec/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/quebec-tax-brackets/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/tranches-imposition-quebec/"/>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/quebec-tax-brackets/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/tranches-imposition-quebec/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/quebec-tax-brackets/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/tranches-imposition-quebec/"/>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/calcul-impot-quebec/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/calcul-paie-net-quebec/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-paie-net-quebec/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/quebec-paycheck-calculator/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/calcul-paie-net-quebec/"/>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/quebec-paycheck-calculator/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-paie-net-quebec/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/quebec-paycheck-calculator/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/calcul-paie-net-quebec/"/>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/quebec-tax-rate/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/taux-tps-tvq-quebec/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/quebec-tax-rate/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/taux-tps-tvq-quebec/"/>
+  </url>
+  <url>
     <loc>https://www.calcultaxesquebec.ca/blog/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/comment-calculer-tps-tvq-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/comment-retirer-taxes-prix-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/taxe-quebec-2026/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/difference-tps-tvq/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/prix-avant-taxes-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/produits-sans-taxes-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/taxable-detaxe-exonere-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/seuil-inscription-tps-tvq-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/tps-tvq-travailleur-autonome/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/calcul-taxes-facture-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/taxes-incluses-vs-taxes-en-sus/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/calcul-rabais-taxes-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/tableau-tps-tvq-quebec/</loc>
-    <lastmod>2026-11-11</lastmod>
+    <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -10,7 +10,7 @@ const path = require("path");
  * must use www. Pointing canonicals at the apex sent Google to a redirect on every page (Nov 2026 fix). */
 const SITE = "https://www.calcultaxesquebec.ca";
 const UPDATED_YEAR = "2026";
-const BUILD_DATE = "2026-11-11";
+const BUILD_DATE = "2026-11-17";
 const DATE_PUBLISHED = "2026-01-01";
 
 /* Bing Webmaster Tools site verification (content of the msvalidate.01 meta).
@@ -166,8 +166,10 @@ function fmtZero(lang) {
   return lang === "en" ? "$0.00" : "0,00&nbsp;$";
 }
 
-function salaryCard(lang) {
+function salaryCard(lang, opts = {}) {
   const fr = lang !== "en";
+  const freq = opts.freq || "year";
+  const sel = (v) => (v === freq ? " selected" : "");
   const z = fmtZero(lang);
   const L = fr
     ? {
@@ -186,7 +188,7 @@ function salaryCard(lang) {
         ded: "Total deductions", rate: "Effective tax rate", copy: "Copy result", clear: "Clear",
         note: "Estimate for a single salaried Quebec resident (basic credits, 2026 rates). For guidance only."
       };
-  return `<div class="card calc salary" data-salary>
+  return `<div class="card calc salary" data-salary${opts.main === "biweek" ? ' data-sal-main="biweek"' : ""}>
     <div class="field">
       <label for="salary">${L.label}</label>
       <div class="input-money">
@@ -196,11 +198,11 @@ function salaryCard(lang) {
       </div>
       <div class="freq">
         <select data-sal-freq aria-label="${L.per}">
-          <option value="year" selected>${L.year}</option>
-          <option value="month">${L.month}</option>
-          <option value="biweek">${L.biweek}</option>
-          <option value="week">${L.week}</option>
-          <option value="hour">${L.hour}</option>
+          <option value="year"${sel("year")}>${L.year}</option>
+          <option value="month"${sel("month")}>${L.month}</option>
+          <option value="biweek"${sel("biweek")}>${L.biweek}</option>
+          <option value="week"${sel("week")}>${L.week}</option>
+          <option value="hour"${sel("hour")}>${L.hour}</option>
         </select>
         <label class="hours" data-sal-hourswrap hidden>${L.hours}
           <input data-sal-hours type="text" inputmode="decimal" autocomplete="off" value="40">
@@ -209,7 +211,7 @@ function salaryCard(lang) {
     </div>
     <div class="result" aria-live="polite">
       <div class="total-box">
-        <span class="lbl">${L.net}</span>
+        <span class="lbl">${opts.main === "biweek" ? (fr ? "Paie nette aux 2 semaines" : "Net pay every 2 weeks") : L.net}</span>
         <span class="amt" data-sal-out="net">${z}</span>
         <span class="sub" data-sal-out="netperiod"></span>
       </div>
@@ -267,12 +269,18 @@ function internalLinks(lang, currentPath) {
     { href: "/calcul-taxe-inverse-quebec/", label: "Calcul taxe inverse Québec", sub: "Retirer les taxes d'un prix" },
     { href: "/calcul-salaire-net-quebec/", label: "Calcul salaire net Québec", sub: "Salaire brut en net (impôts, RRQ…)" },
     { href: "/calcul-taxe-de-bienvenue-quebec/", label: "Calcul taxe de bienvenue", sub: "Droits de mutation 2026, Montréal et Québec" },
+    { href: "/calcul-paie-net-quebec/", label: "Calcul paie net Québec", sub: "Paie nette aux 2 semaines ou par heure" },
+    { href: "/calcul-impot-quebec/", label: "Calcul impôt Québec", sub: "Impôt fédéral et provincial 2026" },
+    { href: "/tranches-imposition-quebec/", label: "Tranches d'imposition 2026", sub: "Taux marginal Québec + fédéral" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ Québec", sub: "TPS 5 %, TVQ 9,975 %" },
     { href: "/quebec-tax-calculator/", label: "Quebec Tax Calculator", sub: "Version anglaise" }
   ] : [
     { href: "/quebec-tax-calculator/", label: "Quebec Sales Tax Calculator", sub: "Add GST and QST" },
     { href: "/reverse-tax-calculator-quebec/", label: "Reverse Tax Calculator Quebec", sub: "Remove tax from a price" },
     { href: "/quebec-income-tax-calculator/", label: "Quebec Income Tax Calculator", sub: "Salary after tax, 2026" },
+    { href: "/quebec-paycheck-calculator/", label: "Quebec Paycheck Calculator", sub: "Take-home pay every 2 weeks" },
+    { href: "/quebec-tax-brackets/", label: "Quebec Tax Brackets 2026", sub: "Combined marginal rates" },
+    { href: "/quebec-tax-rate/", label: "Quebec Tax Rate", sub: "14.975% and other provinces" },
     { href: "/quebec-welcome-tax-calculator/", label: "Quebec Welcome Tax Calculator", sub: "Land transfer tax, 2026 brackets" },
     { href: "/", label: "Calcul taxes Québec", sub: "Version française" }
   ]).map((l) => ({ ...l, subFr: l.sub, subEn: l.sub }))
@@ -609,6 +617,135 @@ function welcomeCard(lang) {
   <script>window.WT=${JSON.stringify({ standard: WT.standard.map(([c, r]) => [c === Infinity ? null : c, r]), montreal: WT.montreal.map(([c, r]) => [c === Infinity ? null : c, r]), quebecCity: WT.quebecCity.map(([c, r]) => [c === Infinity ? null : c, r]) })};</script>`;
 }
 
+/* ===================== income tax, brackets, paycheque, tax rate (Nov 17 2026) =====================
+ * Same pattern as the Nov 11 pages that lifted impressions 3.5×: the answer and a number in the
+ * title, a quick-answer box, then tables computed from the real engine (assets/js/salary.js), so
+ * the figures always match the calculator on the page.
+ * Keyword clusters (Semrush CA export, 2026-11-17):
+ *   quebec tax brackets / tax brackets quebec / quebec and canada tax brackets … (~9,000/mo, KD 32–62)
+ *   tranches / taux d'imposition / bracket impôt Québec (~3,500/mo, KD 32–41)
+ *   calcul impôt Québec / calculateur impôt / impôt Québec calcul (~7,000/mo, KD 14–41)
+ *   quebec paycheck / pay / take home pay calculator (~3,600/mo, KD 38–54)
+ *   calcul paie net / simulation calcul paie Québec (~1,800/mo, KD 26–38)
+ *   quebec tax rate / sales tax rate / how much is tax in quebec (~6,000/mo, KD 15–60) */
+const { computeNet: netPay, R: TAXP } = require("./assets/js/salary.js");
+const ABATE = TAXP.federal.abatement;
+const FED_BR = TAXP.federal.brackets;
+const QC_BR = TAXP.quebec.brackets;
+
+const pct = (r, lang, d = 2) => {
+  const f = 10 ** d, s = (Math.round(r * 100 * f + 1e-6) / f).toFixed(d).replace(/\.?0+$/, "");
+  return lang === "en" ? s + "%" : s.replace(".", ",") + "&nbsp;%";
+};
+const num = (n, lang) => (lang === "en" ? n.toLocaleString("en-CA", { maximumFractionDigits: 0 }) : n.toLocaleString("fr-CA", { maximumFractionDigits: 0 }).replace(/ | | /g, "&nbsp;"));
+const mInt = (n, lang) => moneyInt(Math.round(n), lang);
+const incomeTax = (g) => { const r = netPay(g); return { ...r, tax: r.fed + r.qc }; };
+
+function rateAt(brackets, income) { for (const [cap, rate] of brackets) if (income <= cap) return rate; return brackets[brackets.length - 1][1]; }
+/* Combined marginal rate for a Quebec resident: federal rate less the 16.5 % abatement, plus the Quebec rate. */
+function combinedRate(income) { return rateAt(FED_BR, income) * (1 - ABATE) + rateAt(QC_BR, income); }
+function combinedBands() {
+  const caps = [...new Set([...FED_BR, ...QC_BR].map(([c]) => c))].sort((a, b) => a - b);
+  let lo = 0;
+  return caps.map((cap) => { const mid = cap === Infinity ? lo + 1 : (lo + cap) / 2; const band = { lo, hi: cap, fed: rateAt(FED_BR, mid), qc: rateAt(QC_BR, mid) }; band.total = band.fed * (1 - ABATE) + band.qc; lo = cap; return band; });
+}
+const TOP_COMBINED = combinedBands().slice(-1)[0].total;
+function bandLabel(lo, hi, lang) {
+  const fr = lang !== "en";
+  if (hi === Infinity) return fr ? `Plus de ${mInt(lo, lang)}` : `Over ${mInt(lo, lang)}`;
+  if (lo === 0) return fr ? `Jusqu'à ${mInt(hi, lang)}` : `Up to ${mInt(hi, lang)}`;
+  return `${mInt(lo, lang)} – ${mInt(hi, lang)}`;
+}
+function bracketTable(lang, brackets, rateHead) {
+  const fr = lang !== "en";
+  let lo = 0;
+  const rows = brackets.map(([cap, rate]) => { const r = `<tr><td>${bandLabel(lo, cap, lang)}</td><td>${pct(rate, lang)}</td></tr>`; lo = cap; return r; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Revenu imposable" : "Taxable income"}</th><th>${rateHead}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+function combinedTable(lang) {
+  const fr = lang !== "en";
+  const rows = combinedBands().map((b) => `<tr><td>${bandLabel(b.lo, b.hi, lang)}</td><td>${pct(b.fed * (1 - ABATE), lang)}</td><td>${pct(b.qc, lang)}</td><td><b>${pct(b.total, lang)}</b></td></tr>`).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Revenu imposable" : "Taxable income"}</th><th>${fr ? "Fédéral (après abattement)" : "Federal (after abatement)"}</th><th>${fr ? "Québec" : "Quebec"}</th><th>${fr ? "Taux marginal combiné" : "Combined marginal rate"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const TAX_INCOMES = [25000, 30000, 40000, 50000, 60000, 75000, 90000, 100000, 125000, 150000, 200000];
+function taxByIncomeTable(lang, incomes = TAX_INCOMES) {
+  const fr = lang !== "en";
+  const rows = incomes.map((g) => { const r = incomeTax(g); return `<tr><td>${mInt(g, lang)}</td><td>${mInt(r.fed, lang)}</td><td>${mInt(r.qc, lang)}</td><td><b>${mInt(r.tax, lang)}</b></td><td>${pct(r.tax / g, lang, 1)}</td><td>${pct(combinedRate(g), lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Revenu" : "Income"}</th><th>${fr ? "Impôt fédéral" : "Federal tax"}</th><th>${fr ? "Impôt Québec" : "Quebec tax"}</th><th>${fr ? "Impôt total" : "Total tax"}</th><th>${fr ? "Taux effectif" : "Average rate"}</th><th>${fr ? "Taux marginal" : "Marginal rate"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const PAY_SALARIES = [30000, 40000, 45000, 50000, 55000, 60000, 70000, 80000, 90000, 100000, 120000];
+function payTable(lang) {
+  const fr = lang !== "en";
+  const rows = PAY_SALARIES.map((g) => { const r = netPay(g); return `<tr><td>${mInt(g, lang)}</td><td>${money(r2(r.net / 52), lang)}</td><td><b>${money(r2(r.net / 26), lang)}</b></td><td>${money(r2(r.net / 12), lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Salaire brut annuel" : "Annual gross salary"}</th><th>${fr ? "Net par semaine" : "Net weekly"}</th><th>${fr ? "Net aux 2 semaines" : "Net every 2 weeks"}</th><th>${fr ? "Net par mois" : "Net monthly"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const HOURLY = [17, 18, 20, 22, 25, 28, 30, 35, 40, 50];
+function hourlyTable(lang) {
+  const fr = lang !== "en";
+  const rows = HOURLY.map((h) => { const g = h * 40 * 52, r = netPay(g); return `<tr><td>${money(h, lang)}</td><td>${mInt(g, lang)}</td><td><b>${money(r2(r.net / 26), lang)}</b></td><td>${money(r2(r.net / 2080), lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Taux horaire" : "Hourly wage"}</th><th>${fr ? "Brut annuel (40 h)" : "Annual gross (40 h)"}</th><th>${fr ? "Net aux 2 semaines" : "Net every 2 weeks"}</th><th>${fr ? "Net par heure" : "Net per hour"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+/* Sales tax by province, rates in force in 2026 (CRA GST/HST rates; provincial PST sites). */
+const PROV = [
+  { fr: "Québec", en: "Quebec", parts: { fr: "TPS 5 % + TVQ 9,975 %", en: "GST 5% + QST 9.975%" }, rate: 0.14975 },
+  { fr: "Ontario", en: "Ontario", parts: { fr: "TVH 13 %", en: "HST 13%" }, rate: 0.13 },
+  { fr: "Colombie-Britannique", en: "British Columbia", parts: { fr: "TPS 5 % + TVP 7 %", en: "GST 5% + PST 7%" }, rate: 0.12 },
+  { fr: "Alberta", en: "Alberta", parts: { fr: "TPS 5 %", en: "GST 5%" }, rate: 0.05 },
+  { fr: "Saskatchewan", en: "Saskatchewan", parts: { fr: "TPS 5 % + TVP 6 %", en: "GST 5% + PST 6%" }, rate: 0.11 },
+  { fr: "Manitoba", en: "Manitoba", parts: { fr: "TPS 5 % + TVD 7 %", en: "GST 5% + RST 7%" }, rate: 0.12 },
+  { fr: "Nouveau-Brunswick", en: "New Brunswick", parts: { fr: "TVH 15 %", en: "HST 15%" }, rate: 0.15 },
+  { fr: "Nouvelle-Écosse", en: "Nova Scotia", parts: { fr: "TVH 14 %", en: "HST 14%" }, rate: 0.14 },
+  { fr: "Île-du-Prince-Édouard", en: "Prince Edward Island", parts: { fr: "TVH 15 %", en: "HST 15%" }, rate: 0.15 },
+  { fr: "Terre-Neuve-et-Labrador", en: "Newfoundland and Labrador", parts: { fr: "TVH 15 %", en: "HST 15%" }, rate: 0.15 },
+  { fr: "Yukon, T.N.-O., Nunavut", en: "Yukon, NWT, Nunavut", parts: { fr: "TPS 5 %", en: "GST 5%" }, rate: 0.05 }
+];
+function provinceTable(lang) {
+  const fr = lang !== "en";
+  const rows = PROV.map((p) => `<tr><td>${fr ? p.fr : p.en}</td><td>${p.parts[fr ? "fr" : "en"].replace(/ %/g, "&nbsp;%")}</td><td><b>${pct(p.rate, lang, 3)}</b></td><td>${money(r2(100 * (1 + p.rate)), lang)}</td></tr>`).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Province" : "Province"}</th><th>${fr ? "Taxes" : "Taxes"}</th><th>${fr ? "Taux total" : "Total rate"}</th><th>${fr ? "100 $ devient" : "$100 becomes"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+
+const S60 = incomeTax(60000);
+const S50 = incomeTax(50000);
+const S100 = incomeTax(100000);
+const QC_LOW = QC_BR[0], FED_LOW = FED_BR[0];
+// Gross salary at which each income tax starts (basic personal amount + contribution credits)
+const firstTaxed = (key) => { for (let g = 10000; g < 60000; g += 50) if (netPay(g)[key] > 0.5) return g; return 0; };
+const QC_START = firstTaxed("qc"), FED_START = firstTaxed("fed");
+// Worked example: Quebec tax on 60 000 $ of taxable income, before credits
+const EX_LOW = r2(QC_LOW[0] * QC_LOW[1]);
+const EX_HIGH = r2((60000 - QC_LOW[0]) * QC_BR[1][1]);
+
 /* --------------------------------- pages ---------------------------------- */
 
 const pages = [];
@@ -739,14 +876,18 @@ pages.push({
   out: "taux-tps-tvq-quebec/index.html",
   lang: "fr",
   mode: "add",
-  title: "Taux TPS TVQ Québec 2026 | Taxes au Québec",
-  desc: "Consultez les taux TPS et TVQ au Québec. TPS 5%, TVQ 9,975% et taux combiné de 14,975%.",
+  pair: ["/taux-tps-tvq-quebec/", "/quebec-tax-rate/"],
+  title: "Taux TPS TVQ Québec 2026 : 5 % + 9,975 % = 14,975 %",
+  desc: "Taux de taxes au Québec en 2026 : TPS 5 % + TVQ 9,975 % = 14,975 %. 100 $ avant taxes = 114,98 $. Comparaison avec l'Ontario (TVH 13 %) et les autres provinces.",
   h1: "Taux TPS TVQ Québec",
   intro:
     "Consultez les taux courants de TPS et de TVQ au Québec et calculez instantanément les taxes sur un montant.",
   crumbs: [{ name: "Accueil", href: "/" }, { name: "Taux TPS TVQ Québec", href: "/taux-tps-tvq-quebec/" }],
-  faqs: FAQ_TAUX,
+  faqs: [...FAQ_TAUX,
+    { q: "Les taxes sont-elles plus élevées au Québec qu'en Ontario?", a: "Oui. Le taux combiné du Québec (14,975&nbsp;%) dépasse d'environ 2 points la TVH de 13&nbsp;% de l'Ontario. Sur 100&nbsp;$, on paie 114,98&nbsp;$ au Québec et 113,00&nbsp;$ en Ontario." },
+    { q: "Y a-t-il une TVH au Québec?", a: "Non. Le Québec applique deux taxes distinctes, la TPS (5&nbsp;%) et la TVQ (9,975&nbsp;%). La TVH est utilisée en Ontario et dans les provinces de l'Atlantique." }],
   body:
+    quickAnswer("fr", "<p>Au Québec, le taux de taxes est de <b>14,975&nbsp;%</b>&nbsp;: <b>TPS 5&nbsp;%</b> (fédérale) + <b>TVQ 9,975&nbsp;%</b> (provinciale). Multipliez un prix par <b>1,14975</b> pour obtenir le total&nbsp;: 100&nbsp;$ avant taxes = <b>114,98&nbsp;$</b>. Les taux sont inchangés en 2026.</p>") +
     TRUST_FR +
     `
   <section class="content" aria-labelledby="rates-title">
@@ -759,8 +900,14 @@ pages.push({
     </ul>
     <h2>Comment les taux s'appliquent</h2>
     <p>La TVQ de 9,975&nbsp;% est calculée sur le prix de vente avant taxes, et non sur la TPS. Le taux combiné de 14,975&nbsp;% sert d'estimation rapide du total des taxes.</p>
+    <h2>TPS et TVQ sur des montants courants</h2>
+${addTable("fr", [1, 5, 10, 20, 25, 50, 75, 100, 200, 500, 1000, 5000])}
+    <h2>Taux de taxes de vente par province (2026)</h2>
+${provinceTable("fr")}
     <h2>Calculer un montant</h2>
     <p>Entrez un montant ci-dessus pour voir la TPS, la TVQ et le total. Pour retirer les taxes d'un prix, utilisez le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>.</p>
+    <h2>Vous cherchez le taux d'impôt sur le revenu?</h2>
+    <p>L'impôt sur le revenu est distinct des taxes de vente&nbsp;: au Québec, il va de 14&nbsp;% à 25,75&nbsp;% en 2026, plus l'impôt fédéral. Voyez les <a href="/tranches-imposition-quebec/">tranches d'imposition 2026</a> ou le <a href="/calcul-impot-quebec/">calcul d'impôt Québec</a>.</p>
     <p class="note">Dernière mise à jour&nbsp;: ${UPDATED_YEAR}.</p>
   </section>`
 });
@@ -1001,6 +1148,275 @@ ${welcomeTable("en", WT_PRICES)}
       <li>Quebec City: 2.5% from $500,000 to $750,000, 3% above</li>
     </ul>
     <p>Sources: Québec.ca (transfer duties), montreal.ca, ville.quebec.qc.ca. Other cities such as Laval may also charge higher rates above $500,000; check with your municipality. In 2027 the brackets rise to $64,400 and $322,600.</p>
+  </section>`
+});
+
+// ---------- FR: /tranches-imposition-quebec/ ----------
+pages.push({
+  url: "/tranches-imposition-quebec/",
+  out: "tranches-imposition-quebec/index.html",
+  pair: ["/tranches-imposition-quebec/", "/quebec-tax-brackets/"],
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/salary.js"],
+  featureList: ["Tranches d'imposition du Québec 2026", "Tranches fédérales 2026", "Taux marginal combiné", "Calcul de l'impôt selon le salaire"],
+  title: `Tranches d'imposition Québec 2026 : 14 % à 25,75 % (${pct(TOP_COMBINED, "fr").replace("&nbsp;", " ")} combiné)`,
+  desc: `Tranches d'imposition 2026 au Québec : 14 % jusqu'à ${num(QC_BR[0][0], "en").replace(/,/g, " ")} $, 19 %, 24 % et 25,75 % au-delà de ${num(QC_BR[2][0], "en").replace(/,/g, " ")} $. Tranches fédérales, taux marginal combiné et calculateur.`,
+  h1: "Tranches d'imposition Québec 2026",
+  intro: "Les tranches et taux d'imposition 2026 du Québec et du fédéral, le taux marginal combiné pour un résident du Québec, et l'impôt réel selon votre revenu.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Tranches d'imposition Québec", href: "/tranches-imposition-quebec/" }],
+  faqs: [
+    { q: "Quelles sont les tranches d'imposition au Québec en 2026?", a: `14&nbsp;% jusqu'à ${mInt(QC_BR[0][0], "fr")}, 19&nbsp;% de ${mInt(QC_BR[0][0], "fr")} à ${mInt(QC_BR[1][0], "fr")}, 24&nbsp;% de ${mInt(QC_BR[1][0], "fr")} à ${mInt(QC_BR[2][0], "fr")} et 25,75&nbsp;% au-delà. S'y ajoute l'impôt fédéral, réduit de 16,5&nbsp;% pour les résidents du Québec.` },
+    { q: "Quel est mon taux marginal à 60 000 $ au Québec?", a: `${pct(combinedRate(60000), "fr")} en 2026&nbsp;: ${pct(rateAt(FED_BR, 60000) * (1 - ABATE), "fr")} au fédéral (après abattement) et ${pct(rateAt(QC_BR, 60000), "fr")} au Québec. Chaque dollar gagné de plus est imposé à ce taux, mais pas votre revenu entier.` },
+    { q: "Est-ce que tout mon revenu est imposé au taux de ma tranche?", a: "Non. Chaque taux ne s'applique qu'à la portion du revenu comprise dans sa tranche. Passer dans une tranche supérieure n'augmente l'impôt que sur les dollars au-dessus du seuil." },
+    { q: "Quelle est la différence entre taux marginal et taux effectif?", a: `Le taux marginal s'applique à votre prochain dollar de revenu. Le taux effectif est l'impôt total divisé par le revenu. À 60&nbsp;000&nbsp;$, le taux marginal est de ${pct(combinedRate(60000), "fr")} alors que le taux effectif n'est que d'environ ${pct(S60.tax / 60000, "fr", 1)}.` },
+    { q: "Quel est le revenu minimum imposable au Québec?", a: `Grâce au montant personnel de base (${mInt(TAXP.quebec.bpa, "fr")} au Québec, ${mInt(TAXP.federal.bpaMax, "fr")} au fédéral) et aux crédits pour cotisations, un salarié ne paie pas d'impôt du Québec avant environ ${mInt(QC_START, "fr")} de salaire, ni d'impôt fédéral avant environ ${mInt(FED_START, "fr")}.` },
+    { q: "Qu'est-ce que l'abattement du Québec?", a: "Les résidents du Québec obtiennent une réduction de 16,5&nbsp;% de leur impôt fédéral de base, parce que le Québec finance lui-même certains programmes. C'est pourquoi le taux fédéral effectif de la première tranche est de 11,69&nbsp;% plutôt que 14&nbsp;%." }
+  ],
+  body:
+    quickAnswer("fr", `<p>En 2026, l'impôt du Québec compte <b>4 tranches</b>&nbsp;: <b>14&nbsp;%</b> jusqu'à ${mInt(QC_BR[0][0], "fr")}, <b>19&nbsp;%</b> jusqu'à ${mInt(QC_BR[1][0], "fr")}, <b>24&nbsp;%</b> jusqu'à ${mInt(QC_BR[2][0], "fr")} et <b>25,75&nbsp;%</b> au-delà. Avec le fédéral, le taux marginal combiné va de <b>${pct(combinedBands()[0].total, "fr")}</b> à <b>${pct(TOP_COMBINED, "fr")}</b>. Sur 60&nbsp;000&nbsp;$, l'impôt total est d'environ <b>${mInt(S60.tax, "fr")}</b> (${pct(S60.tax / 60000, "fr", 1)}).</p>`) +
+    `
+  <section class="content" aria-labelledby="br-qc">
+    <h2 id="br-qc">Tranches d'imposition du Québec 2026</h2>
+${bracketTable("fr", QC_BR, "Taux du Québec")}
+    <h2>Tranches d'imposition fédérales 2026</h2>
+${bracketTable("fr", FED_BR, "Taux fédéral")}
+    <p>Les résidents du Québec déduisent l'abattement de 16,5&nbsp;% de leur impôt fédéral de base. Le montant personnel de base fédéral (${mInt(TAXP.federal.bpaMax, "fr")}) diminue graduellement entre ${mInt(TAXP.federal.bpaPhaseStart, "fr")} et ${mInt(TAXP.federal.bpaPhaseEnd, "fr")}.</p>
+    <h2>Taux marginal combiné Québec + fédéral (2026)</h2>
+${combinedTable("fr")}
+  </section>` +
+    salaryCard("fr") +
+    `
+  <section class="content" aria-labelledby="br-eff">
+    <h2 id="br-eff">Impôt réel selon le revenu (2026)</h2>
+    <p>Impôt fédéral et du Québec d'un salarié avec les crédits de base, sans les cotisations RRQ, AE et RQAP&nbsp;:</p>
+${taxByIncomeTable("fr")}
+    <h2>Exemple&nbsp;: comment les tranches s'appliquent à 60&nbsp;000&nbsp;$</h2>
+    <ul class="benefits">
+      <li>Premiers ${mInt(QC_BR[0][0], "fr")} × 14&nbsp;% = ${money(EX_LOW, "fr")}</li>
+      <li>${mInt(60000 - QC_BR[0][0], "fr")} restants × 19&nbsp;% = ${money(EX_HIGH, "fr")}</li>
+      <li>Impôt du Québec avant crédits = ${money(r2(EX_LOW + EX_HIGH), "fr")}</li>
+      <li>Moins les crédits non remboursables (montant personnel de base de ${mInt(TAXP.quebec.bpa, "fr")}, RRQ, AE, RQAP à 14&nbsp;%) et la déduction pour travailleur&nbsp;: environ <b>${mInt(S60.qc, "fr")}</b> d'impôt du Québec réellement payé.</li>
+    </ul>
+    <p>Résultat&nbsp;: même si votre dernier dollar est imposé à 19&nbsp;% au Québec, votre taux réel sur l'ensemble du revenu est beaucoup plus bas. Pour votre propre salaire, utilisez le calculateur ci-dessus ou le <a href="/calcul-impot-quebec/">calcul d'impôt Québec</a>.</p>
+    <h2>Ce que les tranches ne disent pas</h2>
+    <p>Les tranches s'appliquent au revenu imposable, après déductions comme le REER. Une cotisation REER de 1&nbsp;000&nbsp;$ à 60&nbsp;000&nbsp;$ de revenu économise donc environ ${money(r2(1000 * combinedRate(60000)), "fr")} d'impôt, soit votre taux marginal. Sources&nbsp;: Revenu Québec et Agence du revenu du Canada, paramètres 2026.</p>
+  </section>`
+});
+
+// ---------- EN: /quebec-tax-brackets/ ----------
+pages.push({
+  url: "/quebec-tax-brackets/",
+  out: "quebec-tax-brackets/index.html",
+  pair: ["/tranches-imposition-quebec/", "/quebec-tax-brackets/"],
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/salary.js"],
+  featureList: ["2026 Quebec tax brackets", "2026 federal tax brackets", "Combined marginal tax rates", "Tax by salary"],
+  title: `Quebec Tax Brackets 2026: 14% to 25.75% (${pct(TOP_COMBINED, "en")} Combined Top Rate)`,
+  desc: `2026 Quebec income tax brackets: 14% up to $${num(QC_BR[0][0], "en")}, 19%, 24% and 25.75% over $${num(QC_BR[2][0], "en")}. Federal brackets, combined marginal rates for Quebec residents and a tax calculator.`,
+  h1: "Quebec Tax Brackets 2026",
+  intro: "Quebec and federal income tax brackets for 2026, the combined marginal rate a Quebec resident actually pays, and the real tax on common salaries.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Quebec Tax Brackets 2026", href: "/quebec-tax-brackets/" }],
+  faqs: [
+    { q: "What are the Quebec tax brackets for 2026?", a: `14% up to ${mInt(QC_BR[0][0], "en")}, 19% from ${mInt(QC_BR[0][0], "en")} to ${mInt(QC_BR[1][0], "en")}, 24% from ${mInt(QC_BR[1][0], "en")} to ${mInt(QC_BR[2][0], "en")} and 25.75% above. Federal tax is added on top, reduced by 16.5% for Quebec residents.` },
+    { q: "What is the marginal tax rate on $60,000 in Quebec?", a: `${pct(combinedRate(60000), "en")} in 2026: ${pct(rateAt(FED_BR, 60000) * (1 - ABATE), "en")} federal (after the abatement) plus ${pct(rateAt(QC_BR, 60000), "en")} Quebec. That rate applies to your next dollar, not your whole income.` },
+    { q: "What is the highest tax bracket in Quebec?", a: `25.75% on Quebec taxable income over ${mInt(QC_BR[2][0], "en")}. Combined with the top federal rate of 33% (less the abatement), the top marginal rate is ${pct(TOP_COMBINED, "en")} above ${mInt(FED_BR[3][0], "en")}.` },
+    { q: "Does moving into a higher bracket reduce my take-home pay?", a: "No. Only the dollars above the threshold are taxed at the higher rate, so a raise always leaves you with more money after tax." },
+    { q: "How much income is tax-free in Quebec?", a: `Thanks to the basic personal amount (${mInt(TAXP.quebec.bpa, "en")} Quebec, ${mInt(TAXP.federal.bpaMax, "en")} federal) and contribution credits, an employee pays no Quebec income tax until about ${mInt(QC_START, "en")} of salary and no federal tax until about ${mInt(FED_START, "en")}.` },
+    { q: "Why is federal tax lower for Quebec residents?", a: "Quebec residents get a 16.5% abatement on basic federal tax because Quebec funds some programs itself. The lowest federal bracket is effectively 11.69% instead of 14%." }
+  ],
+  body:
+    quickAnswer("en", `<p>Quebec has <b>4 tax brackets</b> in 2026: <b>14%</b> up to ${mInt(QC_BR[0][0], "en")}, <b>19%</b> up to ${mInt(QC_BR[1][0], "en")}, <b>24%</b> up to ${mInt(QC_BR[2][0], "en")} and <b>25.75%</b> above. With federal tax, combined marginal rates run from <b>${pct(combinedBands()[0].total, "en")}</b> to <b>${pct(TOP_COMBINED, "en")}</b>. On $60,000, total income tax is about <b>${mInt(S60.tax, "en")}</b> (${pct(S60.tax / 60000, "en", 1)}).</p>`) +
+    `
+  <section class="content" aria-labelledby="br-qc-en">
+    <h2 id="br-qc-en">Quebec income tax brackets 2026</h2>
+${bracketTable("en", QC_BR, "Quebec rate")}
+    <h2>Federal income tax brackets 2026</h2>
+${bracketTable("en", FED_BR, "Federal rate")}
+    <p>Quebec residents subtract the 16.5% Quebec abatement from basic federal tax. The federal basic personal amount (${mInt(TAXP.federal.bpaMax, "en")}) phases down between ${mInt(TAXP.federal.bpaPhaseStart, "en")} and ${mInt(TAXP.federal.bpaPhaseEnd, "en")}.</p>
+    <h2>Combined Quebec + federal marginal tax rates (2026)</h2>
+${combinedTable("en")}
+  </section>` +
+    salaryCard("en") +
+    `
+  <section class="content" aria-labelledby="br-eff-en">
+    <h2 id="br-eff-en">Actual income tax by salary (2026)</h2>
+    <p>Federal and Quebec income tax for an employee with basic credits, excluding QPP, EI and QPIP contributions:</p>
+${taxByIncomeTable("en")}
+    <h2>Example: how the brackets apply to $60,000</h2>
+    <ul class="benefits">
+      <li>First ${mInt(QC_BR[0][0], "en")} × 14% = ${money(EX_LOW, "en")}</li>
+      <li>Remaining ${mInt(60000 - QC_BR[0][0], "en")} × 19% = ${money(EX_HIGH, "en")}</li>
+      <li>Quebec tax before credits = ${money(r2(EX_LOW + EX_HIGH), "en")}</li>
+      <li>Less non-refundable credits (${mInt(TAXP.quebec.bpa, "en")} basic personal amount, QPP, EI, QPIP at 14%) and the worker deduction: about <b>${mInt(S60.qc, "en")}</b> of Quebec tax actually paid.</li>
+    </ul>
+    <p>So even though your last dollar is taxed at 19% in Quebec, your average rate is far lower. For your own salary, use the calculator above or the <a href="/quebec-income-tax-calculator/">Quebec income tax calculator</a>.</p>
+    <h2>Brackets and RRSP savings</h2>
+    <p>Brackets apply to taxable income, after deductions such as RRSP contributions. A $1,000 RRSP contribution at $60,000 of income saves about ${money(r2(1000 * combinedRate(60000)), "en")} in tax, your marginal rate. Sources: Revenu Québec and Canada Revenue Agency, 2026 parameters.</p>
+  </section>`
+});
+
+// ---------- FR: /calcul-impot-quebec/ ----------
+pages.push({
+  url: "/calcul-impot-quebec/",
+  out: "calcul-impot-quebec/index.html",
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/salary.js"],
+  featureList: ["Calcul de l'impôt fédéral et du Québec", "Taux effectif et marginal", "Abattement du Québec", "Retenues sur la paie"],
+  title: `Calcul Impôt Québec 2026 : 60 000 $ = ${num(Math.round(S60.tax), "en").replace(/,/g, " ")} $ d'impôt`,
+  desc: `Calculez votre impôt 2026 au Québec : impôt fédéral et provincial selon votre salaire. 60 000 $ = ${num(Math.round(S60.tax), "en").replace(/,/g, " ")} $ d'impôt (${(S60.tax / 600).toFixed(1).replace(".", ",")} %). Taux effectif, taux marginal et tableau par revenu.`,
+  h1: "Calcul impôt Québec 2026",
+  intro: "Entrez votre revenu pour estimer votre impôt fédéral et votre impôt du Québec en 2026, avec votre taux effectif et votre salaire net.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul impôt Québec", href: "/calcul-impot-quebec/" }],
+  faqs: [
+    { q: "Combien d'impôt paie-t-on sur 50 000 $ au Québec?", a: `Environ ${mInt(S50.tax, "fr")} en 2026&nbsp;: ${mInt(S50.fed, "fr")} d'impôt fédéral et ${mInt(S50.qc, "fr")} d'impôt du Québec, soit un taux effectif de ${pct(S50.tax / 50000, "fr", 1)}. Les cotisations RRQ, AE et RQAP s'ajoutent sur la paie.` },
+    { q: "Combien d'impôt paie-t-on sur 100 000 $ au Québec?", a: `Environ ${mInt(S100.tax, "fr")} en 2026 (${mInt(S100.fed, "fr")} au fédéral et ${mInt(S100.qc, "fr")} au Québec), soit ${pct(S100.tax / 100000, "fr", 1)} du revenu. Le taux marginal à ce niveau est de ${pct(combinedRate(100000), "fr")}.` },
+    { q: "Comment calculer son impôt au Québec?", a: "On applique les tranches d'imposition au revenu imposable, séparément pour le fédéral et le Québec, puis on soustrait les crédits non remboursables (montant personnel de base, cotisations). L'impôt fédéral est ensuite réduit de l'abattement du Québec de 16,5&nbsp;%." },
+    { q: "Pourquoi fait-on deux déclarations de revenus au Québec?", a: "Le Québec perçoit lui-même son impôt provincial. Les résidents produisent donc une déclaration fédérale (Agence du revenu du Canada) et une déclaration du Québec (TP-1, Revenu Québec)." },
+    { q: "Le calcul d'impôt est-il exact?", a: "C'est une estimation fiable pour un salarié avec les crédits de base. Les REER, frais de garde, dons, revenus de placement ou crédits familiaux changent le montant réel. Pour un calcul officiel, utilisez un logiciel autorisé par Revenu Québec." }
+  ],
+  body:
+    quickAnswer("fr", `<p>Sur un salaire de <b>60&nbsp;000&nbsp;$</b> en 2026, l'impôt est d'environ <b>${mInt(S60.tax, "fr")}</b>&nbsp;: ${mInt(S60.fed, "fr")} au fédéral et ${mInt(S60.qc, "fr")} au Québec, soit un taux effectif de <b>${pct(S60.tax / 60000, "fr", 1)}</b>. Votre taux marginal est de ${pct(combinedRate(60000), "fr")}.</p>`) +
+    salaryCard("fr") +
+    `
+  <section class="content" aria-labelledby="imp-table">
+    <h2 id="imp-table">Impôt selon le revenu au Québec (2026)</h2>
+${taxByIncomeTable("fr")}
+    <p>Salarié résidant au Québec, crédits de base. Le taux effectif est l'impôt total divisé par le revenu&nbsp;; le taux marginal est celui de votre prochain dollar gagné.</p>
+    <h2>Comment l'impôt est calculé, étape par étape</h2>
+    <ul class="benefits">
+      <li>Revenu imposable&nbsp;: salaire moins les déductions (cotisation RRQ bonifiée, déduction pour travailleur au Québec, REER).</li>
+      <li>Impôt du Québec&nbsp;: tranches de 14&nbsp;% à 25,75&nbsp;% (voir les <a href="/tranches-imposition-quebec/">tranches d'imposition 2026</a>).</li>
+      <li>Impôt fédéral&nbsp;: tranches de 14&nbsp;% à 33&nbsp;%.</li>
+      <li>Crédits non remboursables&nbsp;: montant personnel de base (${mInt(TAXP.quebec.bpa, "fr")} au Québec, ${mInt(TAXP.federal.bpaMax, "fr")} au fédéral), RRQ, AE et RQAP.</li>
+      <li>Abattement du Québec&nbsp;: l'impôt fédéral de base est réduit de 16,5&nbsp;%.</li>
+    </ul>
+    <h2>À partir de quel revenu paie-t-on de l'impôt?</h2>
+    <p>Un salarié commence à payer de l'impôt du Québec vers ${mInt(QC_START, "fr")} de salaire et de l'impôt fédéral vers ${mInt(FED_START, "fr")}, grâce au montant personnel de base et aux crédits pour cotisations. Les cotisations RRQ, AE et RQAP, elles, s'appliquent dès le premier dollar (RRQ au-delà de 3&nbsp;500&nbsp;$).</p>
+    <h2>Impôt, salaire net ou paie?</h2>
+    <p>Pour le montant déposé à chaque paie, utilisez le <a href="/calcul-paie-net-quebec/">calcul de paie nette</a>. Pour le net annuel, le <a href="/calcul-salaire-net-quebec/">calcul du salaire net</a>.</p>
+  </section>`
+});
+
+// ---------- FR: /calcul-paie-net-quebec/ ----------
+const P60 = netPay(60000), P50 = netPay(50000), H25 = netPay(25 * 2080);
+pages.push({
+  url: "/calcul-paie-net-quebec/",
+  out: "calcul-paie-net-quebec/index.html",
+  pair: ["/calcul-paie-net-quebec/", "/quebec-paycheck-calculator/"],
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/salary.js"],
+  featureList: ["Paie nette par semaine, aux 2 semaines ou par mois", "Taux horaire", "Impôts, RRQ, AE et RQAP"],
+  title: `Calcul Paie Net Québec 2026 : 60 000 $ = ${num(Math.round(P60.net / 26), "en").replace(/,/g, " ")} $ aux 2 semaines`,
+  desc: `Simulation de paie nette au Québec (2026) : entrez votre salaire ou taux horaire et obtenez votre paie nette par semaine, aux 2 semaines ou par mois après impôts, RRQ, AE et RQAP.`,
+  h1: "Calcul de paie nette Québec 2026",
+  intro: "Entrez votre salaire ou votre taux horaire pour voir le montant net déposé à chaque paie, après impôts et cotisations.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul paie net Québec", href: "/calcul-paie-net-quebec/" }],
+  faqs: [
+    { q: "Combien reçoit-on aux 2 semaines avec 50 000 $ par année?", a: `Environ ${money(r2(P50.net / 26), "fr")} net aux 2 semaines en 2026, soit ${money(r2(P50.net / 12), "fr")} par mois, après impôts fédéral et provincial, RRQ, assurance-emploi et RQAP.` },
+    { q: "Combien fait 25 $ de l'heure net au Québec?", a: `À 40&nbsp;heures par semaine, 25&nbsp;$/h donne ${mInt(25 * 2080, "fr")} brut par année et environ ${money(r2(H25.net / 26), "fr")} net aux 2 semaines, soit ${money(r2(H25.net / 2080), "fr")} net de l'heure.` },
+    { q: "Quelles retenues sont prélevées sur une paie au Québec?", a: "Impôt fédéral, impôt du Québec, RRQ, assurance-emploi (taux réduit du Québec) et RQAP. Votre employeur peut aussi retenir des cotisations syndicales, un régime de retraite ou d'assurance collective." },
+    { q: "Pourquoi ma paie réelle diffère-t-elle un peu?", a: "L'employeur utilise les tables de retenues (formulaires TP-1015.3 et TD1) et vos déductions propres. Le RRQ et l'AE cessent aussi d'être prélevés une fois le maximum annuel atteint, donc les dernières paies de l'année peuvent être plus élevées." },
+    { q: "Combien de paies y a-t-il par année?", a: "26 paies aux 2 semaines, 52 paies par semaine, 24 paies deux fois par mois ou 12 paies mensuelles. Certaines années comptent 27 paies aux 2 semaines selon le calendrier." }
+  ],
+  body:
+    quickAnswer("fr", `<p>Avec un salaire de <b>60&nbsp;000&nbsp;$</b> en 2026, votre paie nette est d'environ <b>${money(r2(P60.net / 26), "fr")} aux 2 semaines</b> (${money(r2(P60.net / 52), "fr")} par semaine, ${money(r2(P60.net / 12), "fr")} par mois). À <b>25&nbsp;$/h</b> et 40&nbsp;h, c'est environ ${money(r2(H25.net / 26), "fr")} aux 2 semaines.</p>`) +
+    salaryCard("fr", { main: "biweek" }) +
+    `
+  <section class="content" aria-labelledby="paie-table">
+    <h2 id="paie-table">Paie nette selon le salaire (2026)</h2>
+${payTable("fr")}
+    <h2>Paie nette selon le taux horaire (40 h/semaine)</h2>
+${hourlyTable("fr")}
+    <h2>Ce qui est retenu sur chaque paie</h2>
+    <ul class="benefits">
+      <li>Impôt fédéral, réduit de l'abattement du Québec de 16,5&nbsp;%</li>
+      <li>Impôt du Québec — <a href="/tranches-imposition-quebec/">tranches de 14&nbsp;% à 25,75&nbsp;%</a></li>
+      <li>RRQ — 6,3&nbsp;% entre 3&nbsp;500&nbsp;$ et 74&nbsp;600&nbsp;$, puis 4&nbsp;% jusqu'à 85&nbsp;000&nbsp;$</li>
+      <li>Assurance-emploi — 1,30&nbsp;% jusqu'à 68&nbsp;900&nbsp;$</li>
+      <li>RQAP — 0,430&nbsp;% jusqu'à 103&nbsp;000&nbsp;$</li>
+    </ul>
+    <p>Le calcul répartit les retenues annuelles également sur chaque paie. Pour l'impôt seulement, voyez le <a href="/calcul-impot-quebec/">calcul d'impôt Québec</a>&nbsp;; pour le net annuel, le <a href="/calcul-salaire-net-quebec/">calcul du salaire net</a>.</p>
+  </section>`
+});
+
+// ---------- EN: /quebec-paycheck-calculator/ ----------
+pages.push({
+  url: "/quebec-paycheck-calculator/",
+  out: "quebec-paycheck-calculator/index.html",
+  pair: ["/calcul-paie-net-quebec/", "/quebec-paycheck-calculator/"],
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/salary.js"],
+  featureList: ["Net pay per week, every 2 weeks or per month", "Hourly wage", "Taxes, QPP, EI and QPIP"],
+  title: `Quebec Paycheck Calculator 2026: $60,000 = $${num(Math.round(P60.net / 26), "en")} Every 2 Weeks`,
+  desc: "Quebec paycheck calculator for 2026: enter your salary or hourly wage to see your take-home pay per week, every two weeks or per month after tax, QPP, EI and QPIP.",
+  h1: "Quebec Paycheck Calculator 2026",
+  intro: "Enter your salary or hourly wage to see the take-home pay deposited each payday, after income tax and payroll contributions.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Quebec Paycheck Calculator", href: "/quebec-paycheck-calculator/" }],
+  faqs: [
+    { q: "How much is a $50,000 salary every two weeks in Quebec?", a: `About ${money(r2(P50.net / 26), "en")} net every two weeks in 2026, or ${money(r2(P50.net / 12), "en")} a month, after federal and Quebec tax, QPP, EI and QPIP.` },
+    { q: "How much is $25 an hour after tax in Quebec?", a: `At 40 hours a week, $25/h is ${mInt(25 * 2080, "en")} a year gross and about ${money(r2(H25.net / 26), "en")} net every two weeks, or ${money(r2(H25.net / 2080), "en")} net per hour.` },
+    { q: "What is deducted from a Quebec paycheque?", a: "Federal income tax, Quebec income tax, the Quebec Pension Plan (QPP), Employment Insurance at Quebec's reduced rate, and the Quebec Parental Insurance Plan (QPIP). Employers may also deduct union dues, pension or group insurance." },
+    { q: "Why is my actual paycheque slightly different?", a: "Employers use payroll withholding tables and your own TD1 / TP-1015.3 forms. QPP and EI also stop once the annual maximum is reached, so late-year paycheques can be higher." },
+    { q: "Why is take-home pay lower in Quebec than in Ontario?", a: "Quebec's provincial income tax is higher, partly offset by the 16.5% federal abatement and lower EI. In exchange, Quebec funds programs like subsidized daycare and QPIP parental leave." }
+  ],
+  body:
+    quickAnswer("en", `<p>On a <b>$60,000</b> salary in 2026, your Quebec paycheque is about <b>${money(r2(P60.net / 26), "en")} every two weeks</b> (${money(r2(P60.net / 52), "en")} weekly, ${money(r2(P60.net / 12), "en")} monthly). At <b>$25/hour</b> and 40 hours, it's about ${money(r2(H25.net / 26), "en")} every two weeks.</p>`) +
+    salaryCard("en", { main: "biweek" }) +
+    `
+  <section class="content" aria-labelledby="pay-table-en">
+    <h2 id="pay-table-en">Take-home pay by salary in Quebec (2026)</h2>
+${payTable("en")}
+    <h2>Take-home pay by hourly wage (40 h/week)</h2>
+${hourlyTable("en")}
+    <h2>What comes off each paycheque</h2>
+    <ul class="benefits">
+      <li>Federal income tax, less the 16.5% Quebec abatement</li>
+      <li>Quebec income tax — <a href="/quebec-tax-brackets/">brackets from 14% to 25.75%</a></li>
+      <li>QPP: 6.3% between $3,500 and $74,600, then 4% up to $85,000</li>
+      <li>Employment Insurance: 1.30% up to $68,900</li>
+      <li>QPIP: 0.430% up to $103,000</li>
+    </ul>
+    <p>The calculator spreads annual deductions evenly across pay periods. For annual figures, see the <a href="/quebec-income-tax-calculator/">Quebec income tax calculator</a>.</p>
+  </section>`
+});
+
+// ---------- EN: /quebec-tax-rate/ (pair of /taux-tps-tvq-quebec/) ----------
+pages.push({
+  url: "/quebec-tax-rate/",
+  out: "quebec-tax-rate/index.html",
+  pair: ["/taux-tps-tvq-quebec/", "/quebec-tax-rate/"],
+  lang: "en",
+  mode: "add",
+  title: "Quebec Tax Rate 2026: 14.975% (GST 5% + QST 9.975%)",
+  desc: "The Quebec sales tax rate in 2026 is 14.975%: 5% GST plus 9.975% QST. $100 before tax = $114.98. Compare with Ontario (13% HST) and every other province.",
+  h1: "Quebec Tax Rate 2026",
+  intro: "The sales tax rate in Quebec, how it's applied, and how it compares with the other provinces. Enter an amount to add the tax.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Quebec Tax Rate", href: "/quebec-tax-rate/" }],
+  faqs: [
+    { q: "What is the sales tax in Quebec?", a: "14.975% in total: the 5% federal GST plus the 9.975% Quebec Sales Tax (QST), both calculated on the price before tax." },
+    { q: "How much is tax on $100 in Quebec?", a: "$14.98: $5.00 GST plus $9.98 QST, for a total of $114.98." },
+    { q: "Is Quebec tax higher than Ontario?", a: "Yes. Quebec's combined 14.975% is about 2 points higher than Ontario's 13% HST. On $100, you pay $114.98 in Quebec and $113.00 in Ontario." },
+    { q: "Does Quebec have HST?", a: "No. Quebec charges two separate taxes, the GST (5%) and the QST (9.975%). HST is used in Ontario and the Atlantic provinces." },
+    { q: "What is the Quebec income tax rate?", a: "Quebec income tax runs from 14% to 25.75% in 2026, on top of federal tax. See the <a href=\"/quebec-tax-brackets/\">2026 Quebec tax brackets</a>." }
+  ],
+  body:
+    quickAnswer("en", "<p>The Quebec sales tax rate is <b>14.975%</b>: <b>5% GST</b> (federal) + <b>9.975% QST</b> (provincial). Multiply a price by <b>1.14975</b> to get the total: $100 before tax = <b>$114.98</b>. Rates are unchanged in 2026.</p>") +
+    TRUST_EN +
+    `
+  <section class="content" aria-labelledby="rate-en-table">
+    <h2 id="rate-en-table">Quebec sales tax on common amounts</h2>
+${addTable("en", [1, 5, 10, 20, 25, 50, 75, 100, 200, 500, 1000, 5000])}
+    <h2>Sales tax rates by province (2026)</h2>
+${provinceTable("en")}
+    <h2>How the Quebec tax rate is applied</h2>
+    <p>Both taxes are calculated on the price before tax: the QST is not charged on the GST. Each tax is rounded to the cent, which is why $100 gives $114.98, not $114.975. To take tax out of a total, divide by 1.14975 with the <a href="/reverse-tax-calculator-quebec/">reverse tax calculator</a>.</p>
+    <h2>Looking for the income tax rate?</h2>
+    <p>Quebec income tax is separate from sales tax: brackets from 14% to 25.75% in 2026, plus federal tax. See the <a href="/quebec-tax-brackets/">Quebec tax brackets</a> or estimate your tax with the <a href="/quebec-income-tax-calculator/">income tax calculator</a>.</p>
   </section>`
 });
 
@@ -1833,12 +2249,25 @@ const llms = `# Calcul Taxes Québec
 - RQAP: 0,430 % jusqu'à 103 000 $.
 - Exemple: 60 000 $ brut ≈ 45 857 $ net/an (~3 821 $/mois), soit ~23,6 % de retenues.
 
+## Impôt sur le revenu (${UPDATED_YEAR})
+- Tranches du Québec: 14 % jusqu'à ${QC_BR[0][0]} $, 19 % jusqu'à ${QC_BR[1][0]} $, 24 % jusqu'à ${QC_BR[2][0]} $, 25,75 % au-delà.
+- Tranches fédérales: ${FED_BR.map(([c, r]) => `${String(Math.round(r * 1000) / 10).replace(".", ",")} %${c === Infinity ? " au-delà" : " jusqu'à " + c + " $"}`).join(", ")}.
+- Abattement du Québec: 16,5 % de l'impôt fédéral de base.
+- Taux marginal combiné: de ${stripTags(pct(combinedBands()[0].total, "fr"))} à ${stripTags(pct(TOP_COMBINED, "fr"))}.
+- Exemple: 60 000 $ de salaire ≈ ${Math.round(S60.tax)} $ d'impôt (fédéral ${Math.round(S60.fed)} $ + Québec ${Math.round(S60.qc)} $), paie nette ≈ ${Math.round(P60.net / 26)} $ aux 2 semaines.
+
 ## Calculatrices
 - Calcul taxes Québec (accueil): ${SITE}/
 - Calcul taxe inverse (retirer): ${SITE}/calcul-taxe-inverse-quebec/
 - Calcul salaire net Québec (brut → net): ${SITE}/calcul-salaire-net-quebec/
+- Calcul paie net Québec (par paie / taux horaire): ${SITE}/calcul-paie-net-quebec/
+- Calcul impôt Québec: ${SITE}/calcul-impot-quebec/
+- Tranches d'imposition Québec 2026: ${SITE}/tranches-imposition-quebec/
 - Taux TPS TVQ Québec: ${SITE}/taux-tps-tvq-quebec/
 - Quebec Tax Calculator (English): ${SITE}/quebec-tax-calculator/
+- Quebec Paycheck Calculator (English): ${SITE}/quebec-paycheck-calculator/
+- Quebec Tax Brackets 2026 (English): ${SITE}/quebec-tax-brackets/
+- Quebec Tax Rate (English): ${SITE}/quebec-tax-rate/
 
 ## Guides (blogue)
 ${POSTS_RAW.map((p) => `- ${stripTags(p.h1)}: ${SITE}${p.url}`).join("\n")}

@@ -20,14 +20,25 @@ instantané et excellents Core Web Vitals.
 
 | URL | Mot-clé principal |
 |-----|-------------------|
-| `/` | calcul taxes quebec |
-| `/calcul-tps-tvq/` | calcul tps tvq |
+| `/` | calcul taxes quebec (absorbe `/calcul-tps-tvq/`, `/calculateur-de-taxes-quebec/`, `/tps-tvq-en-ligne/` via 301) |
 | `/calcul-taxe-inverse-quebec/` | calcul taxe inverse |
-| `/calculateur-de-taxes-quebec/` | calculateur de taxes |
-| `/tps-tvq-en-ligne/` | tps tvq en ligne |
 | `/calcul-salaire-net-quebec/` | calcul salaire net / salaire brut en net |
-| `/quebec-tax-calculator/` | tax calculator quebec (EN) |
+| `/calcul-paie-net-quebec/` | calcul paie net / simulation calcul paie |
+| `/calcul-impot-quebec/` | calcul impôt québec / calculateur impôt |
+| `/tranches-imposition-quebec/` | tranches / taux d'imposition québec |
+| `/calcul-taxe-de-bienvenue-quebec/` | taxe de bienvenue |
 | `/taux-tps-tvq-quebec/` | taux tps tvq |
+| `/quebec-tax-calculator/` | quebec sales tax calculator (EN) |
+| `/reverse-tax-calculator-quebec/` | reverse tax calculator quebec (EN) |
+| `/quebec-income-tax-calculator/` | quebec income tax calculator (EN) |
+| `/quebec-paycheck-calculator/` | quebec paycheck calculator (EN) |
+| `/quebec-tax-brackets/` | quebec tax brackets (EN) |
+| `/quebec-tax-rate/` | quebec tax rate / sales tax rate (EN) |
+| `/quebec-welcome-tax-calculator/` | quebec welcome tax (EN) |
+
+Les tableaux des pages impôt/paie sont calculés au build par le même moteur que la
+calculatrice (`assets/js/salary.js`, exporté pour Node) : modifiez les paramètres
+2026 à un seul endroit.
 
 ## Structure
 

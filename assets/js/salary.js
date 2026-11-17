@@ -29,14 +29,14 @@
       qpp: "RRQ (Régime de rentes)", ei: "Assurance-emploi", qpip: "RQAP", ded: "Retenues totales",
       rate: "Taux d'imposition effectif", copyIdle: "Copier le résultat", copyDone: "Copié ✓",
       copyErr: "Copie impossible", perMonth: "par mois", perBiweek: "aux 2 semaines",
-      perWeek: "par semaine", perHour: "par heure", approx: "≈"
+      perWeek: "par semaine", perHour: "par heure", perYear: "par année", approx: "≈"
     },
     en: {
       net: "Net pay", gross: "Gross pay", fed: "Federal tax", qc: "Quebec tax",
       qpp: "QPP (pension plan)", ei: "Employment Insurance", qpip: "QPIP", ded: "Total deductions",
       rate: "Effective tax rate", copyIdle: "Copy result", copyDone: "Copied ✓",
       copyErr: "Copy failed", perMonth: "per month", perBiweek: "every 2 weeks",
-      perWeek: "per week", perHour: "per hour", approx: "≈"
+      perWeek: "per week", perHour: "per hour", perYear: "per year", approx: "≈"
     }
   };
 
@@ -172,13 +172,16 @@
       set(out.ei, "−" + fmt(r.ei));
       set(out.qpip, "−" + fmt(r.qpip));
       set(out.deductions, "−" + fmt(r.deductions));
-      set(out.net, fmt(r.net));
       set(out.rate, pct.format(r.rate));
       var pi = periodInfo();
-      if (out.netperiod) {
-        out.netperiod.textContent = (pi.div && isFinite(pi.div) && pi.div > 0)
-          ? t.approx + " " + fmt(r.net / pi.div) + " " + pi.per
-          : "";
+      var hasPeriod = pi.div && isFinite(pi.div) && pi.div > 0;
+      // data-sal-main="biweek" (paycheque pages): headline = net every 2 weeks, sub-line = net per year
+      if (root.getAttribute("data-sal-main") === "biweek") {
+        set(out.net, fmt(r.net / 26));
+        set(out.netperiod, t.approx + " " + fmt(r.net) + " " + t.perYear);
+      } else {
+        set(out.net, fmt(r.net));
+        set(out.netperiod, hasPeriod ? t.approx + " " + fmt(r.net / pi.div) + " " + pi.per : "");
       }
       root._summary =
         t.gross + ": " + fmt(r.gross) + " | " +
@@ -222,6 +225,8 @@
     var roots = document.querySelectorAll("[data-salary]");
     for (var i = 0; i < roots.length; i++) initSalary(roots[i]);
   }
+  // build.js reuses the same engine to compute the static tables (single source of truth)
+  if (typeof module !== "undefined" && module.exports) { module.exports = { computeNet: computeNet, R: R }; return; }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot);
   else boot();
 })();

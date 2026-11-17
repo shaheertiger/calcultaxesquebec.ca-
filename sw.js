@@ -1,5 +1,5 @@
 /* Calcul Taxes Québec — service worker (offline-ready, cache-first for assets) */
-const CACHE = "ctq-v3";
+const CACHE = "ctq-v4";
 const ASSETS = [
   "/",
   "/calcul-taxe-inverse-quebec/",
@@ -10,6 +10,12 @@ const ASSETS = [
   "/quebec-welcome-tax-calculator/",
   "/quebec-tax-calculator/",
   "/taux-tps-tvq-quebec/",
+  "/calcul-paie-net-quebec/",
+  "/calcul-impot-quebec/",
+  "/tranches-imposition-quebec/",
+  "/quebec-paycheck-calculator/",
+  "/quebec-tax-brackets/",
+  "/quebec-tax-rate/",
   "/assets/css/styles.css",
   "/assets/js/calculator.js",
   "/assets/js/salary.js",

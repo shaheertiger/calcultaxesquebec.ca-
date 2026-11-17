@@ -20,12 +20,25 @@
 - RQAP: 0,430 % jusqu'à 103 000 $.
 - Exemple: 60 000 $ brut ≈ 45 857 $ net/an (~3 821 $/mois), soit ~23,6 % de retenues.
 
+## Impôt sur le revenu (2026)
+- Tranches du Québec: 14 % jusqu'à 54345 $, 19 % jusqu'à 108680 $, 24 % jusqu'à 132245 $, 25,75 % au-delà.
+- Tranches fédérales: 14 % jusqu'à 58523 $, 20,5 % jusqu'à 117045 $, 26 % jusqu'à 181440 $, 29 % jusqu'à 258482 $, 33 % au-delà.
+- Abattement du Québec: 16,5 % de l'impôt fédéral de base.
+- Taux marginal combiné: de 25,69 % à 53,31 %.
+- Exemple: 60 000 $ de salaire ≈ 9546 $ d'impôt (fédéral 4427 $ + Québec 5118 $), paie nette ≈ 1764 $ aux 2 semaines.
+
 ## Calculatrices
 - Calcul taxes Québec (accueil): https://www.calcultaxesquebec.ca/
 - Calcul taxe inverse (retirer): https://www.calcultaxesquebec.ca/calcul-taxe-inverse-quebec/
 - Calcul salaire net Québec (brut → net): https://www.calcultaxesquebec.ca/calcul-salaire-net-quebec/
+- Calcul paie net Québec (par paie / taux horaire): https://www.calcultaxesquebec.ca/calcul-paie-net-quebec/
+- Calcul impôt Québec: https://www.calcultaxesquebec.ca/calcul-impot-quebec/
+- Tranches d'imposition Québec 2026: https://www.calcultaxesquebec.ca/tranches-imposition-quebec/
 - Taux TPS TVQ Québec: https://www.calcultaxesquebec.ca/taux-tps-tvq-quebec/
 - Quebec Tax Calculator (English): https://www.calcultaxesquebec.ca/quebec-tax-calculator/
+- Quebec Paycheck Calculator (English): https://www.calcultaxesquebec.ca/quebec-paycheck-calculator/
+- Quebec Tax Brackets 2026 (English): https://www.calcultaxesquebec.ca/quebec-tax-brackets/
+- Quebec Tax Rate (English): https://www.calcultaxesquebec.ca/quebec-tax-rate/
 
 ## Guides (blogue)
 - Comment calculer la TPS et la TVQ au Québec?: https://www.calcultaxesquebec.ca/comment-calculer-tps-tvq-quebec/
