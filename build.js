@@ -273,6 +273,8 @@ function internalLinks(lang, currentPath) {
     { href: "/calcul-impot-quebec/", label: "Calcul impôt Québec", sub: "Impôt fédéral et provincial 2026" },
     { href: "/tranches-imposition-quebec/", label: "Tranches d'imposition 2026", sub: "Taux marginal Québec + fédéral" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ Québec", sub: "TPS 5 %, TVQ 9,975 %" },
+    { href: "/calcul-taxes-canada/", label: "Calcul taxes Canada", sub: "TPS, TVH, TVP par province" },
+    { href: "/calcul-taxes-ontario/", label: "Calcul taxes Ontario", sub: "TVH 13 %" },
     { href: "/quebec-tax-calculator/", label: "Quebec Tax Calculator", sub: "Version anglaise" }
   ] : [
     { href: "/quebec-tax-calculator/", label: "Quebec Sales Tax Calculator", sub: "Add GST and QST" },
@@ -281,6 +283,8 @@ function internalLinks(lang, currentPath) {
     { href: "/quebec-paycheck-calculator/", label: "Quebec Paycheck Calculator", sub: "Take-home pay every 2 weeks" },
     { href: "/quebec-tax-brackets/", label: "Quebec Tax Brackets 2026", sub: "Combined marginal rates" },
     { href: "/quebec-tax-rate/", label: "Quebec Tax Rate", sub: "14.975% and other provinces" },
+    { href: "/canada-sales-tax-calculator/", label: "Canada Sales Tax Calculator", sub: "GST, HST, PST by province" },
+    { href: "/ontario-sales-tax-calculator/", label: "Ontario Sales Tax Calculator", sub: "HST 13%" },
     { href: "/quebec-welcome-tax-calculator/", label: "Quebec Welcome Tax Calculator", sub: "Land transfer tax, 2026 brackets" },
     { href: "/", label: "Calcul taxes Québec", sub: "Version française" }
   ]).map((l) => ({ ...l, subFr: l.sub, subEn: l.sub }))
@@ -710,29 +714,130 @@ function hourlyTable(lang) {
       </tbody>
     </table>`;
 }
-/* Sales tax by province, rates in force in 2026 (CRA GST/HST rates; provincial PST sites). */
+/* Sales tax by province, rates in force in 2026 (CRA GST/HST rates; BC, SK and MB PST/RST sites).
+ * Nova Scotia's HST fell from 15 % to 14 % on April 1, 2025. PST/RST/QST are charged on the price before GST,
+ * so the rates add up. kind: gst (GST only), hst (single harmonized tax), pst/rst/qst (GST + provincial tax). */
 const PROV = [
-  { fr: "Québec", en: "Quebec", parts: { fr: "TPS 5 % + TVQ 9,975 %", en: "GST 5% + QST 9.975%" }, rate: 0.14975 },
-  { fr: "Ontario", en: "Ontario", parts: { fr: "TVH 13 %", en: "HST 13%" }, rate: 0.13 },
-  { fr: "Colombie-Britannique", en: "British Columbia", parts: { fr: "TPS 5 % + TVP 7 %", en: "GST 5% + PST 7%" }, rate: 0.12 },
-  { fr: "Alberta", en: "Alberta", parts: { fr: "TPS 5 %", en: "GST 5%" }, rate: 0.05 },
-  { fr: "Saskatchewan", en: "Saskatchewan", parts: { fr: "TPS 5 % + TVP 6 %", en: "GST 5% + PST 6%" }, rate: 0.11 },
-  { fr: "Manitoba", en: "Manitoba", parts: { fr: "TPS 5 % + TVD 7 %", en: "GST 5% + RST 7%" }, rate: 0.12 },
-  { fr: "Nouveau-Brunswick", en: "New Brunswick", parts: { fr: "TVH 15 %", en: "HST 15%" }, rate: 0.15 },
-  { fr: "Nouvelle-Écosse", en: "Nova Scotia", parts: { fr: "TVH 14 %", en: "HST 14%" }, rate: 0.14 },
-  { fr: "Île-du-Prince-Édouard", en: "Prince Edward Island", parts: { fr: "TVH 15 %", en: "HST 15%" }, rate: 0.15 },
-  { fr: "Terre-Neuve-et-Labrador", en: "Newfoundland and Labrador", parts: { fr: "TVH 15 %", en: "HST 15%" }, rate: 0.15 },
-  { fr: "Yukon, T.N.-O., Nunavut", en: "Yukon, NWT, Nunavut", parts: { fr: "TPS 5 %", en: "GST 5%" }, rate: 0.05 }
-];
+  { code: "qc", fr: "Québec", en: "Quebec", kind: "qst", prov: 0.09975 },
+  { code: "on", fr: "Ontario", en: "Ontario", kind: "hst", prov: 0.08 },
+  { code: "bc", fr: "Colombie-Britannique", en: "British Columbia", kind: "pst", prov: 0.07 },
+  { code: "ab", fr: "Alberta", en: "Alberta", kind: "gst", prov: 0 },
+  { code: "sk", fr: "Saskatchewan", en: "Saskatchewan", kind: "pst", prov: 0.06 },
+  { code: "mb", fr: "Manitoba", en: "Manitoba", kind: "rst", prov: 0.07 },
+  { code: "nb", fr: "Nouveau-Brunswick", en: "New Brunswick", kind: "hst", prov: 0.10 },
+  { code: "ns", fr: "Nouvelle-Écosse", en: "Nova Scotia", kind: "hst", prov: 0.09 },
+  { code: "pe", fr: "Île-du-Prince-Édouard", en: "Prince Edward Island", kind: "hst", prov: 0.10 },
+  { code: "nl", fr: "Terre-Neuve-et-Labrador", en: "Newfoundland and Labrador", kind: "hst", prov: 0.10 },
+  { code: "yt", fr: "Yukon", en: "Yukon", kind: "gst", prov: 0 },
+  { code: "nt", fr: "Territoires du Nord-Ouest", en: "Northwest Territories", kind: "gst", prov: 0 },
+  { code: "nu", fr: "Nunavut", en: "Nunavut", kind: "gst", prov: 0 }
+].map((p) => ({ ...p, fed: 0.05, rate: r2((0.05 + p.prov) * 100000) / 100000 }));
+const PROV_BY = Object.fromEntries(PROV.map((p) => [p.code, p]));
+const TAXNAME = { fr: { gst: "TPS", hst: "TVH", pst: "TVP", rst: "TVD", qst: "TVQ" }, en: { gst: "GST", hst: "HST", pst: "PST", rst: "RST", qst: "QST" } };
+function provParts(p, lang) {
+  const n = TAXNAME[lang === "en" ? "en" : "fr"];
+  if (p.kind === "hst") return `${n.hst} ${pct(p.rate, lang, 3)}`;
+  if (p.kind === "gst") return `${n.gst} ${pct(0.05, lang)}`;
+  return `${n.gst} ${pct(0.05, lang)} + ${n[p.kind]} ${pct(p.prov, lang, 3)}`;
+}
+/* Same rounding as the calculators: each tax rounded to the cent (HST as one tax). */
+function provTax(p, base) {
+  if (p.kind === "hst") { const t = r2(base * p.rate); return { base, t1: t, t2: 0, tax: t, total: r2(base + t) }; }
+  const t1 = r2(base * 0.05), t2 = r2(base * p.prov);
+  return { base, t1, t2, tax: r2(t1 + t2), total: r2(base + t1 + t2) };
+}
+function provRemove(p, total) { const base = r2(total / (1 + p.rate)); return { ...provTax(p, base), total }; }
+function provName(p, lang) { return lang === "en" ? p.en : p.fr; }
+
 function provinceTable(lang) {
   const fr = lang !== "en";
-  const rows = PROV.map((p) => `<tr><td>${fr ? p.fr : p.en}</td><td>${p.parts[fr ? "fr" : "en"].replace(/ %/g, "&nbsp;%")}</td><td><b>${pct(p.rate, lang, 3)}</b></td><td>${money(r2(100 * (1 + p.rate)), lang)}</td></tr>`).join("\n        ");
+  const rows = PROV.map((p) => { const t = provTax(p, 100), r = provRemove(p, 100); return `<tr><td>${provName(p, lang)}</td><td>${provParts(p, lang)}</td><td><b>${pct(p.rate, lang, 3)}</b></td><td>${money(t.total, lang)}</td><td>${money(r.base, lang)}</td></tr>`; }).join("\n        ");
   return `    <table class="data-table">
-      <thead><tr><th>${fr ? "Province" : "Province"}</th><th>${fr ? "Taxes" : "Taxes"}</th><th>${fr ? "Taux total" : "Total rate"}</th><th>${fr ? "100 $ devient" : "$100 becomes"}</th></tr></thead>
+      <thead><tr><th>Province</th><th>${fr ? "Taxes" : "Taxes"}</th><th>${fr ? "Taux total" : "Total rate"}</th><th>${fr ? "100 $ + taxes" : "$100 + tax"}</th><th>${fr ? "100 $ taxes incl. = avant taxes" : "$100 tax incl. = before tax"}</th></tr></thead>
       <tbody>
         ${rows}
       </tbody>
     </table>`;
+}
+function provAmountTable(lang, p, amounts) {
+  const fr = lang !== "en", n = TAXNAME[fr ? "fr" : "en"];
+  const hst = p.kind === "hst";
+  const head = hst ? `<th>${n.hst} ${pct(p.rate, lang, 3)}</th>` : `<th>${n.gst} 5${fr ? "&nbsp;%" : "%"}</th><th>${n[p.kind]} ${pct(p.prov, lang, 3)}</th>`;
+  const rows = amounts.map((a) => { const t = provTax(p, a); return `<tr><td>${money(a, lang)}</td>${hst ? `<td>${money(t.t1, lang)}</td>` : `<td>${money(t.t1, lang)}</td><td>${money(t.t2, lang)}</td>`}<td>${money(t.total, lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Avant taxes" : "Before tax"}</th>${head}<th>${fr ? "Total avec taxes" : "Total with tax"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+function provRemoveTable(lang, p, totals) {
+  const fr = lang !== "en";
+  const rows = totals.map((t) => { const x = provRemove(p, t); return `<tr><td>${money(t, lang)}</td><td>${money(x.tax, lang)}</td><td>${money(x.base, lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Prix taxes incluses" : "Price with tax"}</th><th>${fr ? "Taxes incluses" : "Tax included"}</th><th>${fr ? "Prix avant taxes" : "Price before tax"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+/* Tax on one amount in every province, cheapest to most expensive. */
+function provCompareTable(lang, amount) {
+  const fr = lang !== "en";
+  const rows = [...PROV].sort((a, b) => a.rate - b.rate || provName(a, lang).localeCompare(provName(b, lang)))
+    .map((p) => { const t = provTax(p, amount); return `<tr><td>${provName(p, lang)}</td><td>${money(t.tax, lang)}</td><td>${money(t.total, lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Province</th><th>${fr ? `Taxes sur ${moneyInt(amount, lang)}` : `Tax on ${moneyInt(amount, lang)}`}</th><th>${fr ? "Total" : "Total"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+
+function canadaCard(lang, defaultProv = "on", mode = "add") {
+  const fr = lang !== "en";
+  const opts = PROV.map((p) => `<option value="${p.code}" data-fed="0.05" data-prov="${p.prov}" data-kind="${p.kind}"${p.code === defaultProv ? " selected" : ""}>${provName(p, lang)} (${stripTags(pct(p.rate, lang, 3))})</option>`).join("\n          ");
+  const chips = [10, 20, 50, 100, 250, 500, 1000].map((n) => `<button type="button" data-ca-chip="${n}">${fr ? n.toLocaleString("fr-CA").replace(/ /g, " ") + " $" : "$" + n.toLocaleString("en-CA")}</button>`).join("\n        ");
+  const p = PROV_BY[defaultProv];
+  return `<div class="card calc" data-ca data-ca-default-mode="${mode}">
+    <div class="mode-switch" role="group" aria-label="${fr ? "Mode de calcul" : "Calculation mode"}">
+      <button type="button" data-ca-mode="add" aria-pressed="${mode === "add"}">${fr ? "Ajouter les taxes" : "Add tax"}</button>
+      <button type="button" data-ca-mode="remove" aria-pressed="${mode === "remove"}">${fr ? "Retirer les taxes" : "Remove tax"}</button>
+    </div>
+    <div class="field">
+      <label for="ca-prov">${fr ? "Province ou territoire" : "Province or territory"}</label>
+      <select id="ca-prov" data-ca-prov>
+          ${opts}
+      </select>
+    </div>
+    <div class="field">
+      <label for="ca-amount" data-ca-label="input">${fr ? "Montant avant taxes" : "Amount before tax"}</label>
+      <div class="input-money">
+        <input id="ca-amount" data-ca-input type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="${fr ? "0,00" : "0.00"}">
+        <span class="cur" aria-hidden="true">$</span>
+      </div>
+      <div class="chips" role="group" aria-label="${fr ? "Montants rapides" : "Quick amounts"}">
+        ${chips}
+      </div>
+    </div>
+    <div class="result" aria-live="polite">
+      <div class="breakdown">
+        <div class="row"><span class="k" data-ca-label="row1">${fr ? "Sous-total" : "Subtotal"}</span><span class="v" data-ca-out="row1">${fmtZero(lang)}</span></div>
+        <div class="row"><span class="k" data-ca-label="t1">${provParts(p, lang).split(" + ")[0]}</span><span class="v" data-ca-out="t1">${fmtZero(lang)}</span></div>
+        <div class="row"${p.kind === "hst" || p.kind === "gst" ? " hidden" : ""}><span class="k" data-ca-label="t2">${provParts(p, lang).split(" + ")[1] || ""}</span><span class="v" data-ca-out="t2">${fmtZero(lang)}</span></div>
+      </div>
+      <div class="total-box">
+        <span class="lbl" data-ca-label="big">${fr ? "Total avec taxes" : "Total with tax"}</span>
+        <span class="amt" data-ca-out="big">${fmtZero(lang)}</span>
+      </div>
+      <div class="rate-row"><span>${fr ? "Taux total" : "Total rate"}</span><b data-ca-out="rate">${pct(p.rate, lang, 3)}</b></div>
+      <div class="actions">
+        <button type="button" class="btn-copy" data-ca-copy>${fr ? "Copier le résultat" : "Copy result"}</button>
+        <button type="button" class="btn-clear" data-ca-clear>${fr ? "Effacer" : "Clear"}</button>
+      </div>
+      <p class="note">${fr ? "Taux 2026. Chaque taxe est arrondie au cent près." : "2026 rates. Each tax is rounded to the nearest cent."}</p>
+    </div>
+  </div>`;
 }
 
 const S60 = incomeTax(60000);
@@ -1417,6 +1522,189 @@ ${provinceTable("en")}
     <p>Both taxes are calculated on the price before tax: the QST is not charged on the GST. Each tax is rounded to the cent, which is why $100 gives $114.98, not $114.975. To take tax out of a total, divide by 1.14975 with the <a href="/reverse-tax-calculator-quebec/">reverse tax calculator</a>.</p>
     <h2>Looking for the income tax rate?</h2>
     <p>Quebec income tax is separate from sales tax: brackets from 14% to 25.75% in 2026, plus federal tax. See the <a href="/quebec-tax-brackets/">Quebec tax brackets</a> or estimate your tax with the <a href="/quebec-income-tax-calculator/">income tax calculator</a>.</p>
+  </section>`
+});
+
+// ---------- Canada sales tax calculator (FR/EN) + Ontario HST (FR/EN) ----------
+/* Keyword clusters (Semrush CA export, 2026-11-17; the export is Quebec-seeded, so Canada-wide volume is understated):
+ *   ontario taxes / taxes in ontario / taxe ontario / how to calculate tax in ontario … (~10,600/mo, "ontario taxes" KD 14)
+ *   how to calculate tax in canada (KD 5) / calcul taxes canada / tax calculator canada quebec (~2,500/mo)
+ *   bc tax, manitoba tax, taxes in saskatchewan, nova scotia taxes … (answered by the province table) */
+const ON = PROV_BY.on, QC = PROV_BY.qc;
+const CA_FAQ_FR = [
+  { q: "Quel est le taux de taxe de vente au Canada?", a: "La TPS fédérale de 5&nbsp;% s'applique partout. Selon la province, s'ajoute une taxe provinciale (TVP, TVD ou TVQ) ou la TPS est remplacée par une TVH. Le total va de 5&nbsp;% (Alberta et territoires) à 15&nbsp;% (Nouveau-Brunswick, Terre-Neuve-et-Labrador, Île-du-Prince-Édouard)." },
+  { q: "Quelles provinces ont la TVH?", a: "L'Ontario (13&nbsp;%), la Nouvelle-Écosse (14&nbsp;%), le Nouveau-Brunswick, Terre-Neuve-et-Labrador et l'Île-du-Prince-Édouard (15&nbsp;%). La TVH combine la TPS et la part provinciale en une seule taxe." },
+  { q: "Comment calculer les taxes au Canada?", a: "Multipliez le prix avant taxes par le taux total de la province&nbsp;: 1,13 en Ontario, 1,12 en Colombie-Britannique, 1,14975 au Québec, 1,05 en Alberta. Pour retirer les taxes, divisez le total par ce même nombre." },
+  { q: "Quelle province a les taxes les plus basses?", a: "L'Alberta, le Yukon, les Territoires du Nord-Ouest et le Nunavut n'ont que la TPS de 5&nbsp;%. Le Québec (14,975&nbsp;%) et les provinces à TVH de 15&nbsp;% sont les plus élevés." },
+  { q: "La taxe provinciale est-elle calculée sur la TPS?", a: "Non. Dans les provinces avec TVP, TVD ou TVQ, la taxe provinciale est calculée sur le prix avant taxes, comme la TPS. Les deux taux s'additionnent donc simplement." },
+  { q: "Quelle taxe paie-t-on en achetant en ligne dans une autre province?", a: "En général, la taxe de la province de livraison. Un achat livré en Ontario porte la TVH de 13&nbsp;%, même si le vendeur est au Québec." }
+];
+const CA_FAQ_EN = [
+  { q: "What is the sales tax rate in Canada?", a: "The 5% federal GST applies everywhere. Depending on the province, a provincial tax (PST, RST or QST) is added, or the GST is replaced by a single HST. Totals range from 5% (Alberta and the territories) to 15% (New Brunswick, Newfoundland and Labrador, Prince Edward Island)." },
+  { q: "Which provinces have HST?", a: "Ontario (13%), Nova Scotia (14%), New Brunswick, Newfoundland and Labrador and Prince Edward Island (15%). HST combines the GST and the provincial portion into one tax." },
+  { q: "How do you calculate sales tax in Canada?", a: "Multiply the price before tax by the province's total rate: 1.13 in Ontario, 1.12 in British Columbia, 1.14975 in Quebec, 1.05 in Alberta. To remove tax, divide the total by the same number." },
+  { q: "Which province has the lowest sales tax?", a: "Alberta, Yukon, the Northwest Territories and Nunavut charge only the 5% GST. Quebec (14.975%) and the 15% HST provinces are the highest." },
+  { q: "Is PST charged on top of GST?", a: "No. In provinces with PST, RST or QST, the provincial tax is calculated on the price before tax, just like the GST, so the two rates simply add up." },
+  { q: "Which tax applies when I buy online from another province?", a: "Generally the tax of the province where the item is delivered. An order shipped to Ontario carries 13% HST even if the seller is in Quebec." }
+];
+
+pages.push({
+  url: "/calcul-taxes-canada/",
+  out: "calcul-taxes-canada/index.html",
+  pair: ["/calcul-taxes-canada/", "/canada-sales-tax-calculator/"],
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/canada.js"],
+  featureList: ["TPS, TVH, TVP et TVQ des 13 provinces et territoires", "Ajouter ou retirer les taxes", "Taux 2026"],
+  title: "Calcul Taxes Canada 2026 : TPS, TVH et TVP par province (5 % à 15 %)",
+  desc: "Calculez les taxes de vente partout au Canada : TPS 5 %, TVH 13 % à 15 %, TVP et TVQ. Ontario 100 $ = 113,00 $, Québec 114,98 $, Alberta 105,00 $. Ajoutez ou retirez les taxes.",
+  h1: "Calcul des taxes au Canada par province",
+  intro: "Choisissez la province ou le territoire, entrez un montant, et obtenez la TPS, la TVH ou la taxe provinciale et le total. Fonctionne aussi pour retirer les taxes.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul taxes Canada", href: "/calcul-taxes-canada/" }],
+  faqs: CA_FAQ_FR,
+  body:
+    quickAnswer("fr", `<p>Au Canada, la taxe de vente va de <b>5&nbsp;%</b> à <b>15&nbsp;%</b> selon la province. Sur 100&nbsp;$&nbsp;: <b>113,00&nbsp;$</b> en Ontario (TVH 13&nbsp;%), <b>112,00&nbsp;$</b> en Colombie-Britannique et au Manitoba, <b>114,98&nbsp;$</b> au Québec, <b>105,00&nbsp;$</b> en Alberta et <b>115,00&nbsp;$</b> dans les provinces à TVH de 15&nbsp;%.</p>`) +
+    canadaCard("fr", "on") +
+    `
+  <section class="content" aria-labelledby="ca-table">
+    <h2 id="ca-table">Taux de taxes de vente par province (2026)</h2>
+${provinceTable("fr")}
+    <h2>Taxes sur un achat de 1&nbsp;000&nbsp;$ selon la province</h2>
+${provCompareTable("fr", 1000)}
+    <h2>TPS, TVH, TVP, TVQ&nbsp;: quelle différence?</h2>
+    <ul class="benefits">
+      <li><b>TPS</b> (5&nbsp;%)&nbsp;: taxe fédérale, seule taxe en Alberta et dans les territoires.</li>
+      <li><b>TVH</b>&nbsp;: TPS et taxe provinciale fusionnées en une seule taxe (Ontario et provinces de l'Atlantique).</li>
+      <li><b>TVP / TVD</b>&nbsp;: taxe provinciale distincte en Colombie-Britannique (7&nbsp;%), en Saskatchewan (6&nbsp;%) et au Manitoba (7&nbsp;%).</li>
+      <li><b>TVQ</b> (9,975&nbsp;%)&nbsp;: taxe de vente du Québec, perçue par Revenu Québec. Voir le <a href="/">calcul TPS TVQ</a>.</li>
+    </ul>
+    <h2>Comment calculer les taxes dans chaque province</h2>
+    <p>Multipliez le prix avant taxes par 1 + le taux total&nbsp;: × 1,13 en Ontario, × 1,15 au Nouveau-Brunswick, × 1,12 en Colombie-Britannique, × 1,05 en Alberta. Pour retirer les taxes d'un total, divisez par ce même nombre, comme dans le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>. Chaque taxe est arrondie au cent près.</p>
+    <p class="note">Taux en vigueur en 2026 selon l'Agence du revenu du Canada et les ministères des Finances provinciaux. La Nouvelle-Écosse est passée de 15&nbsp;% à 14&nbsp;% le 1<sup>er</sup> avril 2025. Certains biens sont détaxés ou exonérés (épicerie de base, par exemple).</p>
+  </section>`
+});
+
+pages.push({
+  url: "/canada-sales-tax-calculator/",
+  out: "canada-sales-tax-calculator/index.html",
+  pair: ["/calcul-taxes-canada/", "/canada-sales-tax-calculator/"],
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/canada.js"],
+  featureList: ["GST, HST, PST and QST for all 13 provinces and territories", "Add or remove tax", "2026 rates"],
+  title: "Canada Sales Tax Calculator 2026: GST, HST & PST by Province (5% to 15%)",
+  desc: "Calculate sales tax anywhere in Canada: GST 5%, HST 13% to 15%, PST and QST. Ontario $100 = $113.00, BC $112.00, Quebec $114.98, Alberta $105.00. Add or remove tax.",
+  h1: "Canada Sales Tax Calculator",
+  intro: "Pick a province or territory, enter an amount, and get the GST, HST or provincial tax and the total. Works in reverse to remove tax too.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Canada Sales Tax Calculator", href: "/canada-sales-tax-calculator/" }],
+  faqs: CA_FAQ_EN,
+  body:
+    quickAnswer("en", `<p>Sales tax in Canada ranges from <b>5%</b> to <b>15%</b> depending on the province. On $100: <b>$113.00</b> in Ontario (13% HST), <b>$112.00</b> in British Columbia and Manitoba, <b>$114.98</b> in Quebec, <b>$105.00</b> in Alberta and <b>$115.00</b> in the 15% HST provinces.</p>`) +
+    canadaCard("en", "on") +
+    `
+  <section class="content" aria-labelledby="ca-table-en">
+    <h2 id="ca-table-en">Sales tax rates by province (2026)</h2>
+${provinceTable("en")}
+    <h2>Sales tax on a $1,000 purchase by province</h2>
+${provCompareTable("en", 1000)}
+    <h2>GST, HST, PST, QST: what's the difference?</h2>
+    <ul class="benefits">
+      <li><b>GST</b> (5%): the federal tax, and the only one in Alberta and the territories.</li>
+      <li><b>HST</b>: GST and provincial tax merged into one (Ontario and the Atlantic provinces).</li>
+      <li><b>PST / RST</b>: a separate provincial tax in British Columbia (7%), Saskatchewan (6%) and Manitoba (7%).</li>
+      <li><b>QST</b> (9.975%): the Quebec Sales Tax, collected by Revenu Québec. See the <a href="/quebec-tax-calculator/">Quebec sales tax calculator</a>.</li>
+    </ul>
+    <h2>How to calculate sales tax in each province</h2>
+    <p>Multiply the price before tax by 1 + the total rate: × 1.13 in Ontario, × 1.15 in New Brunswick, × 1.12 in British Columbia, × 1.05 in Alberta. To remove tax from a total, divide by the same number, as in the <a href="/reverse-tax-calculator-quebec/">reverse tax calculator</a>. Each tax is rounded to the cent.</p>
+    <p class="note">Rates in force in 2026 per the Canada Revenue Agency and provincial finance ministries. Nova Scotia's HST dropped from 15% to 14% on April 1, 2025. Some items are zero-rated or exempt (basic groceries, for example).</p>
+  </section>`
+});
+
+const ON_AMOUNTS = [1, 5, 10, 20, 25, 50, 75, 100, 200, 500, 1000, 5000];
+const ON_TOTALS = [10, 20, 50, 100, 113, 200, 500, 1000, 5000];
+const QC_VS_ON = [100, 1000, 30000];
+function qcVsOnTable(lang) {
+  const fr = lang !== "en";
+  const rows = QC_VS_ON.map((a) => { const o = provTax(ON, a), q = provTax(QC, a); return `<tr><td>${moneyInt(a, lang)}</td><td>${money(o.tax, lang)}</td><td>${money(q.tax, lang)}</td><td>${money(r2(q.tax - o.tax), lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${fr ? "Achat" : "Purchase"}</th><th>${fr ? "Ontario (13&nbsp;%)" : "Ontario (13%)"}</th><th>${fr ? "Québec (14,975&nbsp;%)" : "Quebec (14.975%)"}</th><th>${fr ? "Écart" : "Difference"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+
+pages.push({
+  url: "/calcul-taxes-ontario/",
+  out: "calcul-taxes-ontario/index.html",
+  pair: ["/calcul-taxes-ontario/", "/ontario-sales-tax-calculator/"],
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/canada.js"],
+  featureList: ["TVH de l'Ontario 13 %", "Ajouter ou retirer la TVH", "Comparaison Québec–Ontario"],
+  title: "Calcul Taxes Ontario 2026 : TVH 13 % (100 $ = 113,00 $)",
+  desc: "Calculez les taxes en Ontario : TVH de 13 % (5 % fédéral + 8 % provincial). 100 $ avant taxes = 113,00 $. Retirez la TVH d'un prix : divisez par 1,13. Tableau et comparaison avec le Québec.",
+  h1: "Calcul des taxes en Ontario (TVH 13 %)",
+  intro: "Entrez un montant pour ajouter ou retirer la TVH de 13&nbsp;% de l'Ontario. Changez de province au besoin.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul taxes Canada", href: "/calcul-taxes-canada/" }, { name: "Calcul taxes Ontario", href: "/calcul-taxes-ontario/" }],
+  faqs: [
+    { q: "Quelle est la taxe en Ontario?", a: "La TVH (taxe de vente harmonisée) de 13&nbsp;%&nbsp;: 5&nbsp;% fédéral et 8&nbsp;% provincial, perçus en une seule taxe." },
+    { q: "Comment calculer la TVH en Ontario?", a: "Multipliez le prix avant taxes par 0,13 pour obtenir la TVH, ou par 1,13 pour le total. Exemple&nbsp;: 50&nbsp;$ × 1,13 = 56,50&nbsp;$." },
+    { q: "Comment retirer la TVH d'un prix en Ontario?", a: "Divisez le prix taxes incluses par 1,13. Exemple&nbsp;: 113&nbsp;$ ÷ 1,13 = 100&nbsp;$ avant taxes, dont 13&nbsp;$ de TVH." },
+    { q: "Les taxes sont-elles plus basses en Ontario qu'au Québec?", a: `Oui, d'environ 2 points&nbsp;: 13&nbsp;% contre 14,975&nbsp;%. Sur un achat de 1&nbsp;000&nbsp;$, on paie ${money(provTax(ON, 1000).tax, "fr")} de taxes en Ontario et ${money(provTax(QC, 1000).tax, "fr")} au Québec.` },
+    { q: "Quels produits ont une remise de TVH en Ontario?", a: "L'Ontario rembourse au point de vente sa part de 8&nbsp;% sur les vêtements et chaussures pour enfants, les couches, les sièges d'auto pour enfants, les livres imprimés et les repas de 4&nbsp;$ ou moins. On ne paie alors que 5&nbsp;%. L'épicerie de base est détaxée." }
+  ],
+  body:
+    quickAnswer("fr", "<p>En Ontario, la taxe de vente est la <b>TVH de 13&nbsp;%</b> (5&nbsp;% fédéral + 8&nbsp;% provincial). Multipliez par <b>1,13</b> pour le total&nbsp;: 100&nbsp;$ = <b>113,00&nbsp;$</b>. Pour retirer la TVH, divisez par 1,13. C'est environ 2 points de moins qu'au Québec (14,975&nbsp;%).</p>") +
+    canadaCard("fr", "on") +
+    `
+  <section class="content" aria-labelledby="on-table">
+    <h2 id="on-table">TVH de l'Ontario sur des montants courants</h2>
+${provAmountTable("fr", ON, ON_AMOUNTS)}
+    <h2>Retirer la TVH&nbsp;: prix avant taxes</h2>
+${provRemoveTable("fr", ON, ON_TOTALS)}
+    <h2>Taxes Québec vs Ontario</h2>
+${qcVsOnTable("fr")}
+    <p>Le Québec perçoit deux taxes (TPS et TVQ) alors que l'Ontario n'en perçoit qu'une (TVH). Voir le <a href="/">calcul TPS TVQ</a> pour le Québec ou le <a href="/calcul-taxes-canada/">calcul des taxes au Canada</a> pour les autres provinces.</p>
+    <h2>Remise de la part ontarienne</h2>
+    <p>Sur certains articles, l'Ontario ne perçoit pas sa part de 8&nbsp;% et seul 5&nbsp;% s'applique&nbsp;: vêtements et chaussures pour enfants, couches, sièges d'auto pour enfants, livres imprimés, journaux et repas ou boissons de 4&nbsp;$ ou moins. L'épicerie de base et les médicaments sur ordonnance ne sont pas taxés.</p>
+  </section>`
+});
+
+pages.push({
+  url: "/ontario-sales-tax-calculator/",
+  out: "ontario-sales-tax-calculator/index.html",
+  pair: ["/calcul-taxes-ontario/", "/ontario-sales-tax-calculator/"],
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/canada.js"],
+  featureList: ["Ontario HST 13%", "Add or remove HST", "Ontario vs Quebec comparison"],
+  title: "Ontario Sales Tax Calculator 2026: HST 13% ($100 = $113.00)",
+  desc: "Calculate Ontario sales tax: 13% HST (5% federal + 8% provincial). $100 before tax = $113.00. Remove HST from a price by dividing by 1.13. Tables and Ontario vs Quebec comparison.",
+  h1: "Ontario Sales Tax Calculator (HST 13%)",
+  intro: "Enter an amount to add or remove Ontario's 13% HST. Switch province if you need to.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Canada Sales Tax Calculator", href: "/canada-sales-tax-calculator/" }, { name: "Ontario Sales Tax Calculator", href: "/ontario-sales-tax-calculator/" }],
+  faqs: [
+    { q: "What is the sales tax in Ontario?", a: "13% HST (Harmonized Sales Tax): 5% federal and 8% provincial, charged as a single tax." },
+    { q: "How do you calculate HST in Ontario?", a: "Multiply the price before tax by 0.13 for the HST, or by 1.13 for the total. Example: $50 × 1.13 = $56.50." },
+    { q: "How do you remove HST from a price in Ontario?", a: "Divide the tax-included price by 1.13. Example: $113 ÷ 1.13 = $100 before tax, including $13 of HST." },
+    { q: "Are taxes lower in Ontario than in Quebec?", a: `Yes, by about 2 points: 13% versus 14.975%. On a $1,000 purchase you pay ${money(provTax(ON, 1000).tax, "en")} of tax in Ontario and ${money(provTax(QC, 1000).tax, "en")} in Quebec.` },
+    { q: "Which items get an HST rebate in Ontario?", a: "Ontario rebates its 8% portion at the till on children's clothing and footwear, diapers, children's car seats, printed books and meals of $4 or less, so only 5% applies. Basic groceries are zero-rated." }
+  ],
+  body:
+    quickAnswer("en", "<p>Ontario's sales tax is the <b>13% HST</b> (5% federal + 8% provincial). Multiply by <b>1.13</b> for the total: $100 = <b>$113.00</b>. To remove HST, divide by 1.13. That's about 2 points less than Quebec (14.975%).</p>") +
+    canadaCard("en", "on") +
+    `
+  <section class="content" aria-labelledby="on-table-en">
+    <h2 id="on-table-en">Ontario HST on common amounts</h2>
+${provAmountTable("en", ON, ON_AMOUNTS)}
+    <h2>Removing HST: price before tax</h2>
+${provRemoveTable("en", ON, ON_TOTALS)}
+    <h2>Quebec vs Ontario sales tax</h2>
+${qcVsOnTable("en")}
+    <p>Quebec charges two taxes (GST and QST) while Ontario charges one (HST). See the <a href="/quebec-tax-calculator/">Quebec sales tax calculator</a> or the <a href="/canada-sales-tax-calculator/">Canada sales tax calculator</a> for other provinces.</p>
+    <h2>Ontario point-of-sale rebate</h2>
+    <p>On some items Ontario doesn't charge its 8% portion, so only 5% applies: children's clothing and footwear, diapers, children's car seats, printed books, newspapers, and prepared food and drinks of $4 or less. Basic groceries and prescription drugs are not taxed.</p>
   </section>`
 });
 
@@ -2249,6 +2537,9 @@ const llms = `# Calcul Taxes Québec
 - RQAP: 0,430 % jusqu'à 103 000 $.
 - Exemple: 60 000 $ brut ≈ 45 857 $ net/an (~3 821 $/mois), soit ~23,6 % de retenues.
 
+## Taxes de vente au Canada (${UPDATED_YEAR})
+${PROV.map((p) => `- ${p.fr}: ${stripTags(provParts(p, "fr"))} = ${stripTags(pct(p.rate, "fr", 3))}`).join("\n")}
+
 ## Impôt sur le revenu (${UPDATED_YEAR})
 - Tranches du Québec: 14 % jusqu'à ${QC_BR[0][0]} $, 19 % jusqu'à ${QC_BR[1][0]} $, 24 % jusqu'à ${QC_BR[2][0]} $, 25,75 % au-delà.
 - Tranches fédérales: ${FED_BR.map(([c, r]) => `${String(Math.round(r * 1000) / 10).replace(".", ",")} %${c === Infinity ? " au-delà" : " jusqu'à " + c + " $"}`).join(", ")}.
@@ -2268,6 +2559,10 @@ const llms = `# Calcul Taxes Québec
 - Quebec Paycheck Calculator (English): ${SITE}/quebec-paycheck-calculator/
 - Quebec Tax Brackets 2026 (English): ${SITE}/quebec-tax-brackets/
 - Quebec Tax Rate (English): ${SITE}/quebec-tax-rate/
+- Calcul taxes Canada (toutes les provinces): ${SITE}/calcul-taxes-canada/
+- Canada Sales Tax Calculator (English): ${SITE}/canada-sales-tax-calculator/
+- Calcul taxes Ontario (TVH 13 %): ${SITE}/calcul-taxes-ontario/
+- Ontario Sales Tax Calculator (English): ${SITE}/ontario-sales-tax-calculator/
 
 ## Guides (blogue)
 ${POSTS_RAW.map((p) => `- ${stripTags(p.h1)}: ${SITE}${p.url}`).join("\n")}

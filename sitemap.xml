@@ -133,6 +133,42 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/taux-tps-tvq-quebec/"/>
   </url>
   <url>
+    <loc>https://www.calcultaxesquebec.ca/calcul-taxes-canada/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxes-canada/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/canada-sales-tax-calculator/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/calcul-taxes-canada/"/>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/canada-sales-tax-calculator/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxes-canada/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/canada-sales-tax-calculator/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/calcul-taxes-canada/"/>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/calcul-taxes-ontario/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxes-ontario/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/ontario-sales-tax-calculator/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/calcul-taxes-ontario/"/>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/ontario-sales-tax-calculator/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxes-ontario/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/ontario-sales-tax-calculator/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/calcul-taxes-ontario/"/>
+  </url>
+  <url>
     <loc>https://www.calcultaxesquebec.ca/blog/</loc>
     <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>

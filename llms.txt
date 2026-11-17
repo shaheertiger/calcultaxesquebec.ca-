@@ -20,6 +20,21 @@
 - RQAP: 0,430 % jusqu'à 103 000 $.
 - Exemple: 60 000 $ brut ≈ 45 857 $ net/an (~3 821 $/mois), soit ~23,6 % de retenues.
 
+## Taxes de vente au Canada (2026)
+- Québec: TPS 5 % + TVQ 9,975 % = 14,975 %
+- Ontario: TVH 13 % = 13 %
+- Colombie-Britannique: TPS 5 % + TVP 7 % = 12 %
+- Alberta: TPS 5 % = 5 %
+- Saskatchewan: TPS 5 % + TVP 6 % = 11 %
+- Manitoba: TPS 5 % + TVD 7 % = 12 %
+- Nouveau-Brunswick: TVH 15 % = 15 %
+- Nouvelle-Écosse: TVH 14 % = 14 %
+- Île-du-Prince-Édouard: TVH 15 % = 15 %
+- Terre-Neuve-et-Labrador: TVH 15 % = 15 %
+- Yukon: TPS 5 % = 5 %
+- Territoires du Nord-Ouest: TPS 5 % = 5 %
+- Nunavut: TPS 5 % = 5 %
+
 ## Impôt sur le revenu (2026)
 - Tranches du Québec: 14 % jusqu'à 54345 $, 19 % jusqu'à 108680 $, 24 % jusqu'à 132245 $, 25,75 % au-delà.
 - Tranches fédérales: 14 % jusqu'à 58523 $, 20,5 % jusqu'à 117045 $, 26 % jusqu'à 181440 $, 29 % jusqu'à 258482 $, 33 % au-delà.
@@ -39,6 +54,10 @@
 - Quebec Paycheck Calculator (English): https://www.calcultaxesquebec.ca/quebec-paycheck-calculator/
 - Quebec Tax Brackets 2026 (English): https://www.calcultaxesquebec.ca/quebec-tax-brackets/
 - Quebec Tax Rate (English): https://www.calcultaxesquebec.ca/quebec-tax-rate/
+- Calcul taxes Canada (toutes les provinces): https://www.calcultaxesquebec.ca/calcul-taxes-canada/
+- Canada Sales Tax Calculator (English): https://www.calcultaxesquebec.ca/canada-sales-tax-calculator/
+- Calcul taxes Ontario (TVH 13 %): https://www.calcultaxesquebec.ca/calcul-taxes-ontario/
+- Ontario Sales Tax Calculator (English): https://www.calcultaxesquebec.ca/ontario-sales-tax-calculator/
 
 ## Guides (blogue)
 - Comment calculer la TPS et la TVQ au Québec?: https://www.calcultaxesquebec.ca/comment-calculer-tps-tvq-quebec/
