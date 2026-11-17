@@ -39,6 +39,7 @@ instantané et excellents Core Web Vitals.
 | `/canada-sales-tax-calculator/` | canada sales tax calculator (EN) |
 | `/calcul-taxes-ontario/` | calcul taxes ontario / taxe ontario |
 | `/ontario-sales-tax-calculator/` | ontario taxes / ontario sales tax (EN) |
+| `/what-is-the-tax-in-quebec/` | what is the tax in quebec (guide EN, paire de `/taxe-quebec-2026/`) |
 
 Les tableaux des pages impôt/paie sont calculés au build par le même moteur que la
 calculatrice (`assets/js/salary.js`, exporté pour Node) : modifiez les paramètres

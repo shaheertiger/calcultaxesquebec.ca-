@@ -191,6 +191,9 @@
     <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/taxe-quebec-2026/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/what-is-the-tax-in-quebec/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/taxe-quebec-2026/"/>
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/difference-tps-tvq/</loc>
@@ -251,5 +254,14 @@
     <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/what-is-the-tax-in-quebec/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/taxe-quebec-2026/"/>
+    <xhtml:link rel="alternate" hreflang="en-CA" href="https://www.calcultaxesquebec.ca/what-is-the-tax-in-quebec/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.calcultaxesquebec.ca/taxe-quebec-2026/"/>
   </url>
 </urlset>

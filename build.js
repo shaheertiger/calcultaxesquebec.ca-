@@ -282,6 +282,7 @@ function internalLinks(lang, currentPath) {
     { href: "/quebec-income-tax-calculator/", label: "Quebec Income Tax Calculator", sub: "Salary after tax, 2026" },
     { href: "/quebec-paycheck-calculator/", label: "Quebec Paycheck Calculator", sub: "Take-home pay every 2 weeks" },
     { href: "/quebec-tax-brackets/", label: "Quebec Tax Brackets 2026", sub: "Combined marginal rates" },
+    { href: "/what-is-the-tax-in-quebec/", label: "What is the tax in Quebec?", sub: "Plain-English guide" },
     { href: "/quebec-tax-rate/", label: "Quebec Tax Rate", sub: "14.975% and other provinces" },
     { href: "/canada-sales-tax-calculator/", label: "Canada Sales Tax Calculator", sub: "GST, HST, PST by province" },
     { href: "/ontario-sales-tax-calculator/", label: "Ontario Sales Tax Calculator", sub: "HST 13%" },
@@ -1891,6 +1892,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
 
   {
     url: "/taxe-quebec-2026/",
+    pair: ["/taxe-quebec-2026/", "/what-is-the-tax-in-quebec/"],
     short: "Taxe au Québec en 2026",
     title: "Quelle est la taxe au Québec en 2026? | TPS, TVQ et taux combiné",
     desc: "En 2026, la taxe au Québec est de 5 % (TPS) plus 9,975 % (TVQ), pour un taux combiné de 14,975 % sur la plupart des biens et services.",
@@ -2395,32 +2397,108 @@ Taxes incluses → avant taxes&nbsp;:&nbsp;prix&nbsp;÷&nbsp;1,14975</div>
       { q: "Comment calculer un montant absent du tableau?", a: "Multipliez le montant avant taxes par 1,14975 pour le total, ou par 0,05 et 0,09975 pour la TPS et la TVQ séparément." },
       { q: "Pourquoi un écart d'un cent parfois?", a: "Parce que la TVQ exacte comporte une fraction de cent. Selon qu'on arrondit chaque taxe ou le total, le résultat peut varier d'un cent." }
     ]
-  }
+  },
+
+  /* EN guide — "what is the tax in quebec" cluster (what is / how much is / what's the tax in quebec,
+   * what is the sales tax in quebec, how much tax in quebec … ~2,500 searches/mo, KD 31–56).
+   * Pair of the FR post /taxe-quebec-2026/. */
+  {
+    url: "/what-is-the-tax-in-quebec/",
+    lang: "en",
+    pair: ["/taxe-quebec-2026/", "/what-is-the-tax-in-quebec/"],
+    short: "What is the tax in Quebec?",
+    title: "What Is the Tax in Quebec? 14.975% (GST 5% + QST 9.975%) | 2026 Guide",
+    desc: "The tax in Quebec is 14.975%: 5% GST plus 9.975% QST, so $100 costs $114.98. What's taxed and what isn't, tipping, tourist refunds, income tax and how Quebec compares.",
+    h1: "What is the tax in Quebec?",
+    intro: "Sales tax, what it applies to, and the other taxes you'll run into in Quebec in 2026.",
+    datePublished: "2026-11-17",
+    answer:
+      "<p>The sales tax in Quebec is <strong>14.975%</strong>: the <strong>5% GST</strong> (federal) plus the <strong>9.975% QST</strong> (Quebec Sales Tax). Both are calculated on the price before tax, so a $100 item costs <strong>$114.98</strong>. Multiply a price by <strong>1.14975</strong> to get the total; divide a total by 1.14975 to remove the tax.</p>",
+    facts: [
+      { k: "GST (federal)", v: "5%" },
+      { k: "QST (Quebec)", v: "9.975%" },
+      { k: "Total sales tax", v: "14.975%" },
+      { k: "$100 before tax", v: "$114.98" },
+      { k: "Add tax", v: "× 1.14975" },
+      { k: "Remove tax", v: "÷ 1.14975" }
+    ],
+    cta: postCta("/quebec-tax-calculator/", "Open the Quebec tax calculator", "Want the exact amount? The calculator adds or removes GST and QST instantly."),
+    howto: {
+      name: "Calculate the sales tax in Quebec",
+      steps: [
+        { name: "Calculate the GST", text: "Multiply the price before tax by 0.05 (5%)." },
+        { name: "Calculate the QST", text: "Multiply the same price before tax by 0.09975 (9.975%)." },
+        { name: "Add them up", text: "Add the price before tax, the GST and the QST to get the total. Shortcut: price × 1.14975." }
+      ]
+    },
+    sections: `    <h2>The two sales taxes in Quebec</h2>
+    <p>Quebec charges two separate sales taxes on most goods and services. The <strong>GST</strong> (Goods and Services Tax) is the 5% federal tax charged across Canada. The <strong>QST</strong> (Quebec Sales Tax, <em>TVQ</em> in French) is the 9.975% provincial tax collected by Revenu Québec. On a receipt they appear as two lines, often labelled TPS and TVQ.</p>
+    <p>Both taxes are calculated on the price before tax: the QST is <strong>not</strong> charged on the GST. That's why the combined rate is simply 5% + 9.975% = 14.975%. Quebec does not use HST.</p>
+    <h2>How much is tax on common amounts in Quebec?</h2>
+${addTable("en", [1, 5, 10, 20, 50, 100, 250, 500, 1000])}
+    <p>Each tax is rounded to the cent, so $100 gives $5.00 GST and $9.98 QST. If a price already includes tax, about 13% of it is tax (14.975 ÷ 114.975): use the <a href="/reverse-tax-calculator-quebec/">reverse tax calculator</a> to find the price before tax.</p>
+    <h2>What isn't taxed in Quebec?</h2>
+    <p>Some items are <strong>zero-rated</strong> (taxable at 0%) or <strong>exempt</strong>, so no GST or QST is added. The most common:</p>
+    <ul>
+      <li>Basic groceries: fresh fruit and vegetables, meat, milk, bread, eggs (but not snacks, soft drinks, candy or restaurant meals)</li>
+      <li>Prescription drugs and many medical devices</li>
+      <li>Residential rent and most child care</li>
+      <li>Most health care and educational services</li>
+      <li>The sale of a used (resale) home</li>
+    </ul>
+    <h2>Are prices in Quebec shown with tax included?</h2>
+    <p>Usually not. Store shelves, menus and online prices are almost always shown <strong>before tax</strong>, and the 14.975% is added at the checkout. Two common exceptions: gasoline prices at the pump and SAQ (liquor store) prices already include tax.</p>
+    <h2>Do you tip on the amount before or after tax?</h2>
+    <p>In Quebec restaurants, tips of 15% to 20% are customary. Many people tip on the amount before tax. A handy shortcut: the two tax lines on your bill add up to almost exactly 15%, so tipping the same amount as the taxes is a 15% tip.</p>
+    <h2>Can tourists get the tax back?</h2>
+    <p>No. Canada ended its GST visitor rebate program in 2007, and Quebec does not refund the QST to visitors. Tourists pay the same 14.975% as residents on purchases in Quebec. (Businesses registered for GST/QST can claim input tax credits, which is a different system.)</p>
+    <h2>How Quebec sales tax compares with other provinces</h2>
+${provinceTable("en")}
+    <p>Quebec's 14.975% is one of the highest in Canada, just under the 15% HST in New Brunswick, Newfoundland and Labrador and Prince Edward Island, and about 2 points above Ontario's 13% HST. See the <a href="/canada-sales-tax-calculator/">Canada sales tax calculator</a> to compare any amount.</p>
+    <h2>Other taxes in Quebec</h2>
+    <ul>
+      <li><strong>Income tax:</strong> Quebec has its own income tax, from 14% to 25.75% in 2026, on top of federal tax (reduced by 16.5% for Quebec residents). See the <a href="/quebec-tax-brackets/">2026 Quebec tax brackets</a> or the <a href="/quebec-income-tax-calculator/">income tax calculator</a>.</li>
+      <li><strong>Payroll deductions:</strong> QPP, EI and QPIP also come off each paycheque. The <a href="/quebec-paycheck-calculator/">Quebec paycheck calculator</a> shows your take-home pay.</li>
+      <li><strong>Welcome tax:</strong> buyers of a home pay transfer duties to the municipality, from 0.5% to 1.5% and more in Montreal. See the <a href="/quebec-welcome-tax-calculator/">welcome tax calculator</a>.</li>
+      <li><strong>Specific taxes:</strong> fuel, alcohol and tobacco carry extra taxes that are built into the price, and hotels add a lodging tax.</li>
+    </ul>
+    <p>Rates unchanged since 2013 (QST 9.975%) and 2008 (GST 5%). Sources: Revenu Québec and the Canada Revenue Agency.</p>`,
+    faqs: [
+      { q: "What is the tax in Quebec?", a: "14.975% in total: the 5% federal GST plus the 9.975% Quebec Sales Tax (QST), both calculated on the price before tax." },
+      { q: "How much is tax on $100 in Quebec?", a: "$14.98: $5.00 of GST and $9.98 of QST, for a total of $114.98." },
+      { q: "What is the QST?", a: "The Quebec Sales Tax (TVQ in French), a 9.975% provincial sales tax collected by Revenu Québec on most goods and services, in addition to the 5% GST." },
+      { q: "Does Quebec have HST?", a: "No. Quebec charges the GST and the QST separately. HST is used in Ontario and the Atlantic provinces." },
+      { q: "Is Quebec sales tax the highest in Canada?", a: "Almost. At 14.975%, Quebec is just below the 15% HST of New Brunswick, Newfoundland and Labrador and Prince Edward Island, and above Ontario (13%), BC and Manitoba (12%), Saskatchewan (11%) and Alberta (5%)." },
+      { q: "Do tourists get sales tax back in Quebec?", a: "No. The federal visitor rebate program ended in 2007 and Quebec does not refund the QST to visitors." },
+      { q: "Is tax included in prices in Quebec?", a: "Usually not: most prices are shown before tax and the 14.975% is added at checkout. Gas at the pump and SAQ prices include tax." }
+    ]
+  },
 ];
 
 /* turn raw posts into renderable page objects */
-const FR_DATE = { "01": "janvier", "06": "juin" };
-function frMonth(iso) {
-  const [, m] = iso.split("-");
-  return FR_DATE[m] || "2026";
-}
+const MONTHS = {
+  fr: ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"],
+  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+};
+function monthName(iso, lang) { return MONTHS[lang === "en" ? "en" : "fr"][Number(iso.split("-")[1]) - 1]; }
 const posts = POSTS_RAW.map((p) => {
-  const crumbs = [
-    { name: "Accueil", href: "/" },
-    { name: "Blogue", href: BLOG },
-    { name: p.short, href: p.url }
-  ];
-  const meta = `Mis à jour en ${frMonth(BUILD_DATE)} ${UPDATED_YEAR}`;
+  const lang = p.lang || "fr";
+  // EN guides sit outside the (French) blog index: Home › guide
+  const crumbs = lang === "en"
+    ? [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: p.short, href: p.url }]
+    : [{ name: "Accueil", href: "/" }, { name: "Blogue", href: BLOG }, { name: p.short, href: p.url }];
+  const meta = lang === "en" ? `Updated ${monthName(BUILD_DATE, "en")} ${UPDATED_YEAR}` : `Mis à jour en ${monthName(BUILD_DATE, "fr")} ${UPDATED_YEAR}`;
   const body =
     `  <p class="post-meta">${meta}</p>\n` +
-    `  ${answerBox("fr", p.answer)}\n` +
-    `  ${keyFacts("fr", p.facts)}\n` +
+    `  ${answerBox(lang, p.answer)}\n` +
+    `  ${keyFacts(lang, p.facts)}\n` +
     `  ${p.cta}\n` +
     `  <article class="prose">\n${p.sections}\n  </article>`;
   return {
     url: p.url,
     out: p.url.replace(/^\//, "").replace(/\/$/, "") + "/index.html",
-    lang: "fr",
+    lang,
+    pair: p.pair,
     showCalc: false,
     title: p.title,
     desc: p.desc,
@@ -2429,7 +2507,7 @@ const posts = POSTS_RAW.map((p) => {
     crumbs,
     faqs: p.faqs,
     body,
-    schemaHtml: postSchema({ ...p, crumbs, lang: "fr" })
+    schemaHtml: postSchema({ ...p, crumbs, lang })
   };
 });
 
@@ -2448,7 +2526,7 @@ const blogIndex = {
   faqs: null,
   body:
     `  <div class="post-list">\n` +
-    POSTS_RAW.map((p) => `    <a href="${p.url}"><h2>${p.short}</h2><p>${p.desc}</p></a>`).join("\n") +
+    POSTS_RAW.filter((p) => !p.lang || p.lang === "fr").map((p) => `    <a href="${p.url}"><h2>${p.short}</h2><p>${p.desc}</p></a>`).join("\n") +
     `\n  </div>`,
   schemaHtml: jsonLd({
     "@context": "https://schema.org",
@@ -2461,7 +2539,7 @@ const blogIndex = {
         url: SITE + BLOG,
         name: "Blogue — Calcul Taxes Québec",
         inLanguage: "fr-CA",
-        blogPost: POSTS_RAW.map((p) => ({ "@type": "BlogPosting", headline: stripTags(p.h1), url: SITE + p.url, datePublished: p.datePublished, dateModified: BUILD_DATE }))
+        blogPost: POSTS_RAW.filter((p) => !p.lang || p.lang === "fr").map((p) => ({ "@type": "BlogPosting", headline: stripTags(p.h1), url: SITE + p.url, datePublished: p.datePublished, dateModified: BUILD_DATE }))
       },
       {
         "@type": "BreadcrumbList",
