@@ -20,8 +20,8 @@ instantané et excellents Core Web Vitals.
 
 | URL | Mot-clé principal |
 |-----|-------------------|
-| `/` | calcul taxes quebec (absorbe `/calcul-tps-tvq/`, `/calculateur-de-taxes-quebec/`, `/tps-tvq-en-ligne/` via 301) |
-| `/calcul-taxe-inverse-quebec/` | calcul taxe inverse |
+| `/` | calcul taxes quebec, prix avec taxes, calcul tps / tvq (absorbe `/calcul-tps-tvq/`, `/calculateur-de-taxes-quebec/`, `/tps-tvq-en-ligne/`, `/tableau-tps-tvq-quebec/` via 301) |
+| `/calcul-taxe-inverse-quebec/` | calcul taxes inversé / taxes inversées (absorbe `/prix-avant-taxes-quebec/` via 301) |
 | `/calcul-salaire-net-quebec/` | calcul salaire net / salaire brut en net |
 | `/calcul-paie-net-quebec/` | calcul paie net / simulation calcul paie |
 | `/calcul-impot-quebec/` | calcul impôt québec / calculateur impôt |
@@ -39,6 +39,8 @@ instantané et excellents Core Web Vitals.
 | `/canada-sales-tax-calculator/` | canada sales tax calculator (EN) |
 | `/calcul-taxes-ontario/` | calcul taxes ontario / taxe ontario |
 | `/ontario-sales-tax-calculator/` | ontario taxes / ontario sales tax (EN) |
+| `/gst-calculator/` | gst calculator / gst calculator alberta / reverse gst (EN) |
+| `/hst-calculator/` | hst calculator / reverse hst calculator, 13-14-15 % (EN) |
 | `/what-is-the-tax-in-quebec/` | what is the tax in quebec (guide EN, paire de `/taxe-quebec-2026/`) |
 
 Les tableaux des pages impôt/paie sont calculés au build par le même moteur que la

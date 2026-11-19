@@ -5,6 +5,10 @@
     { "source": "/calculateur-de-taxes-quebec/", "destination": "/", "permanent": true },
     { "source": "/calculateur-de-taxes-quebec", "destination": "/", "permanent": true },
     { "source": "/tps-tvq-en-ligne/", "destination": "/", "permanent": true },
-    { "source": "/tps-tvq-en-ligne", "destination": "/", "permanent": true }
+    { "source": "/tps-tvq-en-ligne", "destination": "/", "permanent": true },
+    { "source": "/prix-avant-taxes-quebec/", "destination": "/calcul-taxe-inverse-quebec/", "permanent": true },
+    { "source": "/prix-avant-taxes-quebec", "destination": "/calcul-taxe-inverse-quebec/", "permanent": true },
+    { "source": "/tableau-tps-tvq-quebec/", "destination": "/", "permanent": true },
+    { "source": "/tableau-tps-tvq-quebec", "destination": "/", "permanent": true }
   ]
 }

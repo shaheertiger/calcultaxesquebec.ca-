@@ -64,7 +64,6 @@
 - Comment retirer les taxes d'un prix au Québec?: https://www.calcultaxesquebec.ca/comment-retirer-taxes-prix-quebec/
 - Quelle est la taxe au Québec en 2026?: https://www.calcultaxesquebec.ca/taxe-quebec-2026/
 - TPS et TVQ : quelle est la différence?: https://www.calcultaxesquebec.ca/difference-tps-tvq/
-- Comment trouver le prix avant taxes au Québec?: https://www.calcultaxesquebec.ca/prix-avant-taxes-quebec/
 - Quels produits n'ont pas de TPS/TVQ au Québec?: https://www.calcultaxesquebec.ca/produits-sans-taxes-quebec/
 - Taxable, détaxé ou exonéré : quelle différence au Québec?: https://www.calcultaxesquebec.ca/taxable-detaxe-exonere-quebec/
 - À partir de combien faut-il s'inscrire à la TPS/TVQ?: https://www.calcultaxesquebec.ca/seuil-inscription-tps-tvq-quebec/
@@ -72,7 +71,6 @@
 - Comment calculer les taxes sur une facture au Québec?: https://www.calcultaxesquebec.ca/calcul-taxes-facture-quebec/
 - Taxes en sus : qu'est-ce que ça veut dire?: https://www.calcultaxesquebec.ca/taxes-incluses-vs-taxes-en-sus/
 - Comment calculer un rabais avant ou après taxes au Québec?: https://www.calcultaxesquebec.ca/calcul-rabais-taxes-quebec/
-- Tableau TPS TVQ Québec : montants courants: https://www.calcultaxesquebec.ca/tableau-tps-tvq-quebec/
 - What is the tax in Quebec?: https://www.calcultaxesquebec.ca/what-is-the-tax-in-quebec/
 
 ## À propos

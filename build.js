@@ -286,6 +286,8 @@ function internalLinks(lang, currentPath) {
     { href: "/quebec-tax-rate/", label: "Quebec Tax Rate", sub: "14.975% and other provinces" },
     { href: "/canada-sales-tax-calculator/", label: "Canada Sales Tax Calculator", sub: "GST, HST, PST by province" },
     { href: "/ontario-sales-tax-calculator/", label: "Ontario Sales Tax Calculator", sub: "HST 13%" },
+    { href: "/gst-calculator/", label: "GST Calculator", sub: "Add or remove 5% GST" },
+    { href: "/hst-calculator/", label: "HST Calculator", sub: "13%, 14% and 15% HST" },
     { href: "/quebec-welcome-tax-calculator/", label: "Quebec Welcome Tax Calculator", sub: "Land transfer tax, 2026 brackets" },
     { href: "/", label: "Calcul taxes Québec", sub: "Version française" }
   ]).map((l) => ({ ...l, subFr: l.sub, subEn: l.sub }))
@@ -795,9 +797,9 @@ function provCompareTable(lang, amount) {
     </table>`;
 }
 
-function canadaCard(lang, defaultProv = "on", mode = "add") {
+function canadaCard(lang, defaultProv = "on", mode = "add", only = null) {
   const fr = lang !== "en";
-  const opts = PROV.map((p) => `<option value="${p.code}" data-fed="0.05" data-prov="${p.prov}" data-kind="${p.kind}"${p.code === defaultProv ? " selected" : ""}>${provName(p, lang)} (${stripTags(pct(p.rate, lang, 3))})</option>`).join("\n          ");
+  const opts = PROV.filter((p) => !only || only.includes(p.code)).map((p) => `<option value="${p.code}" data-fed="0.05" data-prov="${p.prov}" data-kind="${p.kind}"${p.code === defaultProv ? " selected" : ""}>${provName(p, lang)} (${stripTags(pct(p.rate, lang, 3))})</option>`).join("\n          ");
   const chips = [10, 20, 50, 100, 250, 500, 1000].map((n) => `<button type="button" data-ca-chip="${n}">${fr ? n.toLocaleString("fr-CA").replace(/ /g, " ") + " $" : "$" + n.toLocaleString("en-CA")}</button>`).join("\n        ");
   const p = PROV_BY[defaultProv];
   return `<div class="card calc" data-ca data-ca-default-mode="${mode}">
@@ -864,7 +866,7 @@ pages.push({
   lang: "fr",
   mode: "add",
   title: "Calcul Taxes Québec 2026 : TPS 5 % + TVQ 9,975 % = 14,975 %",
-  desc: "Calcul des taxes au Québec en 2026 : TPS 5 % et TVQ 9,975 %, soit 14,975 %. 100 $ avant taxes = 114,98 $. Ajoutez ou retirez les taxes instantanément.",
+  desc: "Calcul des taxes au Québec en 2026 : TPS 5 % et TVQ 9,975 %, soit 14,975 %. 100 $ = 114,98 $ avec taxes. Calculez le prix avec taxes, la TPS seule, la TVQ seule ou retirez les taxes.",
   h1: "Calcul Taxes Québec",
   intro:
     "Entrez un montant et voyez instantanément la TPS, la TVQ et le total avec taxes. Simple, rapide et fait pour le Québec.",
@@ -872,7 +874,10 @@ pages.push({
   faqs: FAQ_HOME.concat([
     { q: "Combien de taxes sur 100 $ au Québec?", a: "Sur 100&nbsp;$ avant taxes, la TPS est de 5,00&nbsp;$ et la TVQ de 9,98&nbsp;$, soit 14,98&nbsp;$ de taxes et un total de 114,98&nbsp;$." },
     { q: "Comment calculer 15 % de taxes au Québec?", a: "Le taux réel n'est pas 15&nbsp;% mais 14,975&nbsp;%. Multipliez le prix par 1,14975 pour obtenir le total. Arrondir à 15&nbsp;% surestime les taxes de 2,5&nbsp;cents par 100&nbsp;$." },
-    { q: "Quels produits ne sont pas taxés au Québec?", a: "Les produits alimentaires de base (épicerie), les médicaments sur ordonnance, la plupart des loyers résidentiels et certains services de santé et d'éducation sont détaxés ou exonérés. Les plats préparés, l'alcool, les boissons gazeuses et les grignotines sont taxables." }
+    { q: "Quels produits ne sont pas taxés au Québec?", a: "Les produits alimentaires de base (épicerie), les médicaments sur ordonnance, la plupart des loyers résidentiels et certains services de santé et d'éducation sont détaxés ou exonérés. Les plats préparés, l'alcool, les boissons gazeuses et les grignotines sont taxables." },
+    { q: "Comment calculer le prix avec taxes au Québec?", a: "Multipliez le prix avant taxes par 1,14975. Exemple&nbsp;: 80&nbsp;$ × 1,14975 = 91,98&nbsp;$ avec taxes (4,00&nbsp;$ de TPS et 7,98&nbsp;$ de TVQ)." },
+    { q: "Comment calculer la TPS seulement?", a: "Multipliez le prix avant taxes par 0,05. Sur 100&nbsp;$, la TPS est de 5,00&nbsp;$. Si le prix inclut déjà les taxes, multipliez-le par 5 ÷ 114,975 (environ 4,349&nbsp;%)." },
+    { q: "Comment calculer la TVQ seulement?", a: "Multipliez le prix avant taxes par 0,09975. Sur 100&nbsp;$, la TVQ est de 9,98&nbsp;$ (9,975&nbsp;$ arrondi au cent). La TVQ se calcule sur le prix avant taxes, jamais sur la TPS." }
   ]),
   body:
     quickAnswer("fr", "<p>Au Québec en 2026, on ajoute <b>5&nbsp;% de TPS</b> et <b>9,975&nbsp;% de TVQ</b> au prix avant taxes, soit <b>14,975&nbsp;%</b>. Multipliez par 1,14975&nbsp;: 100&nbsp;$ devient 114,98&nbsp;$. Pour retirer les taxes, divisez par 1,14975.</p>") +
@@ -882,6 +887,18 @@ pages.push({
     <h2 id="table-title">Combien de taxes sur 10&nbsp;$, 100&nbsp;$ ou 1&nbsp;000&nbsp;$?</h2>
     <p>Taxes calculées avec les taux 2026, arrondies au cent comme sur une facture&nbsp;:</p>
 ${addTable("fr", [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000, 10000])}
+  </section>
+  <section class="content" aria-labelledby="avec-title">
+    <h2 id="avec-title">Prix avec taxes : calculer le montant total</h2>
+    <p>Pour obtenir le montant avec taxes, multipliez le prix avant taxes par <b>1,14975</b>. La calculatrice fait le calcul au cent près et affiche le détail&nbsp;:</p>
+    <div class="formula">Montant avec taxes = prix avant taxes × 1,14975
+Exemple : 80,00 $ × 1,14975 = 91,98 $</div>
+    <h2>Calcul TPS seule et calcul TVQ seule</h2>
+    <ul class="benefits">
+      <li>Calcul TPS&nbsp;: prix avant taxes × 0,05 (100&nbsp;$ → 5,00&nbsp;$)</li>
+      <li>Calcul TVQ&nbsp;: prix avant taxes × 0,09975 (100&nbsp;$ → 9,98&nbsp;$)</li>
+      <li>Les deux taxes se calculent sur le même prix avant taxes&nbsp;: la TVQ ne s'applique pas sur la TPS.</li>
+    </ul>
   </section>
   <section class="content" aria-labelledby="reverse-title">
     <h2 id="reverse-title">Retirer les taxes d'un prix</h2>
@@ -961,12 +978,13 @@ TVQ incluse = prix avant taxes × 9,975&nbsp;%</div>
 // 4. /quebec-tax-calculator/ (EN)
 pages.push({
   url: "/quebec-tax-calculator/",
+  modified: "2026-11-19",
   out: "quebec-tax-calculator/index.html",
   lang: "en",
   mode: "add",
-  title: "Quebec Sales Tax Calculator 2026: GST 5% + QST 9.975%",
-  desc: "Quebec sales tax in 2026 is 14.975%: GST 5% plus QST 9.975%. $100 before tax = $114.98. Add or remove Quebec tax instantly with this free calculator.",
-  h1: "Quebec Sales Tax Calculator",
+  title: "Quebec Sales Tax Calculator 2026 | GST QST Calculator (14.975%)",
+  desc: "GST QST calculator for Quebec: 5% GST + 9.975% QST = 14.975% in 2026. $100 before tax = $114.98. Add or remove Quebec sales tax and see the GST and QST separately.",
+  h1: "Quebec Sales Tax Calculator (GST + QST)",
   intro:
     "Enter an amount and instantly calculate Quebec GST, QST, and the total with tax. Simple, fast, and made for Quebec.",
   crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }],
@@ -991,6 +1009,15 @@ ${addTable("en", [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000
     <p>On $100.00: the GST is $5.00, the QST is $9.98, and the total with tax is $114.98.</p>
     <h2>Add or remove tax</h2>
     <p>Choose “Add tax” to start from a price before tax. Choose “Remove tax” if your price already includes GST and QST. The QST is calculated on the price before taxes, not on the GST.</p>
+    <h2>GST QST calculator: each tax separately</h2>
+    <ul class="benefits">
+      <li>GST = price before tax × 0.05 ($100 → $5.00)</li>
+      <li>QST = price before tax × 0.09975 ($100 → $9.98)</li>
+      <li>GST in a tax-included total = total × 5 ÷ 114.975 (≈ 4.349%)</li>
+      <li>QST in a tax-included total = total × 9.975 ÷ 114.975 (≈ 8.676%)</li>
+    </ul>
+    <h2>Outside Quebec?</h2>
+    <p>Alberta and the territories charge only the 5% GST: use the <a href="/gst-calculator/">GST calculator</a>. Ontario and the Atlantic provinces charge a single HST of 13% to 15%: use the <a href="/hst-calculator/">HST calculator</a>.</p>
   </section>`
 });
 
@@ -1619,6 +1646,7 @@ ${provCompareTable("fr", 1000)}
 
 pages.push({
   url: "/canada-sales-tax-calculator/",
+  modified: "2026-11-19",
   out: "canada-sales-tax-calculator/index.html",
   pair: ["/calcul-taxes-canada/", "/canada-sales-tax-calculator/"],
   lang: "en",
@@ -1642,8 +1670,8 @@ ${provinceTable("en")}
 ${provCompareTable("en", 1000)}
     <h2>GST, HST, PST, QST: what's the difference?</h2>
     <ul class="benefits">
-      <li><b>GST</b> (5%): the federal tax, and the only one in Alberta and the territories.</li>
-      <li><b>HST</b>: GST and provincial tax merged into one (Ontario and the Atlantic provinces).</li>
+      <li><b>GST</b> (5%): the federal tax, and the only one in Alberta and the territories. See the <a href="/gst-calculator/">GST calculator</a>.</li>
+      <li><b>HST</b>: GST and provincial tax merged into one (Ontario and the Atlantic provinces). See the <a href="/hst-calculator/">HST calculator</a>.</li>
       <li><b>PST / RST</b>: a separate provincial tax in British Columbia (7%), Saskatchewan (6%) and Manitoba (7%).</li>
       <li><b>QST</b> (9.975%): the Quebec Sales Tax, collected by Revenu Québec. See the <a href="/quebec-tax-calculator/">Quebec sales tax calculator</a>.</li>
     </ul>
@@ -1706,6 +1734,7 @@ ${qcVsOnTable("fr")}
 
 pages.push({
   url: "/ontario-sales-tax-calculator/",
+  modified: "2026-11-19",
   out: "ontario-sales-tax-calculator/index.html",
   pair: ["/calcul-taxes-ontario/", "/ontario-sales-tax-calculator/"],
   lang: "en",
@@ -1735,9 +1764,187 @@ ${provAmountTable("en", ON, ON_AMOUNTS)}
 ${provRemoveTable("en", ON, ON_TOTALS)}
     <h2>Quebec vs Ontario sales tax</h2>
 ${qcVsOnTable("en")}
-    <p>Quebec charges two taxes (GST and QST) while Ontario charges one (HST). See the <a href="/quebec-tax-calculator/">Quebec sales tax calculator</a> or the <a href="/canada-sales-tax-calculator/">Canada sales tax calculator</a> for other provinces.</p>
+    <p>Quebec charges two taxes (GST and QST) while Ontario charges one (HST). See the <a href="/quebec-tax-calculator/">Quebec sales tax calculator</a>, the <a href="/hst-calculator/">HST calculator</a> for Nova Scotia and the 15% provinces, or the <a href="/canada-sales-tax-calculator/">Canada sales tax calculator</a> for other provinces.</p>
     <h2>Ontario point-of-sale rebate</h2>
     <p>On some items Ontario doesn't charge its 8% portion, so only 5% applies: children's clothing and footwear, diapers, children's car seats, printed books, newspapers, and prepared food and drinks of $4 or less. Basic groceries and prescription drugs are not taxed.</p>
+  </section>`
+});
+
+/* ============================ GST / HST (EN) ============================= */
+/* "gst calculator" ~14,800/mo (KD 19), "hst calculator" ~12,100/mo (KD 20), Semrush CA, 2026-11-19.
+ * Rates come from PROV, so the tables, the calculator options and the copy share one source. */
+const HST_PROVS = PROV.filter((p) => p.kind === "hst");
+const GST_ONLY = PROV.filter((p) => p.kind === "gst");
+const listNames = (arr, lang) => { const n = arr.map((p) => provName(p, lang)); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + (lang === "en" ? " and " : " et ") + n[n.length - 1]; };
+/* One flat rate: tax rounded to the cent, as on a receipt. */
+function flatAddTable(lang, rate, label, amounts) {
+  const rows = amounts.map((a) => { const t = r2(a * rate); return `<tr><td>${money(a, lang)}</td><td>${money(t, lang)}</td><td>${money(r2(a + t), lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Before tax</th><th>${label}</th><th>Total with tax</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+function flatRemoveTable(lang, rate, label, totals) {
+  const rows = totals.map((t) => { const b = r2(t / (1 + rate)); return `<tr><td>${money(t, lang)}</td><td>${money(r2(t - b), lang)}</td><td>${money(b, lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Price with tax</th><th>${label} included</th><th>Price before tax</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+/* GST part of the sales tax in every province. */
+function gstByProvTable(lang) {
+  const rows = PROV.map((p) => {
+    const other = p.kind === "gst" ? "None" : p.kind === "hst" ? `${pct(p.prov, lang, 3)} provincial part of the HST` : `${TAXNAME.en[p.kind]} ${pct(p.prov, lang, 3)}`;
+    return `<tr><td>${provName(p, lang)}</td><td>5%${p.kind === "hst" ? " (in HST)" : ""}</td><td>${other}</td><td><b>${pct(p.rate, lang, 3)}</b></td></tr>`;
+  }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Province</th><th>GST</th><th>Provincial tax</th><th>Total rate</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+function hstRatesTable(lang) {
+  const rows = HST_PROVS.map((p) => { const t = provTax(p, 100), r = provRemove(p, 100); return `<tr><td>${provName(p, lang)}</td><td><b>${pct(p.rate, lang, 3)}</b></td><td>5% + ${pct(p.prov, lang, 3)}</td><td>${money(t.total, lang)}</td><td>${money(r.base, lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Province</th><th>HST</th><th>Federal + provincial</th><th>$100 + HST</th><th>$100 with HST = before tax</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const HST_RATES = [...new Set(HST_PROVS.map((p) => p.rate))].sort((a, b) => a - b);
+const hstRateLabel = (r) => `${pct(r, "en", 3)} (${listNames(HST_PROVS.filter((p) => p.rate === r).map((p) => ({ ...p, en: p.code === "pe" ? "PEI" : p.code === "nl" ? "NL" : p.code === "nb" ? "NB" : p.en })), "en")})`;
+function hstCompareTable(lang, amounts, reverse = false) {
+  const head = HST_RATES.map((r) => `<th>${hstRateLabel(r)}</th>`).join("");
+  const rows = amounts.map((a) => `<tr><td>${money(a, lang)}</td>${HST_RATES.map((r) => { if (reverse) return `<td>${money(r2(a / (1 + r)), lang)}</td>`; const t = r2(a * r); return `<td>${money(r2(a + t), lang)}</td>`; }).join("")}</tr>`).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${reverse ? "Price with HST" : "Before tax"}</th>${head}</tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const GST_AMOUNTS = [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000, 10000];
+const GST_TOTALS = [1.05, 10, 20, 50, 100, 105, 200, 500, 1000, 5000];
+const fracPct = (r) => (r / (1 + r) * 100).toFixed(3) + "%";
+
+pages.push({
+  url: "/gst-calculator/",
+  modified: "2026-11-19",
+  out: "gst-calculator/index.html",
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/canada.js"],
+  featureList: ["Add or remove 5% GST", "GST-only provinces and territories", "GST part of the tax in every province", "2026 rates"],
+  title: "GST Calculator 2026: Add or Remove 5% GST (Alberta & Canada)",
+  desc: "Free GST calculator for 2026: add or remove Canada's 5% GST. $100 + GST = $105.00, and $105 with GST = $100 before tax. For Alberta, Yukon, NWT and Nunavut, plus the GST part of the tax in every province.",
+  h1: "GST Calculator (5%)",
+  intro: "Enter an amount to add or remove the 5% GST. Pick another province to include its provincial sales tax.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Canada Sales Tax Calculator", href: "/canada-sales-tax-calculator/" }, { name: "GST Calculator", href: "/gst-calculator/" }],
+  faqs: [
+    { q: "How do you calculate GST?", a: "Multiply the price before tax by 0.05 for the GST, or by 1.05 for the total. Example: $80 × 1.05 = $84.00, including $4.00 of GST." },
+    { q: "How do you calculate GST backwards?", a: `Divide the GST-included price by 1.05. Example: $105 ÷ 1.05 = $100 before tax. The GST inside any total is ${fracPct(0.05)} of it (5 ÷ 105), not 5%.` },
+    { q: "What is the GST on $100?", a: "$5.00, for a total of $105.00." },
+    { q: "Is there PST in Alberta?", a: `No. Alberta has no provincial sales tax, so only the 5% GST applies. The same goes for ${listNames(GST_ONLY.filter((p) => p.code !== "ab"), "en")}.` },
+    { q: "Is GST 5% in every province?", a: "Yes. The federal GST is 5% everywhere in Canada. In Ontario and the Atlantic provinces it is part of the HST; in British Columbia, Saskatchewan and Manitoba a separate PST or RST is added; in Quebec the QST is added." },
+    { q: "What is not charged GST?", a: "Basic groceries, prescription drugs, medical devices and most residential rent are zero-rated or exempt. Restaurant meals, snacks, soft drinks and alcohol are taxable." },
+    { q: "Is the GST holiday still in effect?", a: "No. The temporary GST/HST break on certain items ran from December 14, 2024 to February 15, 2025. The normal 5% GST applies again." }
+  ],
+  body:
+    quickAnswer("en", `<p>The GST is Canada's <b>5% federal sales tax</b>. To add it, <b>multiply by 1.05</b>: $100 becomes <b>$105.00</b>. To remove it, <b>divide by 1.05</b>: $105 is $100 before tax. In ${listNames(GST_ONLY, "en")}, the GST is the only sales tax.</p>`) +
+    canadaCard("en", "ab") +
+    `
+  <section class="content" aria-labelledby="gst-table">
+    <h2 id="gst-table">GST on common amounts (5%)</h2>
+${flatAddTable("en", 0.05, "GST 5%", GST_AMOUNTS)}
+    <h2>Reverse GST calculator: price before tax</h2>
+    <p>Divide a GST-included price by 1.05 to remove the GST:</p>
+${flatRemoveTable("en", 0.05, "GST", GST_TOTALS)}
+    <h2>GST formula</h2>
+    <div class="formula">GST = price before tax × 0.05
+Total with GST = price before tax × 1.05
+Price before tax = total ÷ 1.05
+GST included in a total = total × 5 ÷ 105 (≈ ${fracPct(0.05)})</div>
+    <h2>Why not subtract 5%?</h2>
+    <p>The GST was added on the price before tax, so remove it by dividing. On $105, subtracting 5% gives $99.75, which is 25 cents too low. Dividing by 1.05 gives the correct $100.00.</p>
+    <h2>GST in Alberta and the territories</h2>
+    <p>${listNames(GST_ONLY, "en")} have no provincial sales tax: the 5% GST is all you pay. That makes Alberta the lowest sales tax in Canada, tied with the territories. Pick your province in the calculator above to see the full tax elsewhere.</p>
+    <h2>GST and provincial sales tax by province (2026)</h2>
+${gstByProvTable("en")}
+    <h2>GST vs HST vs PST</h2>
+    <ul class="benefits">
+      <li><b>GST</b> (5%): the federal tax, charged across Canada.</li>
+      <li><b>HST</b>: the GST and the provincial tax combined into one rate in Ontario (13%), Nova Scotia (14%), and New Brunswick, Newfoundland and Labrador and PEI (15%). Use the <a href="/hst-calculator/">HST calculator</a>.</li>
+      <li><b>PST / RST</b>: a separate provincial tax added to the GST in British Columbia (7%), Saskatchewan (6%) and Manitoba (7%).</li>
+      <li><b>QST</b> (9.975%): Quebec's provincial tax, added to the GST for 14.975% in total. Use the <a href="/quebec-tax-calculator/">Quebec GST QST calculator</a>.</li>
+    </ul>
+    <h2>GST registration for small businesses</h2>
+    <p>A business must register for the GST/HST once its taxable sales pass $30,000 over four consecutive calendar quarters (the small supplier threshold). Below that, registration is optional.</p>
+    <p class="note">Rates in force in 2026 per the Canada Revenue Agency. Each tax is rounded to the cent.</p>
+  </section>`
+});
+
+const HST_AMOUNTS = [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000, 10000];
+const HST_TOTALS = [10, 20, 50, 100, 113, 114, 115, 200, 500, 1000, 5000];
+
+pages.push({
+  url: "/hst-calculator/",
+  modified: "2026-11-19",
+  out: "hst-calculator/index.html",
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/canada.js"],
+  featureList: ["Add or remove HST", "Ontario 13%, Nova Scotia 14%, NB, NL and PEI 15%", "Reverse HST tables", "2026 rates"],
+  title: "HST Calculator 2026: Add or Remove HST (13%, 14%, 15%) by Province",
+  desc: "HST calculator for 2026: Ontario 13%, Nova Scotia 14%, New Brunswick, Newfoundland and Labrador and PEI 15%. $100 + 13% HST = $113.00. Add or remove HST and see reverse HST tables.",
+  h1: "HST Calculator",
+  intro: "Pick your province, enter an amount and add or remove the HST. Works in reverse to find the price before tax.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Canada Sales Tax Calculator", href: "/canada-sales-tax-calculator/" }, { name: "HST Calculator", href: "/hst-calculator/" }],
+  faqs: [
+    { q: "How do you calculate HST?", a: "Multiply the price before tax by the HST rate: 0.13 in Ontario, 0.14 in Nova Scotia, 0.15 in New Brunswick, Newfoundland and Labrador and PEI. For the total, multiply by 1.13, 1.14 or 1.15." },
+    { q: "How do you calculate HST backwards?", a: `Divide the HST-included price by 1 + the rate. Example in Ontario: $113 ÷ 1.13 = $100 before tax. The HST inside a total is ${fracPct(0.13)} of it at 13%, ${fracPct(0.14)} at 14% and ${fracPct(0.15)} at 15%.` },
+    { q: "Which provinces charge HST?", a: `${listNames(HST_PROVS, "en")}. The other provinces charge the GST alone or the GST plus a separate provincial tax.` },
+    { q: "What is the HST in Nova Scotia?", a: "14% since April 1, 2025, down from 15%. $100 before tax = $114.00." },
+    { q: "What is the difference between HST and GST?", a: "The GST is the 5% federal tax. The HST combines the GST with the provincial sales tax into a single rate, so in Ontario the 13% HST is 5% federal plus 8% provincial." },
+    { q: "Is there HST in Quebec?", a: "No. Quebec charges the 5% GST and its own 9.975% QST separately, for 14.975% in total. Use the Quebec GST QST calculator." },
+    { q: "What is HST on $100?", a: "$13.00 in Ontario (total $113.00), $14.00 in Nova Scotia (total $114.00) and $15.00 in New Brunswick, Newfoundland and Labrador and PEI (total $115.00)." }
+  ],
+  body:
+    quickAnswer("en", `<p>The HST is <b>13% in Ontario</b>, <b>14% in Nova Scotia</b> and <b>15% in New Brunswick, Newfoundland and Labrador and PEI</b>. To add it, multiply by 1 + the rate: $100 × 1.13 = <b>$113.00</b>. To remove it, divide: $113 ÷ 1.13 = $100 before tax.</p>`) +
+    canadaCard("en", "on", "add", HST_PROVS.map((p) => p.code)) +
+    `
+  <section class="content" aria-labelledby="hst-rates">
+    <h2 id="hst-rates">HST rates by province (2026)</h2>
+${hstRatesTable("en")}
+    <h2>HST on common amounts: total with tax</h2>
+${hstCompareTable("en", HST_AMOUNTS)}
+    <h2>Reverse HST calculator: price before tax</h2>
+    <p>Divide an HST-included price by 1.13, 1.14 or 1.15 to remove the HST:</p>
+${hstCompareTable("en", HST_TOTALS, true)}
+    <h2>HST formula</h2>
+    <div class="formula">HST = price before tax × rate
+Total with HST = price before tax × (1 + rate)
+Price before tax = total ÷ (1 + rate)
+HST included = total × rate ÷ (1 + rate)</div>
+    <ul class="benefits">
+      <li>13% HST included = total × 13 ÷ 113 (≈ ${fracPct(0.13)})</li>
+      <li>14% HST included = total × 14 ÷ 114 (≈ ${fracPct(0.14)})</li>
+      <li>15% HST included = total × 15 ÷ 115 (≈ ${fracPct(0.15)})</li>
+    </ul>
+    <h2>Why not subtract 13%?</h2>
+    <p>The HST was added on the price before tax, so remove it by dividing. On $113, subtracting 13% gives $98.31, which is $1.69 too low. Dividing by 1.13 gives the correct $100.00.</p>
+    <h2>HST vs GST</h2>
+    <p>The HST is the 5% federal GST and the provincial sales tax charged as one tax: in Ontario, 5% + 8% = 13%; in Nova Scotia, 5% + 9% = 14%; elsewhere, 5% + 10% = 15%. Alberta and the territories charge only the GST: see the <a href="/gst-calculator/">GST calculator</a>. For Ontario's point-of-sale rebates and HST tables, see the <a href="/ontario-sales-tax-calculator/">Ontario sales tax calculator</a>.</p>
+    <h2>Nova Scotia HST change</h2>
+    <p>Nova Scotia cut its HST from 15% to 14% on April 1, 2025. On $1,000, that's $1,140.00 instead of $1,150.00.</p>
+    <h2>Provinces without HST</h2>
+    <p>British Columbia, Saskatchewan and Manitoba add a separate PST or RST to the GST, and Quebec adds the QST (14.975% in total, see the <a href="/quebec-tax-calculator/">Quebec GST QST calculator</a>). The <a href="/canada-sales-tax-calculator/">Canada sales tax calculator</a> covers every province.</p>
+    <p class="note">Rates in force in 2026 per the Canada Revenue Agency. HST is charged as one tax and rounded to the cent.</p>
   </section>`
 });
 
@@ -2002,49 +2209,6 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
       { q: "Quelle est la différence entre la TPS et la TVQ?", a: "La TPS est la taxe fédérale de 5 % du Canada; la TVQ est la taxe provinciale de 9,975 % du Québec. Les deux s'ajoutent au prix avant taxes." },
       { q: "Qui perçoit la TPS et la TVQ au Québec?", a: "Au Québec, Revenu Québec perçoit les deux taxes, puis remet la portion fédérale au gouvernement du Canada." },
       { q: "La TVQ s'applique-t-elle sur la TPS?", a: "Non. La TVQ se calcule sur le prix avant taxes, pas sur le montant incluant la TPS." }
-    ]
-  },
-
-  {
-    url: "/prix-avant-taxes-quebec/",
-    short: "Prix avant taxes",
-    title: "Comment trouver le prix avant taxes au Québec? | Méthode simple",
-    desc: "Pour trouver le prix avant taxes au Québec, divisez le prix taxes incluses par 1,14975. Méthode, formule et tableau de référence.",
-    h1: "Comment trouver le prix avant taxes au Québec?",
-    intro: "La méthode et un tableau de référence prêt à l'emploi.",
-    datePublished: "2026-01-14",
-    answer:
-      "<p>Pour trouver le prix avant taxes au Québec, <strong>divisez le prix taxes incluses par 1,14975</strong>. Par exemple, un total de 57,49&nbsp;$ correspond à un prix avant taxes d'environ 50,00&nbsp;$. C'est le même calcul que la taxe inverse.</p>",
-    facts: [
-      { k: "Diviseur", v: "1,14975" },
-      { k: "11,50 $ → net", v: "10,00 $" },
-      { k: "57,49 $ → net", v: "50,00 $" },
-      { k: "114,98 $ → net", v: "100,00 $" }
-    ],
-    cta: postCta("/calcul-taxe-inverse-quebec/", "Trouver le prix avant taxes", "Entrez un total taxes incluses et obtenez le prix avant taxes au cent près."),
-    sections: `    <h2>La méthode</h2>
-    <p>Un prix taxes incluses vaut 114,975&nbsp;% du prix avant taxes. Pour retrouver le montant net, on divise donc le total par 1,14975. Inutile de séparer la TPS et la TVQ d'abord&nbsp;: une seule division suffit.</p>
-    <h2>La formule</h2>
-    <div class="formula">Prix avant taxes&nbsp;=&nbsp;Prix taxes incluses&nbsp;÷&nbsp;1,14975</div>
-    <h2>Tableau de référence</h2>
-    <table class="data-table">
-      <thead><tr><th>Prix taxes incluses</th><th>Prix avant taxes</th></tr></thead>
-      <tbody>
-        <tr><td>11,50&nbsp;$</td><td>10,00&nbsp;$</td></tr>
-        <tr><td>22,98&nbsp;$</td><td>19,99&nbsp;$</td></tr>
-        <tr><td>57,49&nbsp;$</td><td>50,00&nbsp;$</td></tr>
-        <tr><td>114,98&nbsp;$</td><td>100,00&nbsp;$</td></tr>
-        <tr><td>1 149,75&nbsp;$</td><td>1 000,00&nbsp;$</td></tr>
-      </tbody>
-    </table>
-    <h2>Pourquoi un écart de quelques cents</h2>
-    <p>Le prix affiché en magasin a déjà été arrondi au cent. En remontant au prix avant taxes, on peut donc tomber à un ou deux cents près du montant exact. C'est normal et sans conséquence pour la plupart des usages.</p>
-    <h2>Cas pratiques</h2>
-    <p>Utile pour une dépense professionnelle, un remboursement ou une comptabilité simple. La <a href="/calcul-taxe-inverse-quebec/">calculatrice de taxe inverse</a> fait le calcul et sépare la TPS et la TVQ. Pour ajouter les taxes à un prix, voyez <a href="/comment-calculer-tps-tvq-quebec/">comment calculer la TPS et la TVQ</a>.</p>`,
-    faqs: [
-      { q: "Comment calculer le prix avant taxes au Québec?", a: "Divisez le prix taxes incluses par 1,14975. Le résultat est le prix avant taxes." },
-      { q: "Quel est le prix avant taxes de 100 $ taxes incluses?", a: "Environ 86,98 $ : 100 ÷ 1,14975 ≈ 86,98 $ avant taxes." },
-      { q: "Est-ce le même calcul que la taxe inverse?", a: "Oui. Trouver le prix avant taxes et faire un calcul de taxe inverse, c'est la même opération : diviser par 1,14975." }
     ]
   },
 
@@ -2387,58 +2551,6 @@ ${removeTable("fr", [10, 20, 50, 100, 200, 500, 1000])}
       { q: "Le rabais s'applique-t-il avant ou après les taxes?", a: "Habituellement avant les taxes : on réduit le prix, puis on ajoute la TPS et la TVQ sur le montant rabattu." },
       { q: "Le total change-t-il selon l'ordre?", a: "À peine. Comme les taxes sont proportionnelles au prix, appliquer le rabais avant ou après les taxes donne pratiquement le même total, à un cent près." },
       { q: "Comment calculer 50 $ avec 20 % de rabais plus taxes?", a: "50 $ − 20 % = 40 $, puis 40 $ × 1,14975 = 45,99 $ taxes incluses." }
-    ]
-  },
-
-  {
-    url: "/tableau-tps-tvq-quebec/",
-    short: "Tableau TPS TVQ",
-    title: "Tableau TPS TVQ Québec : montants courants | Référence 2026",
-    desc: "Tableau de référence TPS TVQ pour le Québec : TPS, TVQ et total taxes incluses pour les montants courants de 1 $ à 1 000 $, au taux de 14,975 %.",
-    h1: "Tableau TPS TVQ Québec : montants courants",
-    intro: "TPS, TVQ et total pour les montants les plus fréquents.",
-    datePublished: "2026-06-17",
-    answer:
-      "<p>Ce tableau donne la <strong>TPS (5&nbsp;%)</strong>, la <strong>TVQ (9,975&nbsp;%)</strong> et le <strong>total taxes incluses</strong> pour les montants courants au Québec. Le total correspond toujours au montant avant taxes multiplié par <strong>1,14975</strong>.</p>",
-    facts: [
-      { k: "TPS", v: "5 %" },
-      { k: "TVQ", v: "9,975 %" },
-      { k: "Taux combiné", v: "14,975 %" },
-      { k: "100 $ → total", v: "114,98 $" }
-    ],
-    cta: postCta("/", "Calculer un autre montant", "Votre montant n'est pas dans le tableau? La calculatrice le fait au cent près."),
-    sections: `    <h2>Tableau de référence (taxes en sus)</h2>
-    <p>Montant avant taxes, puis TPS, TVQ et total à payer. Les taxes sont arrondies au cent.</p>
-    <table class="data-table">
-      <thead><tr><th>Avant taxes</th><th>TPS</th><th>TVQ</th><th>Total</th></tr></thead>
-      <tbody>
-        <tr><td>1,00&nbsp;$</td><td>0,05&nbsp;$</td><td>0,10&nbsp;$</td><td>1,15&nbsp;$</td></tr>
-        <tr><td>2,00&nbsp;$</td><td>0,10&nbsp;$</td><td>0,20&nbsp;$</td><td>2,30&nbsp;$</td></tr>
-        <tr><td>5,00&nbsp;$</td><td>0,25&nbsp;$</td><td>0,50&nbsp;$</td><td>5,75&nbsp;$</td></tr>
-        <tr><td>10,00&nbsp;$</td><td>0,50&nbsp;$</td><td>1,00&nbsp;$</td><td>11,50&nbsp;$</td></tr>
-        <tr><td>15,00&nbsp;$</td><td>0,75&nbsp;$</td><td>1,50&nbsp;$</td><td>17,25&nbsp;$</td></tr>
-        <tr><td>20,00&nbsp;$</td><td>1,00&nbsp;$</td><td>2,00&nbsp;$</td><td>23,00&nbsp;$</td></tr>
-        <tr><td>25,00&nbsp;$</td><td>1,25&nbsp;$</td><td>2,49&nbsp;$</td><td>28,74&nbsp;$</td></tr>
-        <tr><td>50,00&nbsp;$</td><td>2,50&nbsp;$</td><td>4,99&nbsp;$</td><td>57,49&nbsp;$</td></tr>
-        <tr><td>75,00&nbsp;$</td><td>3,75&nbsp;$</td><td>7,48&nbsp;$</td><td>86,23&nbsp;$</td></tr>
-        <tr><td>100,00&nbsp;$</td><td>5,00&nbsp;$</td><td>9,98&nbsp;$</td><td>114,98&nbsp;$</td></tr>
-        <tr><td>150,00&nbsp;$</td><td>7,50&nbsp;$</td><td>14,96&nbsp;$</td><td>172,46&nbsp;$</td></tr>
-        <tr><td>200,00&nbsp;$</td><td>10,00&nbsp;$</td><td>19,95&nbsp;$</td><td>229,95&nbsp;$</td></tr>
-        <tr><td>250,00&nbsp;$</td><td>12,50&nbsp;$</td><td>24,94&nbsp;$</td><td>287,44&nbsp;$</td></tr>
-        <tr><td>500,00&nbsp;$</td><td>25,00&nbsp;$</td><td>49,88&nbsp;$</td><td>574,88&nbsp;$</td></tr>
-        <tr><td>750,00&nbsp;$</td><td>37,50&nbsp;$</td><td>74,81&nbsp;$</td><td>862,31&nbsp;$</td></tr>
-        <tr><td>1 000,00&nbsp;$</td><td>50,00&nbsp;$</td><td>99,75&nbsp;$</td><td>1 149,75&nbsp;$</td></tr>
-      </tbody>
-    </table>
-    <h2>Comment lire le tableau</h2>
-    <p>Chaque ligne part du montant avant taxes. La TPS vaut 5&nbsp;% de ce montant, la TVQ 9,975&nbsp;%, et le total est la somme des trois. Raccourci&nbsp;: montant × 1,14975.</p>
-    <h2>Petit écart d'arrondi</h2>
-    <p>La TVQ exacte peut comporter une fraction de cent (par exemple 9,975&nbsp;$ sur 100&nbsp;$). Les montants sont arrondis au cent, ce qui peut créer un écart d'un cent selon la méthode.</p>
-    <p>Besoin d'un montant absent du tableau&nbsp;? Utilisez la <a href="/">calculatrice TPS TVQ</a>. Pour retirer les taxes d'un total, voyez le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a> et les <a href="/taux-tps-tvq-quebec/">taux TPS TVQ au Québec</a>.</p>`,
-    faqs: [
-      { q: "Quel est le total taxes incluses sur 100 $ au Québec?", a: "114,98 $ : 5,00 $ de TPS plus 9,98 $ de TVQ s'ajoutent au montant de 100 $." },
-      { q: "Comment calculer un montant absent du tableau?", a: "Multipliez le montant avant taxes par 1,14975 pour le total, ou par 0,05 et 0,09975 pour la TPS et la TVQ séparément." },
-      { q: "Pourquoi un écart d'un cent parfois?", a: "Parce que la TVQ exacte comporte une fraction de cent. Selon qu'on arrondit chaque taxe ou le total, le résultat peut varier d'un cent." }
     ]
   },
 
