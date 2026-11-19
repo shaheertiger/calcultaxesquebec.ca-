@@ -10,7 +10,7 @@ const path = require("path");
  * must use www. Pointing canonicals at the apex sent Google to a redirect on every page (Nov 2026 fix). */
 const SITE = "https://www.calcultaxesquebec.ca";
 const UPDATED_YEAR = "2026";
-const BUILD_DATE = "2026-11-17";
+const BUILD_DATE = "2026-11-17"; // default lastmod; set `modified` on a page (or `dateModified` on a post) when only it changes
 const DATE_PUBLISHED = "2026-01-01";
 
 /* Bing Webmaster Tools site verification (content of the msvalidate.01 meta).
@@ -343,7 +343,7 @@ function schemaFor(page) {
     inLanguage: page.lang === "en" ? "en-CA" : "fr-CA",
     description: page.desc,
     datePublished: DATE_PUBLISHED,
-    dateModified: BUILD_DATE,
+    dateModified: page.modified || BUILD_DATE,
     offers: { "@type": "Offer", price: "0", priceCurrency: "CAD" },
     featureList:
       page.featureList ||
@@ -859,6 +859,7 @@ const pages = [];
 // 1. Home (FR)
 pages.push({
   url: "/",
+  modified: "2026-11-19",
   out: "index.html",
   lang: "fr",
   mode: "add",
@@ -884,7 +885,7 @@ ${addTable("fr", [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000
   </section>
   <section class="content" aria-labelledby="reverse-title">
     <h2 id="reverse-title">Retirer les taxes d'un prix</h2>
-    <p>Vous avez un prix avec taxes incluses? Choisissez «&nbsp;Retirer les taxes&nbsp;» dans la calculatrice, entrez le total et obtenez le montant avant taxes, la TPS et la TVQ. Pour une page dédiée, consultez le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>.</p>
+    <p>Vous avez un prix avec taxes incluses? Choisissez «&nbsp;Retirer les taxes&nbsp;» dans la calculatrice, entrez le total et obtenez le montant avant taxes, la TPS et la TVQ. Pour le tableau complet et la formule, consultez le <a href="/calcul-taxe-inverse-quebec/">calcul des taxes inversé (TPS TVQ inversée)</a>.</p>
   </section>
   <section class="content" aria-labelledby="simple-title">
     <h2 id="simple-title">Calculatrice TPS TVQ simple pour le Québec</h2>
@@ -905,34 +906,51 @@ ${addTable("fr", [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000
 // 3. /calcul-taxe-inverse-quebec/ (FR)
 pages.push({
   url: "/calcul-taxe-inverse-quebec/",
+  modified: "2026-11-19",
   out: "calcul-taxe-inverse-quebec/index.html",
   pair: ["/calcul-taxe-inverse-quebec/", "/reverse-tax-calculator-quebec/"],
   lang: "fr",
   mode: "remove",
-  title: "Calcul Taxe Inverse Québec 2026 : Total ÷ 1,14975",
-  desc: "Calcul taxes inversé 2026 : divisez le prix taxes incluses par 1,14975. 114,98 $ = 100 $ avant taxes, 5,00 $ de TPS et 9,98 $ de TVQ. Calculatrice instantanée.",
-  h1: "Calcul Taxe Inverse Québec",
+  title: "Taxes Inversées Québec 2026 : Total ÷ 1,14975 (TPS TVQ)",
+  desc: "Calcul des taxes inversé 2026 : divisez le prix taxes incluses par 1,14975. 114,98 $ = 100 $ avant taxes + 5,00 $ de TPS + 9,98 $ de TVQ. Tableau et calculatrice TPS TVQ inversée.",
+  h1: "Calcul taxes inversé Québec (TPS TVQ inversée)",
   intro:
-    "Vous avez un prix avec taxes incluses? Entrez le total et la calculatrice vous donne le montant avant taxes, la TPS et la TVQ.",
+    "Vous avez un prix avec taxes incluses? Entrez le total : la calculatrice inversée retire la TPS et la TVQ et donne le montant avant taxes.",
   crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul Taxe Inverse Québec", href: "/calcul-taxe-inverse-quebec/" }],
   faqs: FAQ_INVERSE.concat([
     { q: "Comment calculer le montant avant taxes de 50 $?", a: "Divisez 50&nbsp;$ par 1,14975&nbsp;: le prix avant taxes est de 43,49&nbsp;$, dont 2,17&nbsp;$ de TPS et 4,34&nbsp;$ de TVQ incluses." },
-    { q: "Quel pourcentage de taxes est inclus dans un prix au Québec?", a: "Environ 13,02&nbsp;% d'un prix taxes incluses est constitué de taxes (14,975 ÷ 114,975). Retirer 14,975&nbsp;% du total est une erreur courante&nbsp;: on obtiendrait un montant trop bas." }
+    { q: "Quel pourcentage de taxes est inclus dans un prix au Québec?", a: "Environ 13,02&nbsp;% d'un prix taxes incluses est constitué de taxes (14,975 ÷ 114,975). Retirer 14,975&nbsp;% du total est une erreur courante&nbsp;: on obtiendrait un montant trop bas." },
+    { q: "Comment calculer la TPS et la TVQ inversée?", a: "Divisez le total par 1,14975 pour obtenir le prix avant taxes, puis multipliez ce prix par 5&nbsp;% pour la TPS et par 9,975&nbsp;% pour la TVQ. Sur 100&nbsp;$ taxes incluses&nbsp;: 86,98&nbsp;$ avant taxes, 4,35&nbsp;$ de TPS et 8,68&nbsp;$ de TVQ." },
+    { q: "Comment calculer seulement la TVQ incluse dans un prix?", a: "Multipliez le prix taxes incluses par 9,975 ÷ 114,975 (environ 8,676&nbsp;%). Pour la TPS seule, multipliez par 5 ÷ 114,975 (environ 4,349&nbsp;%)." },
+    { q: "Le calcul des taxes inversé a-t-il changé en 2026?", a: "Non. Les taux sont les mêmes en 2026&nbsp;: TPS 5&nbsp;% et TVQ 9,975&nbsp;%. Le diviseur reste donc 1,14975." }
   ]),
   body:
-    quickAnswer("fr", "<p>Pour retirer les taxes d'un prix au Québec, <b>divisez le total par 1,14975</b>. Exemple&nbsp;: 114,98&nbsp;$ ÷ 1,14975 = <b>100,00&nbsp;$ avant taxes</b>, dont 5,00&nbsp;$ de TPS et 9,98&nbsp;$ de TVQ. Environ 13&nbsp;% d'un prix taxes incluses, c'est des taxes.</p>") +
+    quickAnswer("fr", "<p>Calcul des taxes inversé au Québec en 2026&nbsp;: <b>divisez le total par 1,14975</b>. Exemple&nbsp;: 114,98&nbsp;$ ÷ 1,14975 = <b>100,00&nbsp;$ avant taxes</b>, dont 5,00&nbsp;$ de TPS et 9,98&nbsp;$ de TVQ. Environ 13&nbsp;% d'un prix taxes incluses, c'est des taxes&nbsp;: ne retirez pas 14,975&nbsp;%.</p>") +
     TRUST_FR +
     `
   <section class="content" aria-labelledby="rtable-title">
-    <h2 id="rtable-title">Prix avant taxes pour les montants courants</h2>
-${removeTable("fr", [5, 10, 20, 50, 100, 150, 200, 250, 500, 1000, 1500, 2000, 5000])}
+    <h2 id="rtable-title">Taxes inversées : prix avant taxes pour les montants courants</h2>
+    <p>TPS et TVQ incluses dans chaque total, calculées avec les taux 2026 et arrondies au cent&nbsp;:</p>
+${removeTable("fr", [1, 5, 10, 20, 25, 50, 75, 100, 114.98, 150, 200, 250, 500, 1000, 1500, 2000, 5000, 10000])}
   </section>` +
     `
   <section class="content" aria-labelledby="rev-title">
-    <h2 id="rev-title">Retirer les taxes d'un prix</h2>
+    <h2 id="rev-title">Formule du calcul TPS TVQ inversé</h2>
+    <div class="formula">Prix avant taxes = total ÷ 1,14975
+TPS incluse = prix avant taxes × 5&nbsp;%
+TVQ incluse = prix avant taxes × 9,975&nbsp;%</div>
     <p>Le calcul de taxe inverse part d'un prix avec taxes incluses pour retrouver le montant avant taxes. On divise le total par 1,14975, puis on répartit la TPS (5&nbsp;%) et la TVQ (9,975&nbsp;%).</p>
     <h3>Exemple sur 114,98&nbsp;$</h3>
-    <p>Pour un total de 114,98&nbsp;$ avec taxes incluses, le montant avant taxes est d'environ 100,00&nbsp;$, la TPS d'environ 5,00&nbsp;$ et la TVQ d'environ 9,98&nbsp;$.</p>
+    <p>Pour un total de 114,98&nbsp;$ avec taxes incluses, le montant avant taxes est de 100,00&nbsp;$, la TPS de 5,00&nbsp;$ et la TVQ de 9,98&nbsp;$.</p>
+    <h2>Pourquoi ne pas soustraire 14,975&nbsp;%?</h2>
+    <p>Les taxes ont été ajoutées sur le prix avant taxes&nbsp;: il faut donc diviser, pas soustraire. Sur 114,98&nbsp;$, retirer 14,975&nbsp;% donne 97,76&nbsp;$, soit 2,24&nbsp;$ de trop peu. Diviser par 1,14975 donne le bon montant&nbsp;: 100,00&nbsp;$.</p>
+    <h2>Trouver seulement la TPS ou la TVQ incluse</h2>
+    <ul class="benefits">
+      <li>TPS incluse = total × 5 ÷ 114,975 (≈ 4,349&nbsp;%)</li>
+      <li>TVQ incluse = total × 9,975 ÷ 114,975 (≈ 8,676&nbsp;%)</li>
+      <li>Taxes incluses = total × 14,975 ÷ 114,975 (≈ 13,025&nbsp;%)</li>
+    </ul>
+    <p>Pratique pour un reçu, une note de frais ou pour réclamer des crédits de taxe sur les intrants (CTI/RTI) comme travailleur autonome.</p>
     <h2>Pourquoi un petit écart est possible</h2>
     <p>Comme les taxes sont arrondies au cent, le montant avant taxes obtenu par calcul inverse peut différer de quelques cents du prix original. Les montants sont arrondis au cent près.</p>
     <h2>Calculer dans l'autre sens</h2>
@@ -1087,12 +1105,13 @@ pages.push({
 // EN reverse — "reverse tax calculator quebec" cluster (~3,850 searches/month, KD 2–21)
 pages.push({
   url: "/reverse-tax-calculator-quebec/",
+  modified: "2026-11-19",
   out: "reverse-tax-calculator-quebec/index.html",
   pair: ["/calcul-taxe-inverse-quebec/", "/reverse-tax-calculator-quebec/"],
   lang: "en",
   mode: "remove",
-  title: "Reverse Tax Calculator Quebec 2026: Total ÷ 1.14975",
-  desc: "Remove Quebec GST and QST from a tax-included price: divide by 1.14975. $114.98 = $100 before tax, $5.00 GST and $9.98 QST. Free reverse sales tax calculator.",
+  title: "Reverse Tax Calculator Quebec 2026: Remove GST + QST (÷ 1.14975)",
+  desc: "Reverse Quebec sales tax: divide the tax-included price by 1.14975. $114.98 = $100 before tax + $5.00 GST + $9.98 QST. Free reverse GST/QST calculator with a table of common totals.",
   h1: "Reverse Tax Calculator Quebec",
   intro: "Enter a price that already includes tax and get the amount before tax, plus the GST and QST it contains.",
   crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Reverse Tax Calculator Quebec", href: "/reverse-tax-calculator-quebec/" }],
@@ -1101,7 +1120,8 @@ pages.push({
     { q: "What is the price before tax of $50 in Quebec?", a: "$50 ÷ 1.14975 = $43.49 before tax, with $2.17 of GST and $4.34 of QST included." },
     { q: "What percentage of a Quebec price is tax?", a: "About 13.02% of a tax-included price is tax (14.975 ÷ 114.975). Taking 14.975% off the total is a common mistake that gives too low a number." },
     { q: "Why is my reverse calculation off by a cent?", a: "Each tax is rounded to the cent on the original bill, so working backwards can differ by a cent or two from the shelf price." },
-    { q: "Does the reverse calculator work for HST provinces?", a: "No. It uses Quebec's GST (5%) and QST (9.975%). HST provinces use one harmonized rate, for example 13% in Ontario." }
+    { q: "Does the reverse calculator work for HST provinces?", a: "No. It uses Quebec's GST (5%) and QST (9.975%). HST provinces use one harmonized rate, for example 13% in Ontario. Use the <a href=\"/canada-sales-tax-calculator/\">Canada sales tax calculator</a> for other provinces." },
+    { q: "How do I find only the QST included in a price?", a: "Multiply the tax-included price by 9.975 ÷ 114.975 (about 8.676%). For the GST only, multiply by 5 ÷ 114.975 (about 4.349%)." }
   ],
   body:
     quickAnswer("en", "<p>To take tax out of a Quebec price, <b>divide the total by 1.14975</b>. Example: $114.98 ÷ 1.14975 = <b>$100.00 before tax</b>, which includes $5.00 GST and $9.98 QST. About 13% of any tax-included Quebec price is tax.</p>") +
@@ -1109,11 +1129,23 @@ pages.push({
     `
   <section class="content" aria-labelledby="rev-en-table">
     <h2 id="rev-en-table">Price before tax for common Quebec totals</h2>
-${removeTable("en", [5, 10, 20, 50, 100, 150, 200, 250, 500, 1000, 1500, 2000, 5000])}
+    <p>GST and QST included in each total, using 2026 rates and rounded to the cent:</p>
+${removeTable("en", [1, 5, 10, 20, 25, 50, 75, 100, 114.98, 150, 200, 250, 500, 1000, 1500, 2000, 5000, 10000])}
+    <h2>Reverse GST/QST formula</h2>
+    <div class="formula">Price before tax = total ÷ 1.14975
+GST included = price before tax × 5%
+QST included = price before tax × 9.975%</div>
     <h2>Reverse vs forward: which do you need?</h2>
     <p>Use reverse when you have a receipt or a price that already includes tax and need the amount before tax, for an expense report, a bookkeeping entry or an input tax credit claim. To add tax to a price, use the <a href="/quebec-tax-calculator/">Quebec sales tax calculator</a>.</p>
     <h2>Why not just subtract 14.975%?</h2>
     <p>Tax was added on the price before tax, so it must be removed by dividing. On $114.98, subtracting 14.975% gives $97.76, which is $2.24 too low. Dividing by 1.14975 gives the correct $100.00.</p>
+    <h2>Finding only the GST or the QST in a price</h2>
+    <ul class="benefits">
+      <li>GST included = total × 5 ÷ 114.975 (≈ 4.349%)</li>
+      <li>QST included = total × 9.975 ÷ 114.975 (≈ 8.676%)</li>
+      <li>All tax included = total × 14.975 ÷ 114.975 (≈ 13.025%)</li>
+    </ul>
+    <p>Useful for receipts, expense reports and input tax credit claims if you're self-employed. Need the French version? See the <a href="/calcul-taxe-inverse-quebec/">calcul taxes inversé</a>.</p>
   </section>`
 });
 
@@ -2259,23 +2291,29 @@ Total facturé&nbsp;=&nbsp;honoraires&nbsp;×&nbsp;1,14975</div>
 
   {
     url: "/taxes-incluses-vs-taxes-en-sus/",
-    short: "Taxes incluses ou en sus",
-    title: "Taxes incluses vs taxes en sus : comprendre le prix final | Québec",
-    desc: "Taxes incluses ou taxes en sus : la différence sur le prix final au Québec, avec la formule pour passer de l'un à l'autre et des exemples chiffrés.",
-    h1: "Taxes incluses vs taxes en sus : comprendre le prix final",
-    intro: "Deux façons d'afficher un prix, un seul total réel.",
+    short: "Taxes en sus : veut dire quoi?",
+    title: "Taxes en sus : veut dire quoi? + 14,975 % (vs taxes incluses)",
+    desc: "« Taxes en sus » veut dire taxes en plus : le prix affiché n'inclut pas la TPS ni la TVQ. 100 $ taxes en sus = 114,98 $ à payer. Taxes incluses = prix final. Tableau et formules 2026.",
+    h1: "Taxes en sus : qu'est-ce que ça veut dire?",
+    intro: "Taxes en sus ou taxes incluses : deux façons d'afficher un prix, un seul total réel.",
     datePublished: "2026-06-15",
+    dateModified: "2026-11-19",
     answer:
-      "<p>Un prix <strong>taxes en sus</strong> est affiché avant taxes&nbsp;: il faut ajouter 14,975&nbsp;% pour obtenir le total. Un prix <strong>taxes incluses</strong> contient déjà la TPS et la TVQ&nbsp;: c'est le montant final à payer. Pour passer d'un prix taxes incluses au montant avant taxes, divisez par <strong>1,14975</strong>.</p>",
+      "<p><strong>Taxes en sus</strong> veut dire <strong>taxes en plus</strong>&nbsp;: le prix affiché n'inclut pas la TPS ni la TVQ. Au Québec, ajoutez <strong>14,975&nbsp;%</strong>&nbsp;: <strong>100&nbsp;$ taxes en sus = 114,98&nbsp;$</strong> à payer. À l'inverse, un prix <strong>taxes incluses</strong> est déjà le total final (100&nbsp;$ taxes incluses = 86,98&nbsp;$ avant taxes).</p>",
     facts: [
-      { k: "Taxes en sus", v: "Avant taxes" },
+      { k: "En sus", v: "= en plus" },
+      { k: "Taxes en sus", v: "Prix avant taxes" },
       { k: "Taxes incluses", v: "Total final" },
       { k: "Ajouter les taxes", v: "× 1,14975" },
       { k: "Retirer les taxes", v: "÷ 1,14975" }
     ],
     cta: postCta("/calcul-taxe-inverse-quebec/", "Calculer un prix taxes incluses", "Entrez un prix taxes incluses pour voir le montant avant taxes."),
-    sections: `    <h2>Taxes en sus</h2>
-    <p>« Taxes en sus » veut dire que le prix affiché n'inclut pas la TPS ni la TVQ. C'est l'affichage habituel dans les commerces&nbsp;: le 100&nbsp;$ sur l'étiquette devient 114,98&nbsp;$ à la caisse.</p>
+    sections: `    <h2>Que veut dire « taxes en sus »?</h2>
+    <p>« En sus » est une expression qui veut dire « en plus » ou « en supplément ». « Taxes en sus » (parfois écrit « + taxes », « plus taxes » ou « tx en sus ») veut donc dire que le prix affiché n'inclut pas la TPS ni la TVQ&nbsp;: elles s'ajoutent au moment de payer. C'est l'affichage habituel dans les commerces&nbsp;: le 100&nbsp;$ sur l'étiquette devient 114,98&nbsp;$ à la caisse.</p>
+    <p>En anglais, on dit «&nbsp;plus tax&nbsp;» ou «&nbsp;tax extra&nbsp;».</p>
+    <h2>Prix taxes en sus : combien à payer?</h2>
+    <p>Total à payer pour un prix affiché taxes en sus au Québec (TPS 5&nbsp;% + TVQ 9,975&nbsp;%, arrondies au cent)&nbsp;:</p>
+${addTable("fr", [1, 5, 10, 20, 25, 50, 100, 200, 500, 1000, 5000])}
     <h2>Taxes incluses</h2>
     <p>« Taxes incluses » veut dire que le prix affiché est déjà le total à payer. C'est fréquent pour les forfaits, certains services et les prix « tout compris ». Aucun ajout à la caisse.</p>
     <h2>Passer de l'un à l'autre</h2>
@@ -2290,10 +2328,15 @@ Taxes incluses → avant taxes&nbsp;:&nbsp;prix&nbsp;÷&nbsp;1,14975</div>
       </tbody>
     </table>
     <p>Dans le deuxième cas, le montant avant taxes est de 100&nbsp;$ ÷ 1,14975 ≈ 86,98&nbsp;$, et les taxes comprises sont d'environ 13,02&nbsp;$.</p>
+    <h2>Prix taxes incluses : combien avant taxes?</h2>
+${removeTable("fr", [10, 20, 50, 100, 200, 500, 1000])}
     <h2>Pourquoi ça compte</h2>
     <p>Comparer un prix taxes en sus à un prix taxes incluses sans conversion fausse la comparaison. Ramenez toujours les deux à la même base. Pour ajouter les taxes, utilisez la <a href="/">calculatrice TPS TVQ</a>&nbsp;; pour les retirer, le <a href="/calcul-taxe-inverse-quebec/">calcul de taxe inverse</a>.</p>`,
     faqs: [
       { q: "Que veut dire « taxes en sus »?", a: "Que le prix affiché ne comprend pas les taxes. Il faut ajouter 14,975 % (TPS + TVQ) pour obtenir le total à payer." },
+      { q: "Taxe en sus veut dire quoi?", a: "« En sus » veut dire « en plus ». Un prix taxe en sus est un prix avant taxes&nbsp;: la TPS (5 %) et la TVQ (9,975 %) s'ajoutent à la caisse. 50&nbsp;$ taxes en sus = 57,49&nbsp;$ à payer." },
+      { q: "Comment calculer un prix taxes en sus?", a: "Multipliez le prix par 1,14975. Exemple&nbsp;: 200&nbsp;$ taxes en sus × 1,14975 = 229,95&nbsp;$, dont 10,00&nbsp;$ de TPS et 19,95&nbsp;$ de TVQ." },
+      { q: "Quelle est la différence entre « + taxes » et « taxes en sus »?", a: "Aucune. « + taxes », « plus taxes », « tx en sus » et « taxes en sus » veulent tous dire que les taxes ne sont pas comprises dans le prix affiché." },
       { q: "Comment trouver le montant avant taxes d'un prix taxes incluses?", a: "Divisez le prix taxes incluses par 1,14975. Le résultat est le montant avant taxes." },
       { q: "Un prix taxes incluses change-t-il à la caisse?", a: "Non. Un prix taxes incluses est déjà le montant final à payer, sans ajout à la caisse." }
     ]
@@ -2487,7 +2530,8 @@ const posts = POSTS_RAW.map((p) => {
   const crumbs = lang === "en"
     ? [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: p.short, href: p.url }]
     : [{ name: "Accueil", href: "/" }, { name: "Blogue", href: BLOG }, { name: p.short, href: p.url }];
-  const meta = lang === "en" ? `Updated ${monthName(BUILD_DATE, "en")} ${UPDATED_YEAR}` : `Mis à jour en ${monthName(BUILD_DATE, "fr")} ${UPDATED_YEAR}`;
+  const mod = p.dateModified || BUILD_DATE;
+  const meta = lang === "en" ? `Updated ${monthName(mod, "en")} ${UPDATED_YEAR}` : `Mis à jour en ${monthName(mod, "fr")} ${UPDATED_YEAR}`;
   const body =
     `  <p class="post-meta">${meta}</p>\n` +
     `  ${answerBox(lang, p.answer)}\n` +
@@ -2507,6 +2551,7 @@ const posts = POSTS_RAW.map((p) => {
     crumbs,
     faqs: p.faqs,
     body,
+    modified: p.dateModified,
     schemaHtml: postSchema({ ...p, crumbs, lang })
   };
 });
@@ -2585,7 +2630,7 @@ const sitemap =
           `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/"/>`;
       }
       const priority = p.url === "/" ? "1.0" : p.url.startsWith(BLOG) ? "0.6" : "0.8";
-      return `  <url>\n    <loc>${SITE}${p.url}</loc>\n    <lastmod>${BUILD_DATE}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${priority}</priority>${alt}\n  </url>`;
+      return `  <url>\n    <loc>${SITE}${p.url}</loc>\n    <lastmod>${p.modified || BUILD_DATE}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>${priority}</priority>${alt}\n  </url>`;
     })
     .join("\n") +
   `\n</urlset>\n`;

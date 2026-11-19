@@ -70,7 +70,7 @@
 - À partir de combien faut-il s'inscrire à la TPS/TVQ?: https://www.calcultaxesquebec.ca/seuil-inscription-tps-tvq-quebec/
 - TPS TVQ pour travailleurs autonomes : guide simple: https://www.calcultaxesquebec.ca/tps-tvq-travailleur-autonome/
 - Comment calculer les taxes sur une facture au Québec?: https://www.calcultaxesquebec.ca/calcul-taxes-facture-quebec/
-- Taxes incluses vs taxes en sus : comprendre le prix final: https://www.calcultaxesquebec.ca/taxes-incluses-vs-taxes-en-sus/
+- Taxes en sus : qu'est-ce que ça veut dire?: https://www.calcultaxesquebec.ca/taxes-incluses-vs-taxes-en-sus/
 - Comment calculer un rabais avant ou après taxes au Québec?: https://www.calcultaxesquebec.ca/calcul-rabais-taxes-quebec/
 - Tableau TPS TVQ Québec : montants courants: https://www.calcultaxesquebec.ca/tableau-tps-tvq-quebec/
 - What is the tax in Quebec?: https://www.calcultaxesquebec.ca/what-is-the-tax-in-quebec/
