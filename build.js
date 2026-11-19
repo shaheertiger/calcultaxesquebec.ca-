@@ -288,6 +288,7 @@ function internalLinks(lang, currentPath) {
     { href: "/ontario-sales-tax-calculator/", label: "Ontario Sales Tax Calculator", sub: "HST 13%" },
     { href: "/gst-calculator/", label: "GST Calculator", sub: "Add or remove 5% GST" },
     { href: "/hst-calculator/", label: "HST Calculator", sub: "13%, 14% and 15% HST" },
+    { href: "/gst-pst-calculator/", label: "GST PST Calculator", sub: "BC, Saskatchewan, Manitoba" },
     { href: "/quebec-welcome-tax-calculator/", label: "Quebec Welcome Tax Calculator", sub: "Land transfer tax, 2026 brackets" },
     { href: "/", label: "Calcul taxes Québec", sub: "Version française" }
   ]).map((l) => ({ ...l, subFr: l.sub, subEn: l.sub }))
@@ -1672,7 +1673,7 @@ ${provCompareTable("en", 1000)}
     <ul class="benefits">
       <li><b>GST</b> (5%): the federal tax, and the only one in Alberta and the territories. See the <a href="/gst-calculator/">GST calculator</a>.</li>
       <li><b>HST</b>: GST and provincial tax merged into one (Ontario and the Atlantic provinces). See the <a href="/hst-calculator/">HST calculator</a>.</li>
-      <li><b>PST / RST</b>: a separate provincial tax in British Columbia (7%), Saskatchewan (6%) and Manitoba (7%).</li>
+      <li><b>PST / RST</b>: a separate provincial tax in British Columbia (7%), Saskatchewan (6%) and Manitoba (7%). See the <a href="/gst-pst-calculator/">GST PST calculator</a>.</li>
       <li><b>QST</b> (9.975%): the Quebec Sales Tax, collected by Revenu Québec. See the <a href="/quebec-tax-calculator/">Quebec sales tax calculator</a>.</li>
     </ul>
     <h2>How to calculate sales tax in each province</h2>
@@ -1880,7 +1881,7 @@ ${gstByProvTable("en")}
     <ul class="benefits">
       <li><b>GST</b> (5%): the federal tax, charged across Canada.</li>
       <li><b>HST</b>: the GST and the provincial tax combined into one rate in Ontario (13%), Nova Scotia (14%), and New Brunswick, Newfoundland and Labrador and PEI (15%). Use the <a href="/hst-calculator/">HST calculator</a>.</li>
-      <li><b>PST / RST</b>: a separate provincial tax added to the GST in British Columbia (7%), Saskatchewan (6%) and Manitoba (7%).</li>
+      <li><b>PST / RST</b>: a separate provincial tax added to the GST in British Columbia (7%), Saskatchewan (6%) and Manitoba (7%). Use the <a href="/gst-pst-calculator/">GST PST calculator</a>.</li>
       <li><b>QST</b> (9.975%): Quebec's provincial tax, added to the GST for 14.975% in total. Use the <a href="/quebec-tax-calculator/">Quebec GST QST calculator</a>.</li>
     </ul>
     <h2>GST registration for small businesses</h2>
@@ -1943,8 +1944,92 @@ HST included = total × rate ÷ (1 + rate)</div>
     <h2>Nova Scotia HST change</h2>
     <p>Nova Scotia cut its HST from 15% to 14% on April 1, 2025. On $1,000, that's $1,140.00 instead of $1,150.00.</p>
     <h2>Provinces without HST</h2>
-    <p>British Columbia, Saskatchewan and Manitoba add a separate PST or RST to the GST, and Quebec adds the QST (14.975% in total, see the <a href="/quebec-tax-calculator/">Quebec GST QST calculator</a>). The <a href="/canada-sales-tax-calculator/">Canada sales tax calculator</a> covers every province.</p>
+    <p>British Columbia, Saskatchewan and Manitoba add a separate PST or RST to the GST (see the <a href="/gst-pst-calculator/">GST PST calculator</a>), and Quebec adds the QST (14.975% in total, see the <a href="/quebec-tax-calculator/">Quebec GST QST calculator</a>). The <a href="/canada-sales-tax-calculator/">Canada sales tax calculator</a> covers every province.</p>
     <p class="note">Rates in force in 2026 per the Canada Revenue Agency. HST is charged as one tax and rounded to the cent.</p>
+  </section>`
+});
+
+/* GST + PST (BC, SK, MB) — "gst pst calculator" 2,900/mo (KD 17), "gst calculator bc" ~1,300,
+ * "gst calculator manitoba" 210, Semrush CA 2026-11-19. Same PROV table and canada.js engine. */
+const PST_PROVS = PROV.filter((p) => p.kind === "pst" || p.kind === "rst");
+const BC = PROV_BY.bc, SK = PROV_BY.sk, MB = PROV_BY.mb;
+const shortTax = (p) => `${TAXNAME.en[p.kind]} ${pct(p.prov, "en", 3)}`;
+function pstRatesTable(lang) {
+  const rows = PST_PROVS.map((p) => { const t = provTax(p, 100), r = provRemove(p, 100); return `<tr><td>${provName(p, lang)}</td><td>5%</td><td>${shortTax(p)}</td><td><b>${pct(p.rate, lang, 3)}</b></td><td>${money(t.total, lang)}</td><td>${money(r.base, lang)}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Province</th><th>GST</th><th>Provincial tax</th><th>Total</th><th>$100 + tax</th><th>$100 with tax = before tax</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+/* Total (or price before tax) in each PST province; GST and PST each rounded to the cent. */
+function pstCompareTable(lang, amounts, reverse = false) {
+  const head = PST_PROVS.map((p) => `<th>${p.code.toUpperCase()} ${pct(p.rate, lang, 3)}</th>`).join("");
+  const rows = amounts.map((a) => `<tr><td>${money(a, lang)}</td>${PST_PROVS.map((p) => `<td>${money(reverse ? provRemove(p, a).base : provTax(p, a).total, lang)}</td>`).join("")}</tr>`).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>${reverse ? "Price with tax" : "Before tax"}</th>${head}</tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const PST_AMOUNTS = [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000, 10000];
+const PST_TOTALS = [10, 20, 50, 100, 111, 112, 200, 500, 1000, 5000];
+
+pages.push({
+  url: "/gst-pst-calculator/",
+  modified: "2026-11-19",
+  out: "gst-pst-calculator/index.html",
+  lang: "en",
+  showCalc: false,
+  extraJs: ["/assets/js/canada.js"],
+  featureList: ["GST 5% + PST/RST shown separately", "British Columbia, Saskatchewan and Manitoba", "Add or remove tax", "2026 rates"],
+  title: `GST PST Calculator 2026: BC ${pct(BC.rate, "en", 3)}, Saskatchewan ${pct(SK.rate, "en", 3)}, Manitoba ${pct(MB.rate, "en", 3)}`,
+  desc: `GST + PST calculator for 2026: British Columbia 5% GST + 7% PST, Saskatchewan 5% + 6% PST, Manitoba 5% + 7% RST. $100 in BC = ${money(provTax(BC, 100).total, "en")}. Add or remove GST and PST, shown separately.`,
+  h1: "GST PST Calculator",
+  intro: "Pick British Columbia, Saskatchewan or Manitoba, enter an amount and see the GST and PST separately. Works in reverse too.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "Canada Sales Tax Calculator", href: "/canada-sales-tax-calculator/" }, { name: "GST PST Calculator", href: "/gst-pst-calculator/" }],
+  faqs: [
+    { q: "How do you calculate GST and PST?", a: `Multiply the price before tax by 5% for the GST and by the provincial rate for the PST, then add both. In British Columbia: $100 × 5% = $5.00 GST, $100 × 7% = $7.00 PST, total ${money(provTax(BC, 100).total, "en")}.` },
+    { q: "Is PST charged on GST?", a: "No. In British Columbia, Saskatchewan and Manitoba, the PST (RST in Manitoba) is calculated on the price before tax, not on the GST, so the two rates simply add up." },
+    { q: "How do you remove GST and PST from a total?", a: `Divide the tax-included price by 1 + the combined rate: 1.12 in BC and Manitoba, 1.11 in Saskatchewan. Example: $112 ÷ 1.12 = $100 before tax, including $5.00 GST and $7.00 PST.` },
+    { q: "What is the GST and PST in BC?", a: `5% GST plus 7% PST, ${pct(BC.rate, "en", 3)} in total. Some items carry a different PST rate, such as liquor (10%) and higher-priced passenger vehicles.` },
+    { q: "What is the sales tax in Saskatchewan?", a: `5% GST plus 6% PST, ${pct(SK.rate, "en", 3)} in total. $100 before tax = ${money(provTax(SK, 100).total, "en")}.` },
+    { q: "What is RST in Manitoba?", a: `RST is Manitoba's Retail Sales Tax, its name for the PST: 7%. With the 5% GST, the total is ${pct(MB.rate, "en", 3)}.` },
+    { q: "What is not charged PST?", a: "Many basics are exempt from PST, such as basic groceries, prescription drugs and children's clothing, but the rules differ by province. Check with the provincial finance ministry for a specific item." }
+  ],
+  body:
+    quickAnswer("en", `<p><b>British Columbia</b>: 5% GST + 7% PST = <b>${pct(BC.rate, "en", 3)}</b>. <b>Saskatchewan</b>: 5% + 6% PST = <b>${pct(SK.rate, "en", 3)}</b>. <b>Manitoba</b>: 5% + 7% RST = <b>${pct(MB.rate, "en", 3)}</b>. Both taxes are calculated on the price before tax: $100 in BC = $5.00 GST + $7.00 PST = <b>${money(provTax(BC, 100).total, "en")}</b>.</p>`) +
+    canadaCard("en", "bc", "add", PST_PROVS.map((p) => p.code)) +
+    `
+  <section class="content" aria-labelledby="pst-rates">
+    <h2 id="pst-rates">GST and PST rates by province (2026)</h2>
+${pstRatesTable("en")}
+    <h2>BC GST and PST on common amounts</h2>
+${provAmountTable("en", BC, PST_AMOUNTS)}
+    <h2>Total with GST and PST: BC, Saskatchewan, Manitoba</h2>
+${pstCompareTable("en", PST_AMOUNTS)}
+    <h2>Removing GST and PST: price before tax</h2>
+    <p>Divide a tax-included price by 1.12 (BC, Manitoba) or 1.11 (Saskatchewan):</p>
+${pstCompareTable("en", PST_TOTALS, true)}
+    <h2>GST PST formula</h2>
+    <div class="formula">GST = price before tax × 0.05
+PST = price before tax × PST rate
+Total = price before tax + GST + PST
+Price before tax = total ÷ (1 + 0.05 + PST rate)</div>
+    <p>The PST is not charged on the GST: both are calculated on the same price before tax. Each tax is rounded to the cent, which is why a reverse calculation can be a cent off.</p>
+    <h2>Why not subtract 12%?</h2>
+    <p>The taxes were added on the price before tax, so remove them by dividing. On $112, subtracting 12% gives $98.56, which is $1.44 too low. Dividing by 1.12 gives the correct $100.00.</p>
+    <h2>PST in British Columbia, Saskatchewan and Manitoba</h2>
+    <ul class="benefits">
+      <li><b>British Columbia</b>: 7% PST, administered by the BC government, charged on most goods and some services. Liquor is taxed at 10% and higher-priced passenger vehicles at higher rates.</li>
+      <li><b>Saskatchewan</b>: 6% PST, charged on most goods and many services.</li>
+      <li><b>Manitoba</b>: 7% RST (Retail Sales Tax), Manitoba's name for its PST.</li>
+    </ul>
+    <h2>Other provinces</h2>
+    <p>Alberta and the territories charge only the 5% GST: see the <a href="/gst-calculator/">GST calculator</a>. Ontario and the Atlantic provinces combine both into one HST: see the <a href="/hst-calculator/">HST calculator</a>. Quebec works like the PST provinces with its own 9.975% QST: see the <a href="/quebec-tax-calculator/">Quebec GST QST calculator</a>. The <a href="/canada-sales-tax-calculator/">Canada sales tax calculator</a> covers every province.</p>
+    <p class="note">Rates in force in 2026 per the Canada Revenue Agency and the BC, Saskatchewan and Manitoba finance ministries.</p>
   </section>`
 });
 

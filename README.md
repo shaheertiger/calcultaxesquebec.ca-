@@ -41,6 +41,7 @@ instantané et excellents Core Web Vitals.
 | `/ontario-sales-tax-calculator/` | ontario taxes / ontario sales tax (EN) |
 | `/gst-calculator/` | gst calculator / gst calculator alberta / reverse gst (EN) |
 | `/hst-calculator/` | hst calculator / reverse hst calculator, 13-14-15 % (EN) |
+| `/gst-pst-calculator/` | gst pst calculator / gst calculator bc, manitoba, saskatchewan (EN) |
 | `/what-is-the-tax-in-quebec/` | what is the tax in quebec (guide EN, paire de `/taxe-quebec-2026/`) |
 
 Les tableaux des pages impôt/paie sont calculés au build par le même moteur que la
