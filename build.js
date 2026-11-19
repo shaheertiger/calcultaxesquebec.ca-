@@ -275,6 +275,7 @@ function internalLinks(lang, currentPath) {
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ Québec", sub: "TPS 5 %, TVQ 9,975 %" },
     { href: "/calcul-taxes-canada/", label: "Calcul taxes Canada", sub: "TPS, TVH, TVP par province" },
     { href: "/calcul-taxes-ontario/", label: "Calcul taxes Ontario", sub: "TVH 13 %" },
+    { href: "/methode-rapide-tps-tvq/", label: "Méthode rapide TPS TVQ", sub: "TPS et TVQ à remettre" },
     { href: "/quebec-tax-calculator/", label: "Quebec Tax Calculator", sub: "Version anglaise" }
   ] : [
     { href: "/quebec-tax-calculator/", label: "Quebec Sales Tax Calculator", sub: "Add GST and QST" },
@@ -2033,6 +2034,140 @@ Price before tax = total ÷ (1 + 0.05 + PST rate)</div>
   </section>`
 });
 
+/* Méthode rapide TPS/TVQ (FR) — "déclaration tps tvq" 480/mo, "remise tps tvq" 140, "méthode rapide
+ * tps tvq" 110 (KD 13, CPC 5,73 $), "numéro tps tvq" 90 (Semrush CA, 2026-11-19). Engine shared with
+ * the page: assets/js/rapide.js. Rules: Revenu Québec (méthode rapide) and CRA RC4058. */
+const QM = require("./assets/js/rapide.js");
+{ const t = QM.compute(20000, "services", 0); if (t.gstRemit !== 546 || t.qstRemit !== 1231.72) throw new Error("rapide.js no longer matches Revenu Québec's worked example"); }
+const qmPct = (r) => pct(r, "fr", 3);
+function qmTable(type, sales) {
+  const rows = sales.map((v) => { const x = QM.compute(v, type, 0); return `<tr><td>${moneyInt(v, "fr")}</td><td>${money(r2(x.gstCollected + x.qstCollected), "fr")}</td><td>${money(x.gstRemit, "fr")}</td><td>${money(x.qstRemit, "fr")}</td><td>${money(x.kept, "fr")}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Ventes annuelles avant taxes</th><th>TPS + TVQ perçues</th><th>TPS à remettre</th><th>TVQ à remettre</th><th>Montant conservé</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+function qmCard() {
+  const z = fmtZero("fr");
+  return `<div class="card calc" data-qm-root>
+    <div data-qm>
+    <div class="field">
+      <label for="qm-sales">Ventes taxables au Québec pour la période (avant taxes)</label>
+      <div class="input-money"><input id="qm-sales" data-qm="sales" type="text" inputmode="decimal" autocomplete="off" placeholder="20 000"><span class="cur" aria-hidden="true">$</span></div>
+    </div>
+    <div class="field">
+      <label for="qm-type">Type d'entreprise</label>
+      <select id="qm-type" data-qm="type">
+        <option value="services">Services (TPS ${qmPct(QM.R.rates.services.gst)} · TVQ ${qmPct(QM.R.rates.services.qst)})</option>
+        <option value="goods">Revente de biens, 40&nbsp;% ou plus des ventes (TPS ${qmPct(QM.R.rates.goods.gst)} · TVQ ${qmPct(QM.R.rates.goods.qst)})</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="qm-prior">Ventes avant taxes déjà déclarées cet exercice (pour le crédit de 1&nbsp;%)</label>
+      <div class="input-money"><input id="qm-prior" data-qm="prior" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="cur" aria-hidden="true">$</span></div>
+    </div>
+    <div class="field">
+      <label for="qm-exp">Facultatif&nbsp;: dépenses taxables avant taxes (pour comparer avec la méthode régulière)</label>
+      <div class="input-money"><input id="qm-exp" data-qm="expenses" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="cur" aria-hidden="true">$</span></div>
+    </div>
+    <div class="result" aria-live="polite">
+      <div class="breakdown">
+        <div class="row"><span class="k">TPS perçue (5&nbsp;%)</span><span class="v" data-qm-out="gstCollected">${z}</span></div>
+        <div class="row"><span class="k">TVQ perçue (9,975&nbsp;%)</span><span class="v" data-qm-out="qstCollected">${z}</span></div>
+        <div class="row"><span class="k">Crédit de 1&nbsp;% (TPS / TVQ)</span><span class="v"><span data-qm-out="gstCredit">${z}</span> / <span data-qm-out="qstCredit">${z}</span></span></div>
+        <div class="row"><span class="k">TPS à remettre</span><span class="v" data-qm-out="gstRemit">${z}</span></div>
+        <div class="row"><span class="k">TVQ à remettre</span><span class="v" data-qm-out="qstRemit">${z}</span></div>
+      </div>
+      <div class="total-box"><span class="lbl">Total à remettre (méthode rapide)</span><span class="amt" data-qm-out="quick">${z}</span></div>
+      <div class="rate-row"><span>Montant conservé</span><b data-qm-out="kept">${z}</b></div>
+      <div class="rate-row" hidden><span>Méthode régulière (perçu − CTI/RTI)</span><b data-qm-out="regular">${z}</b></div>
+      <p class="note" hidden><span data-qm-out="compare"></span></p>
+      <p class="note">Ventes au Québec, entreprise établie au Québec. Estimation&nbsp;: confirmez auprès de Revenu Québec.</p>
+    </div>
+    </div>
+  </div>`;
+}
+const QM_SALES = [30000, 50000, 100000, 200000, 350000];
+const QM_EX = QM.compute(100000, "services", 0, 10000);
+
+pages.push({
+  url: "/methode-rapide-tps-tvq/",
+  modified: "2026-11-19",
+  out: "methode-rapide-tps-tvq/index.html",
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/rapide.js"],
+  featureList: ["TPS et TVQ à remettre selon la méthode rapide", "Taux services et revente de biens", "Crédit de 1 % suivi sur l'exercice", "Comparaison avec la méthode régulière"],
+  title: "Méthode rapide TPS TVQ 2026 : calculatrice (3,6 % et 6,6 %)",
+  desc: "Calculez la TPS et la TVQ à remettre avec la méthode rapide au Québec : 3,6 % et 6,6 % pour les services, 1,8 % et 3,4 % pour la revente, crédit de 1 %. Admissibilité, exemples et comparaison avec la méthode régulière.",
+  h1: "Méthode rapide TPS TVQ : calculatrice",
+  intro: "Entrez vos ventes de la période et obtenez la TPS et la TVQ à remettre à Revenu Québec selon la méthode rapide, crédit de 1 % compris.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Méthode rapide TPS TVQ", href: "/methode-rapide-tps-tvq/" }],
+  faqs: [
+    { q: "Qu'est-ce que la méthode rapide de la TPS et de la TVQ?", a: "Une façon simplifiée de calculer les taxes à remettre&nbsp;: au lieu de soustraire les taxes payées sur chaque dépense, on multiplie ses ventes taxes comprises par un taux fixe. L'entreprise facture toujours 5&nbsp;% de TPS et 9,975&nbsp;% de TVQ à ses clients." },
+    { q: "Quels sont les taux de la méthode rapide au Québec?", a: "Pour la plupart des entreprises de services&nbsp;: 3,6&nbsp;% pour la TPS et 6,6&nbsp;% pour la TVQ. Pour les entreprises qui achètent des biens pour les revendre (au moins 40&nbsp;% de leurs ventes)&nbsp;: 1,8&nbsp;% pour la TPS et 3,4&nbsp;% pour la TVQ. Ces taux visent les ventes faites au Québec." },
+    { q: "Sur quel montant applique-t-on les taux?", a: "Le taux de TPS s'applique aux ventes taxables TPS comprise, et le taux de TVQ aux ventes taxables TVQ comprise. Sur 20&nbsp;000&nbsp;$ de ventes avant taxes, la base est de 21&nbsp;000&nbsp;$ pour la TPS et de 21&nbsp;995&nbsp;$ pour la TVQ." },
+    { q: "Qui peut utiliser la méthode rapide?", a: "Une entreprise inscrite dont les ventes taxables mondiales, y compris celles de ses associés, ne dépassent pas 400&nbsp;000&nbsp;$ TPS comprise (418&nbsp;952&nbsp;$ TVQ comprise) sur quatre trimestres consécutifs parmi les cinq derniers. Les services comptables, juridiques, actuariels, de tenue de livres, de conseil financier ou fiscal et de préparation de déclarations, les institutions financières et les organismes de bienfaisance en sont exclus." },
+    { q: "Comment fonctionne le crédit de 1&nbsp;%?", a: "On déduit 1&nbsp;% de la première tranche de 30&nbsp;000&nbsp;$ de ventes admissibles (TPS comprise) et de 31&nbsp;421&nbsp;$ (TVQ comprise) de chaque exercice. La partie inutilisée ne peut pas être reportée à l'exercice suivant." },
+    { q: "Comment choisir la méthode rapide?", a: "Au Québec, avec le formulaire FP-2074 (Choix ou révocation du choix de la méthode rapide de comptabilité) de Revenu Québec. Le choix doit rester en vigueur au moins un an avant d'être révoqué." },
+    { q: "Peut-on réclamer des CTI et des RTI avec la méthode rapide?", a: "Seulement pour les biens immobilisés (ordinateur, véhicule, mobilier de bureau, par exemple) et les immeubles. Les taxes payées sur les dépenses courantes (téléphone, chauffage, fournitures) ne sont pas réclamées&nbsp;: le taux réduit en tient compte." },
+    { q: "Le montant conservé est-il imposable?", a: "Oui. La différence entre les taxes perçues et les taxes remises s'ajoute au revenu de l'entreprise pour l'impôt sur le revenu." }
+  ],
+  body:
+    quickAnswer("fr", `<p>Avec la méthode rapide, une entreprise de services remet <b>3,6&nbsp;% de ses ventes TPS comprise</b> et <b>6,6&nbsp;% de ses ventes TVQ comprise</b>, moins un crédit de 1&nbsp;% sur les premiers 30&nbsp;000&nbsp;$ / 31&nbsp;421&nbsp;$ de l'exercice. Exemple officiel&nbsp;: 20&nbsp;000&nbsp;$ de ventes = <b>546,00&nbsp;$ de TPS</b> et <b>1&nbsp;231,72&nbsp;$ de TVQ</b> à remettre, au lieu de 2&nbsp;995,00&nbsp;$ perçus.</p>`) +
+    qmCard() +
+    `
+  <section class="content" aria-labelledby="qm-rates">
+    <h2 id="qm-rates">Taux de la méthode rapide au Québec</h2>
+    <table class="data-table">
+      <thead><tr><th>Type d'entreprise</th><th>TPS (sur ventes TPS comprise)</th><th>TVQ (sur ventes TVQ comprise)</th></tr></thead>
+      <tbody>
+        <tr><td>Services et la plupart des entreprises</td><td>${qmPct(QM.R.rates.services.gst)}</td><td>${qmPct(QM.R.rates.services.qst)}</td></tr>
+        <tr><td>Revente de biens (achats ≥ 40&nbsp;% des ventes)</td><td>${qmPct(QM.R.rates.goods.gst)}</td><td>${qmPct(QM.R.rates.goods.qst)}</td></tr>
+      </tbody>
+    </table>
+    <p>Le taux réduit de revente s'applique si le coût des biens achetés pour être revendus (taxes comprises, sauf l'épicerie de base) représentait au moins 40&nbsp;% des ventes taxables de l'exercice précédent.</p>
+    <h2>Comment calculer la TPS et la TVQ à remettre</h2>
+    <div class="formula">TPS à remettre = ventes × 1,05 × taux TPS − crédit de 1 %
+TVQ à remettre = ventes × 1,09975 × taux TVQ − crédit de 1 %</div>
+    <h3>Exemple de Revenu Québec&nbsp;: entreprise de nettoyage (services)</h3>
+    <ul class="benefits">
+      <li>1<sup>er</sup> trimestre, 20&nbsp;000&nbsp;$ de ventes&nbsp;: TPS 21&nbsp;000&nbsp;$ × 3,6&nbsp;% = 756,00&nbsp;$ − 210,00&nbsp;$ de crédit = <b>546,00&nbsp;$</b></li>
+      <li>TVQ 21&nbsp;995&nbsp;$ × 6,6&nbsp;% = 1&nbsp;451,67&nbsp;$ − 219,95&nbsp;$ de crédit = <b>1&nbsp;231,72&nbsp;$</b></li>
+      <li>2<sup>e</sup> trimestre&nbsp;: le crédit ne s'applique qu'au reste des tranches de 30&nbsp;000&nbsp;$ et 31&nbsp;421&nbsp;$ (9&nbsp;000&nbsp;$ et 9&nbsp;426&nbsp;$). La calculatrice le fait avec le champ «&nbsp;ventes déjà déclarées&nbsp;».</li>
+    </ul>
+    <h2>Combien remet-on sur une année? Entreprise de services</h2>
+${qmTable("services", QM_SALES)}
+    <h2>Entreprise de revente de biens</h2>
+${qmTable("goods", QM_SALES)}
+    <p>Calculs sur une année complète, ventes au Québec, crédit de 1&nbsp;% compris. Le montant conservé n'est pas un profit net&nbsp;: il compense les taxes payées sur vos dépenses, que la méthode rapide ne permet pas de réclamer (sauf les biens immobilisés). C'est surtout vrai en revente, où les taxes payées sur les marchandises sont importantes. Ce montant est imposable.</p>
+    <h2>Méthode rapide ou méthode régulière?</h2>
+    <p>Avec la méthode régulière, vous remettez les taxes perçues moins les taxes payées sur vos dépenses (CTI pour la TPS, RTI pour la TVQ). La méthode rapide est avantageuse quand vos dépenses taxables sont faibles par rapport à vos ventes, ce qui est le cas de beaucoup de consultants et de travailleurs autonomes.</p>
+    <p>Exemple&nbsp;: entreprise de services, 100&nbsp;000&nbsp;$ de ventes et 10&nbsp;000&nbsp;$ de dépenses taxables sur l'année. Méthode régulière&nbsp;: <b>${money(QM_EX.regular, "fr")}</b> à remettre. Méthode rapide&nbsp;: <b>${money(QM_EX.quick, "fr")}</b>. Écart&nbsp;: ${money(r2(QM_EX.regular - QM_EX.quick), "fr")} de moins avec la méthode rapide. Entrez vos dépenses dans la calculatrice pour comparer.</p>
+    <h2>Qui peut utiliser la méthode rapide?</h2>
+    <ul class="benefits">
+      <li>Ventes taxables mondiales (avec les associés) de 400&nbsp;000&nbsp;$ ou moins TPS comprise, 418&nbsp;952&nbsp;$ ou moins TVQ comprise, sur quatre trimestres consécutifs parmi les cinq derniers</li>
+      <li>Exclus&nbsp;: services comptables, juridiques et actuariels, tenue de livres, conseil financier ou fiscal, préparation de déclarations</li>
+      <li>Exclus aussi&nbsp;: institutions financières désignées, organismes de bienfaisance, municipalités, universités, collèges, hôpitaux et autres organismes publics</li>
+    </ul>
+    <p>Les ventes exonérées, les services financiers et les ventes d'immeubles ou de biens immobilisés ne comptent pas dans le seuil. Les ventes détaxées y comptent, mais ne font pas partie de la base de calcul.</p>
+    <h2>Déclaration TPS TVQ avec la méthode rapide</h2>
+    <ul class="benefits">
+      <li>Choisissez la méthode avec le formulaire FP-2074 de Revenu Québec, au plus tard à la date d'échéance de la déclaration de la première période visée (ou au premier jour du deuxième trimestre si vous déclarez une fois par année).</li>
+      <li>À chaque déclaration, multipliez vos ventes taxes comprises par les taux, déduisez le crédit de 1&nbsp;% et ajoutez les CTI/RTI sur les biens immobilisés achetés.</li>
+      <li>La vente d'un bien immobilisé ou d'un immeuble n'entre pas dans la méthode rapide&nbsp;: remettez toute la taxe perçue.</li>
+      <li>Le choix reste en vigueur au moins un an. Après une révocation, il faut attendre un an pour choisir de nouveau la méthode.</li>
+    </ul>
+    <h2>Ventes hors Québec</h2>
+    <p>La calculatrice vise les ventes faites au Québec. Les ventes faites dans d'autres provinces, notamment dans les provinces à TVH, utilisent d'autres taux de remise&nbsp;; consultez Revenu Québec. Pour la TVH elle-même, voyez la <a href="/hst-calculator/">calculatrice TVH</a>.</p>
+    <p>À lire aussi&nbsp;: <a href="/seuil-inscription-tps-tvq-quebec/">seuil d'inscription à la TPS/TVQ</a> et <a href="/tps-tvq-travailleur-autonome/">TPS TVQ pour travailleurs autonomes</a>.</p>
+    <p class="note">Sources&nbsp;: Revenu Québec, «&nbsp;Méthode rapide de calcul des montants de la TPS et de la TVQ à remettre&nbsp;» et formulaire FP-2074&nbsp;; Agence du revenu du Canada, guide RC4058. Taux en vigueur en 2026.</p>
+    <p class="disclaimer">Information générale seulement, et non un avis fiscal ou comptable. Confirmez votre admissibilité et vos montants auprès de Revenu Québec ou d'un professionnel.</p>
+  </section>`
+});
+
 /* ================================== BLOG =================================== */
 
 const BLOG = "/blog/";
@@ -2421,7 +2556,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
       </tbody>
     </table>
     <h2>Et après l'inscription?</h2>
-    <p>Vous devez facturer 5&nbsp;% de TPS et 9,975&nbsp;% de TVQ sur vos fournitures taxables, puis remettre ces montants à Revenu Québec. Pour calculer ce que vous devez ajouter, voyez <a href="/comment-calculer-tps-tvq-quebec/">comment calculer la TPS et la TVQ</a> et le guide <a href="/tps-tvq-travailleur-autonome/">TPS TVQ pour travailleurs autonomes</a>.</p>
+    <p>Vous devez facturer 5&nbsp;% de TPS et 9,975&nbsp;% de TVQ sur vos fournitures taxables, puis remettre ces montants à Revenu Québec. Pour calculer ce que vous devez ajouter, voyez <a href="/comment-calculer-tps-tvq-quebec/">comment calculer la TPS et la TVQ</a> et le guide <a href="/tps-tvq-travailleur-autonome/">TPS TVQ pour travailleurs autonomes</a>. Si vos ventes ne dépassent pas 400&nbsp;000&nbsp;$, la <a href="/methode-rapide-tps-tvq/">méthode rapide</a> peut simplifier vos remises.</p>
     <p class="disclaimer">Information générale seulement, et non un avis fiscal. Confirmez votre obligation d'inscription auprès de Revenu Québec.</p>`,
     faqs: [
       { q: "À partir de combien s'inscrire à la TPS/TVQ?", a: "Dès que vos revenus taxables dépassent 30 000 $ sur quatre trimestres civils consécutifs. L'inscription devient alors obligatoire." },
@@ -2466,7 +2601,7 @@ Total facturé&nbsp;=&nbsp;honoraires&nbsp;×&nbsp;1,14975</div>
       </tbody>
     </table>
     <h2>4. Remettre les taxes</h2>
-    <p>Les taxes que vous percevez ne vous appartiennent pas&nbsp;: vous les remettez à Revenu Québec selon la fréquence de vos déclarations. Vous pouvez en déduire les taxes payées sur vos achats d'entreprise (crédits de taxe).</p>
+    <p>Les taxes que vous percevez ne vous appartiennent pas&nbsp;: vous les remettez à Revenu Québec selon la fréquence de vos déclarations. Vous pouvez en déduire les taxes payées sur vos achats d'entreprise (crédits de taxe), ou choisir la <a href="/methode-rapide-tps-tvq/">méthode rapide</a>&nbsp;: un taux fixe de 3,6&nbsp;% (TPS) et de 6,6&nbsp;% (TVQ) sur vos ventes de services taxes comprises. Elle n'est pas offerte aux services comptables, juridiques ou de tenue de livres.</p>
     <p>Pour bâtir une facture complète, voyez <a href="/calcul-taxes-facture-quebec/">comment calculer les taxes sur une facture</a>. Pour ajouter rapidement les taxes, utilisez la <a href="/">calculatrice TPS TVQ</a>.</p>
     <p class="disclaimer">Information générale seulement, et non un avis fiscal ou comptable. Consultez Revenu Québec ou un professionnel pour votre situation.</p>`,
     faqs: [

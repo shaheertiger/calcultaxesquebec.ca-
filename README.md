@@ -42,6 +42,7 @@ instantané et excellents Core Web Vitals.
 | `/gst-calculator/` | gst calculator / gst calculator alberta / reverse gst (EN) |
 | `/hst-calculator/` | hst calculator / reverse hst calculator, 13-14-15 % (EN) |
 | `/gst-pst-calculator/` | gst pst calculator / gst calculator bc, manitoba, saskatchewan (EN) |
+| `/methode-rapide-tps-tvq/` | méthode rapide tps tvq / déclaration et remise tps tvq (moteur : `assets/js/rapide.js`) |
 | `/what-is-the-tax-in-quebec/` | what is the tax in quebec (guide EN, paire de `/taxe-quebec-2026/`) |
 
 Les tableaux des pages impôt/paie sont calculés au build par le même moteur que la
