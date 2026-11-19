@@ -7,7 +7,7 @@
  *
  * URLs are read from sitemap.xml (run `node build.js` first) so the list never
  * drifts out of sync. The key file 74d5a7f9a4cb4affadf38a391aa7dcff.txt must be
- * reachable at the site root (https://calcultaxesquebec.ca/<key>.txt) for
+ * reachable at the site root (https://www.calcultaxesquebec.ca/<key>.txt) for
  * IndexNow to verify ownership. Re-run after each deploy to ping Bing instantly.
  */
 "use strict";
@@ -15,7 +15,7 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 
-const HOST = "calcultaxesquebec.ca";
+const HOST = "www.calcultaxesquebec.ca"; // must match the sitemap URLs (canonical www host)
 const KEY = "74d5a7f9a4cb4affadf38a391aa7dcff";
 const SITE = "https://" + HOST;
 
