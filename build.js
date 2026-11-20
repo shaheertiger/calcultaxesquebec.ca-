@@ -2437,7 +2437,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
     url: "/produits-sans-taxes-quebec/",
     short: "Produits sans taxes",
     title: "Quels produits n'ont pas de TPS/TVQ au Québec? | Liste 2026",
-    desc: "Aliments de base, médicaments sur ordonnance, loyer résidentiel, services financiers : la liste des produits et services sans TPS ni TVQ au Québec.",
+    desc: "Produits taxables et non taxables au Québec : épicerie, café, muffins, livres, médicaments, loyer. La liste de ce qui est sans TPS ni TVQ, produit par produit.",
     h1: "Quels produits n'ont pas de TPS/TVQ au Québec?",
     intro: "La liste des biens et services sans taxe, par catégorie.",
     datePublished: "2026-06-12",
@@ -2452,7 +2452,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
     cta: postCta("/", "Calculer la TPS et la TVQ", "Pour un produit taxable, la calculatrice ajoute la TPS et la TVQ instantanément."),
     sections: `    <h2>Les grandes catégories sans taxe</h2>
     <p>La plupart des produits et services sont taxables au taux combiné de <strong>14,975&nbsp;%</strong>. Certaines catégories y échappent toutefois&nbsp;: elles ne portent ni TPS ni TVQ pour le consommateur.</p>
-    <table class="data-table">
+    <table class="data-table wrap">
       <thead><tr><th>Catégorie</th><th>Taxe</th></tr></thead>
       <tbody>
         <tr><td>Aliments de base (épicerie)</td><td>Aucune</td></tr>
@@ -2465,6 +2465,32 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
     </table>
     <h2>Les aliments de base</h2>
     <p>L'épicerie courante (pain, lait, légumes, viande, etc.) est <strong>détaxée</strong>&nbsp;: aucune TPS ni TVQ. Attention&nbsp;: les aliments préparés, les repas au restaurant, les boissons gazeuses, les croustilles, les bonbons et l'alcool restent taxables au taux normal.</p>
+    <h2>Taxable ou non&nbsp;: produits courants</h2>
+    <p>Ce qui compte, c'est souvent la forme du produit&nbsp;: le même aliment peut être détaxé à l'épicerie et taxable une fois préparé ou vendu à l'unité.</p>
+    <table class="data-table wrap">
+      <thead><tr><th>Produit</th><th>Taxes</th><th>Précision</th></tr></thead>
+      <tbody>
+        <tr><td>Café en grains, moulu ou instantané</td><td>Aucune</td><td>Épicerie de base</td></tr>
+        <tr><td>Café préparé (comptoir, restaurant)</td><td>14,975&nbsp;%</td><td>Boisson servie</td></tr>
+        <tr><td>Thé en sachets ou en vrac</td><td>Aucune</td><td>Épicerie de base</td></tr>
+        <tr><td>Lait, œufs, fromage</td><td>Aucune</td><td>Épicerie de base</td></tr>
+        <tr><td>Pain, pâtes, riz, farine</td><td>Aucune</td><td>Épicerie de base</td></tr>
+        <tr><td>Fruits et légumes frais</td><td>Aucune</td><td>Épicerie de base</td></tr>
+        <tr><td>Viande et poisson crus</td><td>Aucune</td><td>Épicerie de base</td></tr>
+        <tr><td>Muffins, beignes, croissants (6 ou plus)</td><td>Aucune</td><td>Vendus en quantité</td></tr>
+        <tr><td>Muffins, beignes, croissants (moins de 6)</td><td>14,975&nbsp;%</td><td>Portion individuelle</td></tr>
+        <tr><td>Sandwichs et plats préparés</td><td>14,975&nbsp;%</td><td>Aliment préparé</td></tr>
+        <tr><td>Repas au restaurant</td><td>14,975&nbsp;%</td><td>Service de restauration</td></tr>
+        <tr><td>Boissons gazeuses</td><td>14,975&nbsp;%</td><td>Exclues de l'épicerie de base</td></tr>
+        <tr><td>Croustilles, bonbons, barres de chocolat</td><td>14,975&nbsp;%</td><td>Grignotines et confiseries</td></tr>
+        <tr><td>Bière, vin, alcool</td><td>14,975&nbsp;%</td><td>Taxable</td></tr>
+        <tr><td>Livres imprimés</td><td>5&nbsp;%</td><td>TPS seulement, sans TVQ</td></tr>
+        <tr><td>Produits d'hygiène féminine</td><td>Aucune</td><td>Détaxés</td></tr>
+        <tr><td>Médicaments sur ordonnance</td><td>Aucune</td><td>Détaxés</td></tr>
+        <tr><td>Médicaments en vente libre</td><td>14,975&nbsp;%</td><td>Généralement taxables</td></tr>
+      </tbody>
+    </table>
+    <p>Exemple&nbsp;: un café préparé de 2,50&nbsp;$ coûte 2,88&nbsp;$ avec taxes (0,13&nbsp;$ de TPS et 0,25&nbsp;$ de TVQ), alors qu'un sac de café moulu à l'épicerie n'a aucune taxe. Un livre de 20&nbsp;$ coûte 21,00&nbsp;$&nbsp;: seulement la TPS.</p>
     <h2>La santé et les médicaments</h2>
     <p>Les médicaments sur ordonnance et plusieurs appareils médicaux sont détaxés. Les services d'un médecin ou d'un dentiste sont généralement exonérés. Les produits de santé vendus en vente libre, eux, sont habituellement taxables.</p>
     <h2>Le logement et les services financiers</h2>
@@ -2474,6 +2500,10 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
     <p class="disclaimer">Information générale seulement. Vérifiez les cas particuliers auprès de Revenu Québec.</p>`,
     faqs: [
       { q: "L'épicerie est-elle taxée au Québec?", a: "Les aliments de base (épicerie courante) ne portent ni TPS ni TVQ. Les aliments préparés, les repas au restaurant, l'alcool et les friandises restent taxables." },
+      { q: "Est-ce que le café est taxable au Québec?", a: "Le café en grains, moulu ou instantané acheté à l'épicerie n'est pas taxé. Le café préparé et servi (comptoir, restaurant, dépanneur) est taxable à 14,975 % : un café de 2,50 $ coûte 2,88 $ avec taxes." },
+      { q: "Qu'est-ce qui est taxable à l'épicerie?", a: "Les boissons gazeuses, les croustilles, les bonbons et barres de chocolat, l'alcool, les plats préparés et les pâtisseries vendues à l'unité (moins de 6) sont taxables. Les aliments de base (lait, pain, fruits, légumes, viande crue, café moulu) ne le sont pas." },
+      { q: "Les muffins et les beignes sont-ils taxés?", a: "Ça dépend de la quantité : achetés par 6 ou plus, ils sont considérés comme épicerie de base et ne sont pas taxés. À l'unité ou par moins de 6, ils sont taxables à 14,975 %." },
+      { q: "Les livres sont-ils taxés au Québec?", a: "Les livres imprimés portent la TPS (5 %) mais pas la TVQ. Un livre de 20 $ coûte donc 21,00 $." },
       { q: "Le loyer est-il taxable au Québec?", a: "Non. Le loyer d'un logement résidentiel est exonéré de TPS et de TVQ." },
       { q: "Les médicaments sont-ils taxés?", a: "Les médicaments sur ordonnance sont détaxés (0 %). Les produits de santé en vente libre sont généralement taxables au taux normal de 14,975 %." }
     ]
