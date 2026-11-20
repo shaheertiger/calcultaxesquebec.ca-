@@ -266,13 +266,14 @@ function internalLinks(lang, currentPath) {
   const fr = lang !== "en";
   const all = (fr ? [
     { href: "/", label: "Calcul taxes Québec", sub: "Ajouter la TPS et la TVQ" },
-    { href: "/calcul-taxe-inverse-quebec/", label: "Calcul taxe inverse Québec", sub: "Retirer les taxes d'un prix" },
+    { href: "/calcul-taxe-inverse-quebec/", label: "Calcul taxes inversé Québec", sub: "Montant avant taxes : total ÷ 1,14975" },
     { href: "/calcul-salaire-net-quebec/", label: "Calcul salaire net Québec", sub: "Salaire brut en net (impôts, RRQ…)" },
     { href: "/calcul-taxe-de-bienvenue-quebec/", label: "Calcul taxe de bienvenue", sub: "Droits de mutation 2026, Montréal et Québec" },
     { href: "/calcul-paie-net-quebec/", label: "Calcul paie net Québec", sub: "Paie nette aux 2 semaines ou par heure" },
     { href: "/calcul-impot-quebec/", label: "Calcul impôt Québec", sub: "Impôt fédéral et provincial 2026" },
     { href: "/tranches-imposition-quebec/", label: "Tranches d'imposition 2026", sub: "Taux marginal Québec + fédéral" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ Québec", sub: "TPS 5 %, TVQ 9,975 %" },
+    { href: "/calcul-rabais-taxes-quebec/", label: "Calcul rabais et taxes", sub: "Rabais avant ou après taxes" },
     { href: "/calcul-taxes-canada/", label: "Calcul taxes Canada", sub: "TPS, TVH, TVP par province" },
     { href: "/calcul-taxes-ontario/", label: "Calcul taxes Ontario", sub: "TVH 13 %" },
     { href: "/methode-rapide-tps-tvq/", label: "Méthode rapide TPS TVQ", sub: "TPS et TVQ à remettre" },

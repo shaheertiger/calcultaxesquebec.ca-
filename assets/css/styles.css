@@ -289,6 +289,7 @@ section.content p { color: var(--muted); margin: 0 0 12px; }
   font-family: var(--mono); font-size: 15px; line-height: 1.8; background: var(--surface);
   border: 1.5px solid var(--line); border-left: 4px solid var(--ink); border-radius: 10px;
   padding: 16px 18px; margin: 0 0 18px; overflow-x: auto; font-variant-numeric: tabular-nums;
+  white-space: pre-line;
 }
 
 .data-table { width: 100%; border-collapse: collapse; margin: 0 0 18px; font-variant-numeric: tabular-nums; }
@@ -335,5 +336,12 @@ section.content p { color: var(--muted); margin: 0 0 12px; }
 [data-wt] select, [data-ca] select { width: 100%; padding: 12px; font-size: 16px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--card, #fff); color: inherit; }
 [data-wt] .check { display: flex; gap: 8px; align-items: center; font-size: 15px; margin: 4px 0 14px; }
 [data-wt] .field + .field { margin-top: 12px; }
-@media (max-width: 560px) { .data-table { display: block; overflow-x: auto; white-space: nowrap; } }
+@media (max-width: 560px) {
+  .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+  /* fit 4 money columns on a phone so the answer column (last) is visible without scrolling */
+  .data-table th, .data-table td { padding: 9px 5px; font-size: 13.5px; }
+  .data-table thead th { font-size: 10px; letter-spacing: .03em; white-space: normal; vertical-align: bottom; }
+  .data-table th:first-child, .data-table td:first-child { padding-left: 0; }
+  .data-table th:last-child, .data-table td:last-child { padding-right: 0; }
+}
 [data-ca] .field + .field { margin-top: 14px; }
