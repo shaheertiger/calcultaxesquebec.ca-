@@ -1,5 +1,5 @@
 /* Calcul Taxes Québec — service worker (offline-ready, cache-first for assets) */
-const CACHE = "ctq-v10";
+const CACHE = "ctq-v11";
 const ASSETS = [
   "/",
   "/calcul-taxe-inverse-quebec/",
@@ -24,12 +24,14 @@ const ASSETS = [
   "/hst-calculator/",
   "/gst-pst-calculator/",
   "/methode-rapide-tps-tvq/",
+  "/calcul-pourboire-quebec/",
   "/assets/css/styles.css",
   "/assets/js/calculator.js",
   "/assets/js/salary.js",
   "/assets/js/welcome.js",
   "/assets/js/canada.js",
   "/assets/js/rapide.js",
+  "/assets/js/pourboire.js",
   "/manifest.webmanifest",
   "/favicon.svg",
   "/icons/icon-192.png",

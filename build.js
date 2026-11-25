@@ -273,6 +273,9 @@ function internalLinks(lang, currentPath) {
     { href: "/calcul-impot-quebec/", label: "Calcul impôt Québec", sub: "Impôt fédéral et provincial 2026" },
     { href: "/tranches-imposition-quebec/", label: "Tranches d'imposition 2026", sub: "Taux marginal Québec + fédéral" },
     { href: "/taux-tps-tvq-quebec/", label: "Taux TPS TVQ Québec", sub: "TPS 5 %, TVQ 9,975 %" },
+    { href: "/calcul-tps-quebec/", label: "Calcul TPS", sub: "TPS seule 5 %, incluse ou retirée" },
+    { href: "/calcul-tvq-quebec/", label: "Calcul TVQ", sub: "TVQ seule 9,975 %" },
+    { href: "/calcul-pourboire-quebec/", label: "Calcul pourboire", sub: "Pourboire avant taxes, par personne" },
     { href: "/calcul-rabais-taxes-quebec/", label: "Calcul rabais et taxes", sub: "Rabais avant ou après taxes" },
     { href: "/calcul-taxes-canada/", label: "Calcul taxes Canada", sub: "TPS, TVH, TVP par province" },
     { href: "/calcul-taxes-ontario/", label: "Calcul taxes Ontario", sub: "TVH 13 %" },
@@ -286,6 +289,7 @@ function internalLinks(lang, currentPath) {
     { href: "/quebec-tax-brackets/", label: "Quebec Tax Brackets 2026", sub: "Combined marginal rates" },
     { href: "/what-is-the-tax-in-quebec/", label: "What is the tax in Quebec?", sub: "Plain-English guide" },
     { href: "/quebec-tax-rate/", label: "Quebec Tax Rate", sub: "14.975% and other provinces" },
+    { href: "/tps-tvq-calculator/", label: "TPS TVQ Calculator", sub: "French tax terms in English" },
     { href: "/canada-sales-tax-calculator/", label: "Canada Sales Tax Calculator", sub: "GST, HST, PST by province" },
     { href: "/ontario-sales-tax-calculator/", label: "Ontario Sales Tax Calculator", sub: "HST 13%" },
     { href: "/gst-calculator/", label: "GST Calculator", sub: "Add or remove 5% GST" },
@@ -1642,6 +1646,14 @@ pages.push({
 ${provinceTable("fr")}
     <h2>Taxes sur un achat de 1&nbsp;000&nbsp;$ selon la province</h2>
 ${provCompareTable("fr", 1000)}
+    <h2>Calculatrices par province</h2>
+    <ul class="benefits">
+      <li><a href="/calcul-taxes-ontario/">Calcul taxes Ontario</a> (TVH 13&nbsp;%)</li>
+      <li><a href="/calcul-taxes-nouveau-brunswick/">Calcul taxes Nouveau-Brunswick</a> (TVH 15&nbsp;%)</li>
+      <li><a href="/calcul-taxes-nouvelle-ecosse/">Calcul taxes Nouvelle-Écosse</a> (TVH 14&nbsp;%)</li>
+      <li><a href="/calcul-taxes-colombie-britannique/">Calcul taxes Colombie-Britannique</a> (TPS + TVP 12&nbsp;%)</li>
+      <li><a href="/calcul-taxes-alberta/">Calcul taxes Alberta</a> (TPS 5&nbsp;%)</li>
+    </ul>
     <h2>TPS, TVH, TVP, TVQ&nbsp;: quelle différence?</h2>
     <ul class="benefits">
       <li><b>TPS</b> (5&nbsp;%)&nbsp;: taxe fédérale, seule taxe en Alberta et dans les territoires.</li>
@@ -1789,18 +1801,20 @@ const GST_ONLY = PROV.filter((p) => p.kind === "gst");
 const listNames = (arr, lang) => { const n = arr.map((p) => provName(p, lang)); return n.length < 2 ? n.join("") : n.slice(0, -1).join(", ") + (lang === "en" ? " and " : " et ") + n[n.length - 1]; };
 /* One flat rate: tax rounded to the cent, as on a receipt. */
 function flatAddTable(lang, rate, label, amounts) {
+  const fr = lang !== "en";
   const rows = amounts.map((a) => { const t = r2(a * rate); return `<tr><td>${money(a, lang)}</td><td>${money(t, lang)}</td><td>${money(r2(a + t), lang)}</td></tr>`; }).join("\n        ");
   return `    <table class="data-table">
-      <thead><tr><th>Before tax</th><th>${label}</th><th>Total with tax</th></tr></thead>
+      <thead><tr><th>${fr ? "Avant taxes" : "Before tax"}</th><th>${label}</th><th>${fr ? "Total avec taxe" : "Total with tax"}</th></tr></thead>
       <tbody>
         ${rows}
       </tbody>
     </table>`;
 }
 function flatRemoveTable(lang, rate, label, totals) {
+  const fr = lang !== "en";
   const rows = totals.map((t) => { const b = r2(t / (1 + rate)); return `<tr><td>${money(t, lang)}</td><td>${money(r2(t - b), lang)}</td><td>${money(b, lang)}</td></tr>`; }).join("\n        ");
   return `    <table class="data-table">
-      <thead><tr><th>Price with tax</th><th>${label} included</th><th>Price before tax</th></tr></thead>
+      <thead><tr><th>${fr ? "Prix taxe incluse" : "Price with tax"}</th><th>${fr ? label + " incluse" : label + " included"}</th><th>${fr ? "Prix avant taxe" : "Price before tax"}</th></tr></thead>
       <tbody>
         ${rows}
       </tbody>
@@ -2178,6 +2192,536 @@ ${qmTable("goods", QM_SALES)}
 });
 
 /* ================================== BLOG =================================== */
+
+/* ---------------------- Nov 25 batch: double down on what Search Console shows works ----------------------
+ * Search Console, Nov 1–25 2026: answer-first pages with "2026" in the title and computed tables win
+ * (home: "calcul taxes québec 2026", pos 4.4, 3.6% CTR). Province pages have the best CTR on the site
+ * (Canada 2.8%, Ontario 2.3%). One page per intent that had impressions but no dedicated page:
+ *   calcul tps (480/mo) / calcul tvq (210/mo) — homepage sections from Nov 19 only reach pos 28–60 —,
+ *   "tps tvq calculator" (EN, ~150 impr.), tps tvq 2025/2024/2023 (history), "1.14975" (pos 2, 7% CTR),
+ *   a tip calculator (new intent), and four French province pages.
+ * "prix/montant avec taxes" stays on the homepage (Nov 19 decision; it ranks ~7 there). */
+const NOV25 = "2026-11-25";
+
+/* ---- 1. Pourboire (tip) — new intent; "prix avec taxes" stays on the homepage (Nov 19 decision, ranks ~7) ---- */
+const TIP_MEALS = [20, 30, 40, 50, 60, 80, 100, 120, 150, 200];
+function tipTable() {
+  const rows = TIP_MEALS.map((m) => { const t = addTax(m); return `<tr><td>${money(m, "fr")}</td><td>${money(t.total, "fr")}</td>${[0.15, 0.18, 0.2].map((r) => { const tip = r2(m * r); return `<td>${money(tip, "fr")} → <b>${money(r2(t.total + tip), "fr")}</b></td>`; }).join("")}</tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Addition avant taxes</th><th>Avec taxes</th><th>15&nbsp;% → total</th><th>18&nbsp;% → total</th><th>20&nbsp;% → total</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+function tipCard() {
+  const z = fmtZero("fr");
+  const rates = [0.15, 0.18, 0.2, 0.25].map((r) => `<button type="button" data-tip-rate="${r}" aria-pressed="${r === 0.15}">${Math.round(r * 100)}&nbsp;%</button>`).join("\n        ");
+  return `<div class="card calc" data-tip>
+    <div class="field">
+      <label for="tip-amount">Addition avant taxes (sous-total)</label>
+      <div class="input-money">
+        <input id="tip-amount" data-tip-input type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" placeholder="0,00">
+        <span class="cur" aria-hidden="true">$</span>
+      </div>
+    </div>
+    <div class="field">
+      <label id="tip-rate-label">Pourboire</label>
+      <div class="mode-switch" role="group" aria-labelledby="tip-rate-label">
+        ${rates}
+      </div>
+    </div>
+    <div class="field">
+      <label for="tip-people">Nombre de personnes</label>
+      <input id="tip-people" class="people" data-tip-people type="text" inputmode="numeric" value="1" autocomplete="off">
+    </div>
+    <div class="result" aria-live="polite">
+      <div class="breakdown">
+        <div class="row"><span class="k">TPS&nbsp;5&nbsp;%</span><span class="v" data-tip-out="tps">${z}</span></div>
+        <div class="row"><span class="k">TVQ&nbsp;9,975&nbsp;%</span><span class="v" data-tip-out="tvq">${z}</span></div>
+        <div class="row"><span class="k">Total avec taxes</span><span class="v" data-tip-out="withtax">${z}</span></div>
+        <div class="row"><span class="k">Pourboire (sur avant taxes)</span><span class="v" data-tip-out="tip">${z}</span></div>
+      </div>
+      <div class="total-box">
+        <span class="lbl">Total à payer</span>
+        <span class="amt" data-tip-out="total">${z}</span>
+      </div>
+      <div class="rate-row"><span>Par personne</span><b data-tip-out="each">${z}</b></div>
+      <div class="actions">
+        <button type="button" class="btn-clear" data-tip-clear>Effacer</button>
+      </div>
+      <p class="note">Taux 2026. Pourboire calculé sur le montant avant taxes, chaque taxe arrondie au cent.</p>
+    </div>
+  </div>`;
+}
+const TIP50 = addTax(50), TIP50_15 = r2(50 * 0.15), TIP50_AFTER = r2(TIP50.total * 0.15);
+pages.push({
+  url: "/calcul-pourboire-quebec/",
+  modified: NOV25,
+  out: "calcul-pourboire-quebec/index.html",
+  lang: "fr",
+  showCalc: false,
+  extraJs: ["/assets/js/pourboire.js"],
+  featureList: ["Pourboire 15, 18, 20 ou 25 %", "Pourboire calculé avant taxes", "TPS, TVQ et partage de l'addition"],
+  title: "Calcul pourboire Québec 2026 : avant ou après taxes? (15 % à 20 %)",
+  desc: `Calculez le pourboire au Québec : 15 % à 20 % du montant avant taxes. Addition de 50 $ : ${stripTags(money(TIP50.total, "fr"))} avec taxes + ${stripTags(money(TIP50_15, "fr"))} de pourboire. Calculatrice avec TPS, TVQ et partage par personne.`,
+  h1: "Calcul du pourboire au Québec (avant taxes)",
+  intro: "Entrez le sous-total avant taxes, choisissez le pourboire et le nombre de personnes&nbsp;: la calculatrice ajoute la TPS, la TVQ et le pourboire.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul pourboire", href: "/calcul-pourboire-quebec/" }],
+  faqs: [
+    { q: "Le pourboire se calcule-t-il avant ou après taxes au Québec?", a: `L'usage est de le calculer sur le montant avant taxes. Sur une addition de 50&nbsp;$, 15&nbsp;% avant taxes donne ${money(TIP50_15, "fr")}&nbsp;; calculé sur le total avec taxes (${money(TIP50.total, "fr")}), il serait de ${money(TIP50_AFTER, "fr")}.` },
+    { q: "Quel pourboire laisser au restaurant au Québec?", a: "Entre 15&nbsp;% et 20&nbsp;% du montant avant taxes est la norme. 15&nbsp;% pour un service correct, 18&nbsp;% à 20&nbsp;% pour un bon service." },
+    { q: "Truc rapide pour calculer le pourboire?", a: "Additionnez la TPS et la TVQ de la facture&nbsp;: elles représentent environ 15&nbsp;% du montant avant taxes (14,975&nbsp;%). C'est un pourboire de 15&nbsp;% calculé presque exactement." },
+    { q: "Le pourboire est-il taxable?", a: "Non. Un pourboire laissé volontairement par le client n'est pas soumis à la TPS ni à la TVQ. Les frais de service obligatoires ajoutés par le restaurant, eux, sont taxables." },
+    { q: "Comment partager l'addition avec pourboire?", a: "Calculez le total (avant taxes + TPS + TVQ + pourboire), puis divisez-le par le nombre de personnes. La calculatrice le fait automatiquement." }
+  ],
+  body:
+    quickAnswer("fr", `<p>Au Québec, le pourboire se calcule <b>sur le montant avant taxes</b>, généralement <b>15&nbsp;% à 20&nbsp;%</b>. Truc&nbsp;: la TPS + la TVQ de la facture font environ 15&nbsp;%. Exemple&nbsp;: 50&nbsp;$ avant taxes = ${money(TIP50.total, "fr")} avec taxes + ${money(TIP50_15, "fr")} de pourboire = <b>${money(r2(TIP50.total + TIP50_15), "fr")}</b>.</p>`) +
+    tipCard() +
+    `
+  <section class="content" aria-labelledby="tip-table">
+    <h2 id="tip-table">Pourboire et total à payer selon l'addition</h2>
+    <p>Taxes calculées aux taux 2026 et pourboire calculé sur le montant avant taxes&nbsp;:</p>
+${tipTable()}
+    <h2>Avant ou après taxes&nbsp;: la différence</h2>
+    <p>Calculer le pourboire sur le total avec taxes revient à donner un pourboire sur la TPS et la TVQ&nbsp;: environ 15&nbsp;% de plus que nécessaire. Sur une addition de 100&nbsp;$, 15&nbsp;% avant taxes donne 15,00&nbsp;$, contre ${money(r2(addTax(100).total * 0.15), "fr")} après taxes. Le choix vous appartient, mais l'usage au Québec est avant taxes.</p>
+    <h2>Le truc des taxes pour un pourboire de 15&nbsp;%</h2>
+    <div class="formula">Pourboire 15 % ≈ TPS + TVQ de la facture
+Exemple : 80,00 $ → 4,00 $ + 7,98 $ = 11,98 $ (15 % exact : 12,00 $)</div>
+    <p>Pour 20&nbsp;%, prenez 10&nbsp;% du sous-total (déplacez la virgule) et doublez-le&nbsp;: 80&nbsp;$ → 8&nbsp;$ × 2 = 16,00&nbsp;$.</p>
+    <h2>Le pourboire est-il taxé?</h2>
+    <p>Non. Le pourboire volontaire n'est pas soumis aux taxes. En revanche, des frais de service obligatoires (souvent pour les groupes) font partie du prix et sont taxables. Pour calculer seulement les taxes d'un prix, utilisez le <a href="/">calcul TPS TVQ</a>.</p>
+  </section>`
+});
+
+/* ---- 2. TPS seule / 3. TVQ seule ---- */
+const ONE_TAX_AMOUNTS = [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000, 10000];
+const QC_INCL_TOTALS = [10, 20, 50, 100, 114.98, 200, 500, 1000, 5000];
+function inclTaxTable(which) {
+  const rows = QC_INCL_TOTALS.map((t) => { const r = removeTax(t); return `<tr><td>${money(t, "fr")}</td><td>${money(r.base, "fr")}</td><td>${money(which === "tps" ? r.g : r.q, "fr")}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Total taxes incluses (Québec)</th><th>Avant taxes</th><th>${which === "tps" ? "TPS incluse" : "TVQ incluse"}</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const SHARE_TPS = (5 / 114.975 * 100).toFixed(3).replace(".", ",");
+const SHARE_TVQ = (9.975 / 114.975 * 100).toFixed(3).replace(".", ",");
+
+pages.push({
+  url: "/calcul-tps-quebec/",
+  modified: NOV25,
+  out: "calcul-tps-quebec/index.html",
+  lang: "fr",
+  mode: "add",
+  featureList: ["Calcul de la TPS seule (5 %)", "TPS incluse dans un prix", "Retirer la TPS (÷ 1,05)"],
+  title: "Calcul TPS 2026 : 5 % (100 $ = 5,00 $ de TPS) | TPS seule et incluse",
+  desc: "Calculez la TPS seule en 2026 : prix avant taxes × 0,05. 100 $ = 5,00 $ de TPS. TPS incluse dans un prix québécois : total × 4,349 %. Retirer la TPS seule : ÷ 1,05. Tableaux et calculatrice.",
+  h1: "Calcul de la TPS (5 %) en 2026",
+  intro: "La calculatrice affiche la TPS séparément de la TVQ. Entrez un montant avant taxes, ou choisissez «&nbsp;Retirer les taxes&nbsp;» pour trouver la TPS incluse dans un total.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Taux TPS TVQ", href: "/taux-tps-tvq-quebec/" }, { name: "Calcul TPS", href: "/calcul-tps-quebec/" }],
+  faqs: [
+    { q: "Comment calculer la TPS?", a: "Multipliez le prix avant taxes par 0,05. Exemple&nbsp;: 80&nbsp;$ × 0,05 = 4,00&nbsp;$ de TPS. Au Québec, ajoutez ensuite la TVQ (9,975&nbsp;%) calculée sur le même prix avant taxes." },
+    { q: "Quel est le taux de la TPS en 2026?", a: "5&nbsp;%, partout au Canada. Il n'a pas changé depuis le 1<sup>er</sup> janvier 2008." },
+    { q: "Comment trouver la TPS incluse dans un prix au Québec?", a: `Multipliez le prix taxes incluses par 5 ÷ 114,975, soit environ ${SHARE_TPS}&nbsp;%. Sur 100&nbsp;$ taxes incluses, la TPS est de ${money(removeTax(100).g, "fr")}.` },
+    { q: "Comment retirer seulement la TPS d'un prix?", a: "Si le prix ne contient que la TPS (Alberta, territoires, ou un produit sans TVQ), divisez par 1,05. Exemple&nbsp;: 105&nbsp;$ ÷ 1,05 = 100&nbsp;$ avant TPS." },
+    { q: "Qui perçoit la TPS au Québec?", a: "Au Québec, Revenu Québec administre la TPS pour le compte du gouvernement fédéral. Les entreprises produisent une seule déclaration TPS/TVQ auprès de Revenu Québec." },
+    { q: "Le congé de TPS est-il terminé?", a: "Oui. L'exemption temporaire de TPS sur certains articles a eu lieu du 14 décembre 2024 au 15 février 2025. La TPS de 5&nbsp;% s'applique de nouveau normalement." }
+  ],
+  body:
+    quickAnswer("fr", `<p>La <b>TPS</b> est la taxe fédérale de <b>5&nbsp;%</b>. Pour la calculer, <b>multipliez le prix avant taxes par 0,05</b>&nbsp;: 100&nbsp;$ = <b>5,00&nbsp;$ de TPS</b>. Dans un prix québécois taxes incluses, la TPS représente environ ${SHARE_TPS}&nbsp;% du total.</p>`) +
+    TRUST_FR +
+    `
+  <section class="content" aria-labelledby="tps-table">
+    <h2 id="tps-table">TPS sur les montants courants (5&nbsp;%)</h2>
+${flatAddTable("fr", 0.05, "TPS 5&nbsp;%", ONE_TAX_AMOUNTS)}
+    <p>Le total de ce tableau ne comprend que la TPS. Au Québec, ajoutez la TVQ ou utilisez le <a href="/">calcul TPS TVQ</a> pour le total réel.</p>
+    <h2>TPS incluse dans un prix taxes incluses (Québec)</h2>
+${inclTaxTable("tps")}
+    <h2>Formules de la TPS</h2>
+    <div class="formula">TPS = prix avant taxes × 0,05
+TPS incluse (prix québécois taxes incluses) = total × 5 ÷ 114,975
+Prix avant TPS (TPS seule) = total ÷ 1,05</div>
+    <h2>Retirer la TPS seule&nbsp;: prix avant TPS</h2>
+    <p>Pour un prix qui ne contient que la TPS, par exemple un achat en Alberta&nbsp;:</p>
+${flatRemoveTable("fr", 0.05, "TPS", [1.05, 10, 20, 50, 100, 105, 200, 500, 1000])}
+    <h2>TPS et TVQ&nbsp;: deux taxes sur le même prix</h2>
+    <p>Au Québec, la TPS et la TVQ se calculent toutes les deux sur le prix avant taxes. La TVQ ne se calcule pas sur la TPS. Pour la part provinciale, voir le <a href="/calcul-tvq-quebec/">calcul de la TVQ</a>&nbsp;; pour l'évolution des taux, l'<a href="/historique-taux-tps-tvq/">historique des taux TPS TVQ</a>.</p>
+    <h2>Inscription à la TPS</h2>
+    <p>Une entreprise doit s'inscrire à la TPS et à la TVQ dès que ses ventes taxables dépassent 30&nbsp;000&nbsp;$ sur quatre trimestres consécutifs. Voir le <a href="/seuil-inscription-tps-tvq-quebec/">seuil d'inscription TPS TVQ</a>.</p>
+  </section>`
+});
+
+pages.push({
+  url: "/calcul-tvq-quebec/",
+  modified: NOV25,
+  out: "calcul-tvq-quebec/index.html",
+  lang: "fr",
+  mode: "add",
+  featureList: ["Calcul de la TVQ seule (9,975 %)", "TVQ incluse dans un prix", "Taux TVQ 2026"],
+  title: "Calcul TVQ 2026 : 9,975 % (100 $ = 9,98 $ de TVQ) | TVQ seule et incluse",
+  desc: "Calculez la TVQ seule en 2026 : prix avant taxes × 0,09975. 100 $ = 9,98 $ de TVQ. TVQ incluse dans un prix taxes incluses : total × 8,676 %. La TVQ ne se calcule pas sur la TPS. Tableaux et calculatrice.",
+  h1: "Calcul de la TVQ (9,975 %) en 2026",
+  intro: "La calculatrice affiche la TVQ séparément de la TPS. Entrez un montant avant taxes, ou choisissez «&nbsp;Retirer les taxes&nbsp;» pour trouver la TVQ incluse dans un total.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Taux TPS TVQ", href: "/taux-tps-tvq-quebec/" }, { name: "Calcul TVQ", href: "/calcul-tvq-quebec/" }],
+  faqs: [
+    { q: "Comment calculer la TVQ?", a: "Multipliez le prix avant taxes par 0,09975 et arrondissez au cent. Exemple&nbsp;: 100&nbsp;$ × 0,09975 = 9,975&nbsp;$, soit 9,98&nbsp;$ de TVQ." },
+    { q: "Quel est le taux de la TVQ en 2026?", a: "9,975&nbsp;%. Ce taux est en vigueur depuis le 1<sup>er</sup> janvier 2013." },
+    { q: "La TVQ se calcule-t-elle sur la TPS?", a: "Non, plus depuis 2013. La TVQ se calcule sur le prix avant taxes, comme la TPS. Avant 2013, la TVQ (9,5&nbsp;% en 2012) s'appliquait au prix incluant la TPS." },
+    { q: "Comment trouver la TVQ incluse dans un prix?", a: `Multipliez le prix taxes incluses par 9,975 ÷ 114,975, soit environ ${SHARE_TVQ}&nbsp;%. Sur 100&nbsp;$ taxes incluses, la TVQ est de ${money(removeTax(100).q, "fr")}.` },
+    { q: "Pourquoi la TVQ est-elle de 9,975 % et pas de 10 %?", a: "Lors de l'harmonisation de 2013, le Québec a fixé un taux qui donne exactement le même total qu'en 2012 (9,5&nbsp;% calculé sur le prix plus la TPS = 9,975&nbsp;% du prix). Le total combiné est resté 14,975&nbsp;%." },
+    { q: "Qui perçoit la TVQ?", a: "Revenu Québec. Les entreprises inscrites perçoivent la TVQ et la remettent avec la TPS dans une seule déclaration." }
+  ],
+  body:
+    quickAnswer("fr", `<p>La <b>TVQ</b> (taxe de vente du Québec) est de <b>9,975&nbsp;%</b>. Pour la calculer, <b>multipliez le prix avant taxes par 0,09975</b>&nbsp;: 100&nbsp;$ = <b>9,98&nbsp;$ de TVQ</b>. Elle se calcule sur le prix avant taxes, jamais sur la TPS.</p>`) +
+    TRUST_FR +
+    `
+  <section class="content" aria-labelledby="tvq-table">
+    <h2 id="tvq-table">TVQ sur les montants courants (9,975&nbsp;%)</h2>
+${flatAddTable("fr", 0.09975, "TVQ 9,975&nbsp;%", ONE_TAX_AMOUNTS)}
+    <p>Le total de ce tableau ne comprend que la TVQ. Ajoutez la TPS de 5&nbsp;%, ou utilisez le <a href="/">calcul TPS TVQ</a> pour le montant réel à payer.</p>
+    <h2>TVQ incluse dans un prix taxes incluses</h2>
+${inclTaxTable("tvq")}
+    <h2>Formules de la TVQ</h2>
+    <div class="formula">TVQ = prix avant taxes × 0,09975
+TVQ incluse = total taxes incluses × 9,975 ÷ 114,975
+Prix avant taxes = total ÷ 1,14975</div>
+    <h2>Pourquoi 9,975&nbsp;%?</h2>
+    <p>Jusqu'en 2012, la TVQ s'appliquait sur le prix plus la TPS&nbsp;: 9,5&nbsp;% × 1,05 = 9,975&nbsp;% du prix. En 2013, le Québec a harmonisé sa taxe avec la TPS&nbsp;: la TVQ se calcule maintenant sur le prix avant taxes, au taux de 9,975&nbsp;%, pour le même total. Voir l'<a href="/historique-taux-tps-tvq/">historique des taux TPS TVQ</a>.</p>
+    <h2>Produits sans TVQ</h2>
+    <p>Certains biens sont détaxés ou exonérés de TVQ comme de TPS (épicerie de base, médicaments sur ordonnance). D'autres ne portent que la TPS&nbsp;: par exemple les livres imprimés, exemptés de TVQ. Voir les <a href="/produits-sans-taxes-quebec/">produits sans taxes au Québec</a> et le <a href="/calcul-tps-quebec/">calcul de la TPS seule</a>.</p>
+  </section>`
+});
+
+/* ---- 4. TPS TVQ calculator (EN) — anglophones searching the French acronyms ---- */
+pages.push({
+  url: "/tps-tvq-calculator/",
+  modified: NOV25,
+  out: "tps-tvq-calculator/index.html",
+  lang: "en",
+  mode: "add",
+  featureList: ["TPS (GST) and TVQ (QST) calculator", "Add or remove Quebec sales tax", "French tax terms explained"],
+  title: "TPS TVQ Calculator 2026: Quebec GST + QST (14.975%) in English",
+  desc: "TPS TVQ calculator in English: TPS is the 5% GST, TVQ is the 9.975% QST. $100 + TPS + TVQ = $114.98. Add or remove Quebec sales tax and decode French receipt terms like taxes en sus.",
+  h1: "TPS TVQ Calculator (in English)",
+  intro: "TPS = GST and TVQ = QST. Enter an amount to add both taxes, or switch to Remove tax for a price that already includes them.",
+  crumbs: [{ name: "Home", href: "/quebec-tax-calculator/" }, { name: "TPS TVQ Calculator", href: "/tps-tvq-calculator/" }],
+  faqs: [
+    { q: "What does TPS TVQ mean?", a: "TPS (taxe sur les produits et services) is the French name of the 5% federal GST. TVQ (taxe de vente du Québec) is the 9.975% Quebec Sales Tax, or QST. Together they add 14.975%." },
+    { q: "How do I calculate TPS and TVQ?", a: "Multiply the price before tax by 0.05 for the TPS and by 0.09975 for the TVQ, both on the same price. Or multiply by 1.14975 for the total: $100 becomes $114.98." },
+    { q: "Is TVQ calculated on TPS?", a: "No. Since 2013 the TVQ is calculated on the price before tax, not on the price plus TPS." },
+    { q: "What does taxes en sus mean?", a: "Plus tax: the price shown does not include TPS and TVQ. Taxes incluses means tax included." },
+    { q: "How do I remove TPS and TVQ from a price?", a: "Divide the tax-included price by 1.14975. $114.98 ÷ 1.14975 = $100.00 before tax." }
+  ],
+  body:
+    quickAnswer("en", "<p><b>TPS</b> is Quebec's French name for the <b>5% GST</b>; <b>TVQ</b> is the <b>9.975% QST</b>. Both apply to the price before tax, for <b>14.975%</b> in total: multiply by 1.14975, so $100 becomes <b>$114.98</b>. To remove them, divide by 1.14975.</p>") +
+    TRUST_EN +
+    `
+  <section class="content" aria-labelledby="tt-glossary">
+    <h2 id="tt-glossary">French tax terms on Quebec receipts</h2>
+    <table class="data-table">
+      <thead><tr><th>French</th><th>English</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>TPS</td><td>GST</td><td>Federal goods and services tax, 5%</td></tr>
+        <tr><td>TVQ</td><td>QST</td><td>Quebec sales tax, 9.975%</td></tr>
+        <tr><td>TVH</td><td>HST</td><td>Harmonized sales tax (Ontario, Atlantic provinces)</td></tr>
+        <tr><td>Sous-total / avant taxes</td><td>Subtotal / before tax</td><td>Price without TPS and TVQ</td></tr>
+        <tr><td>Taxes en sus / + tx</td><td>Plus tax</td><td>Tax is added at the till</td></tr>
+        <tr><td>Taxes incluses / tx incl.</td><td>Tax included</td><td>The price is the final total</td></tr>
+        <tr><td>N° TPS / N° TVQ</td><td>GST / QST number</td><td>The seller's registration numbers</td></tr>
+      </tbody>
+    </table>
+    <h2>TPS and TVQ on common amounts</h2>
+${addTable("en", [1, 5, 10, 20, 25, 50, 75, 100, 200, 250, 500, 1000, 2000, 5000])}
+    <h2>TPS TVQ formula</h2>
+    <div class="formula">TPS (GST) = price before tax × 0.05
+TVQ (QST) = price before tax × 0.09975
+Total = price before tax × 1.14975
+Price before tax = total ÷ 1.14975</div>
+    <h2>Removing TPS and TVQ from a total</h2>
+${removeTable("en", [10, 20, 50, 100, 114.98, 200, 500, 1000])}
+    <p>For more on reverse calculations, see the <a href="/reverse-tax-calculator-quebec/">reverse tax calculator</a>. For a plain-English overview, read <a href="/what-is-the-tax-in-quebec/">what is the tax in Quebec</a>.</p>
+  </section>`
+});
+
+/* ---- 5. Historique des taux TPS TVQ (queries "tps tvq 2025/2024/2023") ---- */
+/* QST applied on price + GST until Dec 31, 2012; on price alone from Jan 1, 2013. */
+const TAX_HISTORY = [
+  { per: "2013 à 2026", gst: 0.05, qst: 0.09975, onGst: false },
+  { per: "2012", gst: 0.05, qst: 0.095, onGst: true },
+  { per: "2011", gst: 0.05, qst: 0.085, onGst: true },
+  { per: "2008 à 2010", gst: 0.05, qst: 0.075, onGst: true },
+  { per: "juillet 2006 à 2007", gst: 0.06, qst: 0.075, onGst: true },
+  { per: "1998 à juin 2006", gst: 0.07, qst: 0.075, onGst: true }
+].map((h) => ({ ...h, total: h.gst + h.qst * (h.onGst ? 1 + h.gst : 1) }));
+function historyTable() {
+  const rows = TAX_HISTORY.map((h) => `<tr><td>${h.per}</td><td>${pct(h.gst, "fr")}</td><td>${pct(h.qst, "fr", 3)}${h.onGst ? " (sur prix + TPS)" : ""}</td><td><b>${pct(h.total, "fr", 3)}</b></td><td>${money((() => { const g = r2(100 * h.gst); return r2(100 + g + r2((h.onGst ? 100 + g : 100) * h.qst)); })(), "fr")}</td></tr>`).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Période</th><th>TPS</th><th>TVQ</th><th>Total</th><th>100&nbsp;$ avec taxes</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+function yearsTable() {
+  const rows = [2026, 2025, 2024, 2023, 2022, 2021, 2020].map((y) => `<tr><td>${y}</td><td>5&nbsp;%</td><td>9,975&nbsp;%</td><td>14,975&nbsp;%</td><td>114,98&nbsp;$</td></tr>`).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Année</th><th>TPS</th><th>TVQ</th><th>Total</th><th>100&nbsp;$ avec taxes</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+pages.push({
+  url: "/historique-taux-tps-tvq/",
+  modified: NOV25,
+  out: "historique-taux-tps-tvq/index.html",
+  lang: "fr",
+  mode: "add",
+  featureList: ["Taux TPS et TVQ par année", "Historique depuis 1998", "Calculatrice aux taux 2026"],
+  title: "TPS TVQ 2025, 2024, 2023 : taux par année (historique depuis 1998)",
+  desc: "Taux TPS TVQ par année : 5 % et 9,975 % (14,975 %) en 2026, 2025, 2024 et 2023, inchangés depuis 2013. Historique : TPS 7 % puis 6 %, TVQ calculée sur la TPS avant 2013. Tableau et calculatrice.",
+  h1: "Taux TPS TVQ par année : 2026, 2025, 2024, 2023…",
+  intro: "Les taux de TPS et de TVQ n'ont pas changé depuis 2013. La calculatrice utilise les taux 2026, identiques à ceux de 2025, 2024 et 2023.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "Taux TPS TVQ", href: "/taux-tps-tvq-quebec/" }, { name: "Historique", href: "/historique-taux-tps-tvq/" }],
+  faqs: [
+    { q: "Quel était le taux de TPS TVQ en 2025?", a: "TPS 5&nbsp;% et TVQ 9,975&nbsp;%, soit 14,975&nbsp;%, comme en 2026. Exception&nbsp;: du 14 décembre 2024 au 15 février 2025, certains articles étaient exemptés de TPS (congé de TPS); la TVQ s'appliquait quand même." },
+    { q: "Quel était le taux de TPS TVQ en 2024 et en 2023?", a: "Le même qu'en 2026&nbsp;: TPS 5&nbsp;%, TVQ 9,975&nbsp;%, total 14,975&nbsp;%. Un calcul de 2023 ou 2024 se fait donc avec la même calculatrice." },
+    { q: "Depuis quand la TVQ est-elle de 9,975 %?", a: "Depuis le 1<sup>er</sup> janvier 2013. Avant, la TVQ était de 9,5&nbsp;% (2012) mais se calculait sur le prix plus la TPS, ce qui donnait le même total de 14,975&nbsp;%." },
+    { q: "Depuis quand la TPS est-elle de 5 %?", a: "Depuis le 1<sup>er</sup> janvier 2008. Elle était de 7&nbsp;% de 1991 à juin 2006, puis de 6&nbsp;% de juillet 2006 à décembre 2007." },
+    { q: "Les taxes vont-elles changer en 2027?", a: "Aucune hausse ni baisse de la TPS ou de la TVQ n'est annoncée à ce jour. Cette page sera mise à jour si un changement est adopté." }
+  ],
+  body:
+    quickAnswer("fr", "<p>En <b>2026, 2025, 2024 et 2023</b>, les taxes au Québec sont les mêmes&nbsp;: <b>TPS 5&nbsp;%</b> + <b>TVQ 9,975&nbsp;%</b> = <b>14,975&nbsp;%</b>. Ces taux n'ont pas changé depuis le 1<sup>er</sup> janvier 2013. 100&nbsp;$ avant taxes = 114,98&nbsp;$, peu importe l'année depuis 2012.</p>") +
+    TRUST_FR +
+    `
+  <section class="content" aria-labelledby="hist-years">
+    <h2 id="hist-years">TPS et TVQ de 2020 à 2026</h2>
+${yearsTable()}
+    <h2>Historique complet des taux TPS et TVQ</h2>
+${historyTable()}
+    <p>Avant 2013, la TVQ s'appliquait sur le prix <i>plus</i> la TPS (une taxe sur la taxe). Le taux effectif était donc plus élevé que le taux affiché&nbsp;: en 2012, 9,5&nbsp;% × 1,05 = 9,975&nbsp;% du prix.</p>
+    <h2>Le congé de TPS de 2024-2025</h2>
+    <p>Du 14 décembre 2024 au 15 février 2025, le fédéral a retiré la TPS sur certains articles (repas au restaurant, vêtements et jouets pour enfants, sapins de Noël, livres, etc.). Le Québec n'a pas suivi&nbsp;: la TVQ de 9,975&nbsp;% s'appliquait toujours. Depuis le 16 février 2025, la TPS de 5&nbsp;% s'applique de nouveau.</p>
+    <h2>Calculer des taxes d'une année passée</h2>
+    <p>Pour une facture de 2013 à aujourd'hui, utilisez la calculatrice ci-dessus ou le <a href="/calcul-taxe-inverse-quebec/">calcul des taxes inversé</a>&nbsp;: les taux sont identiques. Pour une facture plus ancienne, multipliez par le facteur de la période dans le tableau (par exemple × 1,12875 de 2008 à 2010).</p>
+    <p class="note">Sources&nbsp;: Agence du revenu du Canada et Revenu Québec. Montants arrondis au cent.</p>
+  </section>`
+});
+
+/* ---- 6. 1,14975 (query "1.14975": pos 2, 7% CTR) ---- */
+const f6 = (x) => x.toFixed(6).replace(".", ",");
+const MAGIC = [
+  ["1,14975", "Multiplier un prix avant taxes pour obtenir le total", "100 × 1,14975 = 114,98"],
+  ["÷ 1,14975", "Diviser un total taxes incluses pour obtenir le prix avant taxes", "114,98 ÷ 1,14975 = 100,00"],
+  [f6(1 / 1.14975), "Même chose que ÷ 1,14975, en multipliant", "114,98 × " + f6(1 / 1.14975) + " = 100,00"],
+  ["0,14975", "Taxes totales sur un prix avant taxes", "100 × 0,14975 = 14,98"],
+  [f6(0.14975 / 1.14975), "Taxes incluses dans un total taxes incluses", "114,98 × " + f6(0.14975 / 1.14975) + " = 14,98"],
+  ["0,05", "TPS sur un prix avant taxes", "100 × 0,05 = 5,00"],
+  ["0,09975", "TVQ sur un prix avant taxes", "100 × 0,09975 = 9,98"],
+  [f6(5 / 114.975), "TPS incluse dans un total", "114,98 × " + f6(5 / 114.975) + " = 5,00"],
+  [f6(9.975 / 114.975), "TVQ incluse dans un total", "114,98 × " + f6(9.975 / 114.975) + " = 9,98"]
+];
+function magicTable() {
+  const rows = MAGIC.map(([n, use, ex]) => `<tr><td><b>${n}</b></td><td>${use}</td><td>${ex.replace(/ /g, "&nbsp;")}</td></tr>`).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Nombre</th><th>À quoi il sert</th><th>Exemple</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+function multiplierTable() {
+  const rows = [...PROV].sort((a, b) => a.rate - b.rate).map((p) => `<tr><td>${provName(p, "fr")}</td><td>${pct(p.rate, "fr", 3)}</td><td><b>${String(r2((1 + p.rate) * 100000) / 100000).replace(".", ",")}</b></td></tr>`).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Province</th><th>Taux total</th><th>Multiplicateur</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+pages.push({
+  url: "/1-14975-taxes-quebec/",
+  modified: NOV25,
+  out: "1-14975-taxes-quebec/index.html",
+  lang: "fr",
+  mode: "add",
+  featureList: ["Multiplicateur 1,14975", "Diviseur pour retirer les taxes", "Multiplicateurs par province"],
+  title: "1,14975 : multiplier ou diviser? Le chiffre des taxes au Québec (2026)",
+  desc: "1,14975 = 1 + TPS 5 % + TVQ 9,975 %. Multipliez un prix par 1,14975 pour ajouter les taxes (100 $ → 114,98 $), divisez un total par 1,14975 pour les retirer. Tous les nombres utiles et les multiplicateurs par province.",
+  h1: "1,14975 : à quoi sert ce chiffre?",
+  intro: "1,14975 est le multiplicateur des taxes au Québec. Essayez-le dans la calculatrice&nbsp;: elle multiplie ou divise pour vous.",
+  crumbs: [{ name: "Accueil", href: "/" }, { name: "1,14975", href: "/1-14975-taxes-quebec/" }],
+  faqs: [
+    { q: "Que veut dire 1,14975?", a: "C'est 1 (le prix) + 0,05 (TPS) + 0,09975 (TVQ). Multiplier un prix avant taxes par 1,14975 donne le prix avec taxes au Québec." },
+    { q: "Faut-il multiplier ou diviser par 1,14975?", a: "Multipliez pour ajouter les taxes (prix avant taxes → total). Divisez pour les retirer (total taxes incluses → prix avant taxes)." },
+    { q: "Pourquoi ne pas multiplier par 0,85025 pour retirer les taxes?", a: `Parce que les taxes ont été ajoutées sur le prix avant taxes. 114,98&nbsp;$ × 0,85025 = 97,76&nbsp;$, soit 2,24&nbsp;$ de trop peu. Le bon facteur est 1 ÷ 1,14975 = ${f6(1 / 1.14975)}.` },
+    { q: "1,14975 ou 1,15?", a: "1,14975. Multiplier par 1,15 surestime les taxes de 2,5&nbsp;cents par 100&nbsp;$." },
+    { q: "Quel est le multiplicateur des taxes en Ontario?", a: "1,13 (TVH de 13&nbsp;%). En Alberta, 1,05; en Colombie-Britannique et au Manitoba, 1,12." }
+  ],
+  body:
+    quickAnswer("fr", `<p><b>1,14975</b> = 1 + 5&nbsp;% de TPS + 9,975&nbsp;% de TVQ. <b>Multipliez</b> un prix avant taxes par 1,14975 pour obtenir le total (100&nbsp;$ → 114,98&nbsp;$). <b>Divisez</b> un total taxes incluses par 1,14975 pour retrouver le prix avant taxes (114,98&nbsp;$ → 100,00&nbsp;$).</p>`) +
+    TRUST_FR +
+    `
+  <section class="content" aria-labelledby="magic-title">
+    <h2 id="magic-title">Tous les nombres utiles des taxes au Québec</h2>
+${magicTable()}
+    <h2>D'où vient 1,14975?</h2>
+    <div class="formula">1 + 0,05 + 0,09975 = 1,14975
+prix + TPS + TVQ   = prix avec taxes</div>
+    <p>La TPS (5&nbsp;%) et la TVQ (9,975&nbsp;%) se calculent sur le même prix avant taxes&nbsp;: les deux taux s'additionnent simplement. Sur une facture, chaque taxe est arrondie au cent, d'où 114,98&nbsp;$ plutôt que 114,975&nbsp;$.</p>
+    <h2>L'erreur à éviter&nbsp;: soustraire 14,975&nbsp;%</h2>
+    <p>Pour retirer les taxes, on divise par 1,14975. Soustraire 14,975&nbsp;% du total (× 0,85025) donne un montant trop bas, parce que les taxes représentent environ 13&nbsp;% d'un prix taxes incluses, pas 14,975&nbsp;%. Voir le <a href="/calcul-taxe-inverse-quebec/">calcul des taxes inversé</a>.</p>
+    <h2>Le multiplicateur de chaque province</h2>
+${multiplierTable()}
+    <p>Pour calculer avec ces taux, utilisez le <a href="/calcul-taxes-canada/">calcul des taxes au Canada</a>.</p>
+  </section>`
+});
+
+/* ---- 7–10. French province pages (best CTR on the site) ---- */
+function qcVsProvTable(p, amounts) {
+  const rows = amounts.map((a) => { const o = provTax(p, a), q = provTax(QC, a); return `<tr><td>${moneyInt(a, "fr")}</td><td>${money(o.tax, "fr")}</td><td>${money(q.tax, "fr")}</td><td>${money(r2(Math.abs(q.tax - o.tax)), "fr")}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Achat</th><th>${provName(p, "fr")} (${pct(p.rate, "fr", 3)})</th><th>Québec (14,975&nbsp;%)</th><th>Écart</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const PROV_PAGE_AMOUNTS = [1, 5, 10, 20, 25, 50, 75, 100, 200, 500, 1000, 5000];
+const mult = (p) => String(r2((1 + p.rate) * 100000) / 100000).replace(".", ",");
+function provincePageFr(o) {
+  const p = PROV_BY[o.code];
+  const t100 = provTax(p, 100);
+  const totals = [10, 20, 50, 100, r2(100 * (1 + p.rate)), 200, 500, 1000, 5000];
+  pages.push({
+    url: o.url,
+    modified: NOV25,
+    out: o.url.replace(/^\//, "") + "index.html",
+    lang: "fr",
+    showCalc: false,
+    extraJs: ["/assets/js/canada.js"],
+    featureList: [`Taxes de vente ${o.de} (${stripTags(pct(p.rate, "fr", 3))})`, "Ajouter ou retirer les taxes", "Comparaison avec le Québec"],
+    title: o.title,
+    desc: o.desc,
+    h1: o.h1,
+    intro: `Entrez un montant pour ajouter ou retirer les taxes ${o.de}. Changez de province au besoin.`,
+    crumbs: [{ name: "Accueil", href: "/" }, { name: "Calcul taxes Canada", href: "/calcul-taxes-canada/" }, { name: `Calcul taxes ${provName(p, "fr")}`, href: o.url }],
+    faqs: o.faqs,
+    body:
+      quickAnswer("fr", o.answer) +
+      canadaCard("fr", o.code) +
+      `
+  <section class="content" aria-labelledby="${o.code}-table">
+    <h2 id="${o.code}-table">Taxes ${o.de} sur des montants courants</h2>
+${provAmountTable("fr", p, PROV_PAGE_AMOUNTS)}
+    <h2>Retirer les taxes&nbsp;: prix avant taxes ${o.de}</h2>
+    <p>Divisez le prix taxes incluses par ${mult(p)}&nbsp;:</p>
+${provRemoveTable("fr", p, totals)}
+    <h2>Taxes ${o.de} vs au Québec</h2>
+${qcVsProvTable(p, [100, 1000, 30000])}
+    <div class="formula">Total ${o.de} = prix avant taxes × ${mult(p)}
+Prix avant taxes = total ÷ ${mult(p)}
+Exemple : 100,00 $ → ${stripTags(money(t100.total, "fr"))}</div>
+${o.extra}
+    <p>Pour le Québec, utilisez le <a href="/">calcul TPS TVQ</a>&nbsp;; pour les autres provinces, le <a href="/calcul-taxes-canada/">calcul des taxes au Canada</a> ou le <a href="/calcul-taxes-ontario/">calcul des taxes en Ontario</a>.</p>
+    <p class="note">Taux en vigueur en 2026 selon l'Agence du revenu du Canada et le ministère des Finances de la province. Chaque taxe est arrondie au cent.</p>
+  </section>`
+  });
+}
+
+const NB = PROV_BY.nb, NS = PROV_BY.ns, AB = PROV_BY.ab;
+const AB_CAR = provTax(AB, 30000), QC_CAR = provTax(QC, 30000);
+
+provincePageFr({
+  code: "nb",
+  url: "/calcul-taxes-nouveau-brunswick/",
+  de: "au Nouveau-Brunswick",
+  title: "Calcul Taxes Nouveau-Brunswick 2026 : TVH 15 % (100 $ = 115,00 $)",
+  desc: "Calculez les taxes au Nouveau-Brunswick : TVH de 15 % (5 % fédéral + 10 % provincial). 100 $ avant taxes = 115,00 $. Retirez la TVH : divisez par 1,15. Tableaux et comparaison avec le Québec.",
+  h1: "Calcul des taxes au Nouveau-Brunswick (TVH 15 %)",
+  answer: "<p>Au Nouveau-Brunswick, la taxe de vente est la <b>TVH de 15&nbsp;%</b> (5&nbsp;% fédéral + 10&nbsp;% provincial). Multipliez par <b>1,15</b>&nbsp;: 100&nbsp;$ = <b>115,00&nbsp;$</b>. Pour retirer la TVH, divisez par 1,15. C'est à peine plus qu'au Québec (14,975&nbsp;%).</p>",
+  faqs: [
+    { q: "Quelle est la taxe au Nouveau-Brunswick?", a: "La TVH (taxe de vente harmonisée) de 15&nbsp;%, en vigueur depuis le 1<sup>er</sup> juillet 2016 (elle était de 13&nbsp;% auparavant)." },
+    { q: "Comment calculer la TVH au Nouveau-Brunswick?", a: "Multipliez le prix avant taxes par 0,15 pour la TVH, ou par 1,15 pour le total. Exemple&nbsp;: 80&nbsp;$ × 1,15 = 92,00&nbsp;$." },
+    { q: "Comment retirer la TVH d'un prix au Nouveau-Brunswick?", a: "Divisez le prix taxes incluses par 1,15. Exemple&nbsp;: 115&nbsp;$ ÷ 1,15 = 100&nbsp;$ avant taxes, dont 15&nbsp;$ de TVH." },
+    { q: "Les taxes sont-elles plus élevées au Nouveau-Brunswick qu'au Québec?", a: `Très légèrement&nbsp;: 15&nbsp;% contre 14,975&nbsp;%. Sur 1&nbsp;000&nbsp;$, on paie ${money(provTax(NB, 1000).tax, "fr")} au Nouveau-Brunswick et ${money(provTax(QC, 1000).tax, "fr")} au Québec.` },
+    { q: "Quelles provinces ont aussi une TVH de 15 %?", a: "Terre-Neuve-et-Labrador et l'Île-du-Prince-Édouard. La Nouvelle-Écosse est à 14&nbsp;% depuis le 1<sup>er</sup> avril 2025 et l'Ontario à 13&nbsp;%." }
+  ],
+  extra: `    <h2>Une seule taxe, pas deux</h2>
+    <p>Contrairement au Québec, où la TPS et la TVQ apparaissent séparément sur la facture, le Nouveau-Brunswick perçoit une seule taxe&nbsp;: la TVH, administrée par l'Agence du revenu du Canada. Un achat en ligne livré au Nouveau-Brunswick porte la TVH de 15&nbsp;%, même si le vendeur est au Québec.</p>`
+});
+
+provincePageFr({
+  code: "ns",
+  url: "/calcul-taxes-nouvelle-ecosse/",
+  de: "en Nouvelle-Écosse",
+  title: "Calcul Taxes Nouvelle-Écosse 2026 : TVH 14 % (100 $ = 114,00 $)",
+  desc: "Calculez les taxes en Nouvelle-Écosse : TVH de 14 % depuis le 1er avril 2025 (avant : 15 %). 100 $ avant taxes = 114,00 $. Retirez la TVH : divisez par 1,14. Tableaux et comparaison avec le Québec.",
+  h1: "Calcul des taxes en Nouvelle-Écosse (TVH 14 %)",
+  answer: "<p>En Nouvelle-Écosse, la taxe de vente est la <b>TVH de 14&nbsp;%</b> depuis le 1<sup>er</sup> avril 2025 (5&nbsp;% fédéral + 9&nbsp;% provincial). Multipliez par <b>1,14</b>&nbsp;: 100&nbsp;$ = <b>114,00&nbsp;$</b>. Pour retirer la TVH, divisez par 1,14.</p>",
+  faqs: [
+    { q: "Quelle est la taxe en Nouvelle-Écosse en 2026?", a: "La TVH de 14&nbsp;%&nbsp;: 5&nbsp;% fédéral et 9&nbsp;% provincial." },
+    { q: "Quand la TVH est-elle passée de 15 % à 14 % en Nouvelle-Écosse?", a: "Le 1<sup>er</sup> avril 2025. Les achats faits avant cette date portaient la TVH de 15&nbsp;%." },
+    { q: "Comment calculer la TVH en Nouvelle-Écosse?", a: "Multipliez le prix avant taxes par 0,14 pour la TVH, ou par 1,14 pour le total. Exemple&nbsp;: 50&nbsp;$ × 1,14 = 57,00&nbsp;$." },
+    { q: "Comment retirer la TVH d'un prix en Nouvelle-Écosse?", a: "Divisez le prix taxes incluses par 1,14. Exemple&nbsp;: 114&nbsp;$ ÷ 1,14 = 100&nbsp;$ avant taxes." },
+    { q: "Les taxes sont-elles plus basses en Nouvelle-Écosse qu'au Québec?", a: `Oui, d'environ 1 point&nbsp;: 14&nbsp;% contre 14,975&nbsp;%. Sur 1&nbsp;000&nbsp;$, on paie ${money(provTax(NS, 1000).tax, "fr")} en Nouvelle-Écosse et ${money(provTax(QC, 1000).tax, "fr")} au Québec.` }
+  ],
+  extra: `    <h2>Avant et après le 1<sup>er</sup> avril 2025</h2>
+    <table class="data-table">
+      <thead><tr><th>Achat</th><th>TVH 15&nbsp;% (avant)</th><th>TVH 14&nbsp;% (depuis)</th><th>Économie</th></tr></thead>
+      <tbody>
+        ${[100, 1000, 30000].map((a) => `<tr><td>${moneyInt(a, "fr")}</td><td>${money(r2(a * 0.15), "fr")}</td><td>${money(r2(a * 0.14), "fr")}</td><td>${money(r2(a * 0.01), "fr")}</td></tr>`).join("\n        ")}
+      </tbody>
+    </table>
+    <p>Pour un reçu daté d'avant le 1<sup>er</sup> avril 2025, divisez par 1,15 plutôt que 1,14 pour retrouver le prix avant taxes.</p>`
+});
+
+provincePageFr({
+  code: "ab",
+  url: "/calcul-taxes-alberta/",
+  de: "en Alberta",
+  title: "Calcul Taxes Alberta 2026 : TPS 5 % seulement (100 $ = 105,00 $)",
+  desc: "Calculez les taxes en Alberta : seulement la TPS de 5 %, aucune taxe provinciale. 100 $ avant taxes = 105,00 $. Retirez la TPS : divisez par 1,05. Comparaison avec le Québec (14,975 %).",
+  h1: "Calcul des taxes en Alberta (TPS 5 %)",
+  answer: "<p>En Alberta, il n'y a <b>pas de taxe de vente provinciale</b>&nbsp;: seule la <b>TPS de 5&nbsp;%</b> s'applique. Multipliez par <b>1,05</b>&nbsp;: 100&nbsp;$ = <b>105,00&nbsp;$</b>. Pour retirer la TPS, divisez par 1,05. C'est environ 10 points de moins qu'au Québec.</p>",
+  faqs: [
+    { q: "Quelle est la taxe en Alberta?", a: "Seulement la TPS fédérale de 5&nbsp;%. L'Alberta n'a pas de taxe de vente provinciale (TVP)." },
+    { q: "Comment calculer les taxes en Alberta?", a: "Multipliez le prix avant taxes par 1,05. Exemple&nbsp;: 80&nbsp;$ × 1,05 = 84,00&nbsp;$, dont 4,00&nbsp;$ de TPS." },
+    { q: "Comment retirer la TPS d'un prix en Alberta?", a: "Divisez le prix taxes incluses par 1,05. Exemple&nbsp;: 105&nbsp;$ ÷ 1,05 = 100&nbsp;$ avant taxes." },
+    { q: "Combien économise-t-on en Alberta par rapport au Québec?", a: `Sur un achat de 1&nbsp;000&nbsp;$, ${money(provTax(AB, 1000).tax, "fr")} de taxes en Alberta contre ${money(provTax(QC, 1000).tax, "fr")} au Québec. Sur une voiture de 30&nbsp;000&nbsp;$, ${money(AB_CAR.tax, "fr")} contre ${money(QC_CAR.tax, "fr")}.` },
+    { q: "Un Québécois qui achète en Alberta paie-t-il la TVQ?", a: "En magasin en Alberta, on ne paie que la TPS. Un bien livré au Québec par un vendeur inscrit porte la TVQ. Pour un véhicule acheté hors Québec puis immatriculé au Québec, la TVQ est généralement payable à l'immatriculation." }
+  ],
+  extra: `    <h2>Les autres régions à 5&nbsp;%</h2>
+    <p>Le Yukon, les Territoires du Nord-Ouest et le Nunavut n'ont, comme l'Alberta, que la TPS de 5&nbsp;%. Ce sont les taxes de vente les plus basses au Canada. Pour la TPS seule, voir aussi le <a href="/calcul-tps-quebec/">calcul de la TPS</a>.</p>`
+});
+
+provincePageFr({
+  code: "bc",
+  url: "/calcul-taxes-colombie-britannique/",
+  de: "en Colombie-Britannique",
+  title: "Calcul Taxes Colombie-Britannique 2026 : TPS 5 % + TVP 7 % = 12 %",
+  desc: "Calculez les taxes en Colombie-Britannique : TPS 5 % + TVP 7 % = 12 %. 100 $ avant taxes = 112,00 $. Retirez les taxes : divisez par 1,12. Repas au restaurant : TPS seulement. Comparaison avec le Québec.",
+  h1: "Calcul des taxes en Colombie-Britannique (TPS + TVP 12 %)",
+  answer: "<p>En Colombie-Britannique, on paie la <b>TPS de 5&nbsp;%</b> et la <b>TVP de 7&nbsp;%</b>, soit <b>12&nbsp;%</b>. Multipliez par <b>1,12</b>&nbsp;: 100&nbsp;$ = <b>112,00&nbsp;$</b>. Pour retirer les taxes, divisez par 1,12. Les deux taxes se calculent sur le prix avant taxes.</p>",
+  faqs: [
+    { q: "Quelle est la taxe en Colombie-Britannique?", a: "La TPS fédérale de 5&nbsp;% plus la TVP (PST) provinciale de 7&nbsp;%, pour 12&nbsp;% au total." },
+    { q: "Comment calculer les taxes en Colombie-Britannique?", a: "Multipliez le prix avant taxes par 0,05 pour la TPS et par 0,07 pour la TVP, ou par 1,12 pour le total. Exemple&nbsp;: 50&nbsp;$ × 1,12 = 56,00&nbsp;$." },
+    { q: "La TVP se calcule-t-elle sur la TPS en Colombie-Britannique?", a: "Non. La TVP de 7&nbsp;% se calcule sur le prix avant taxes, comme la TPS." },
+    { q: "Paie-t-on la TVP au restaurant en Colombie-Britannique?", a: "Non. Les repas au restaurant sont exemptés de la TVP&nbsp;: seule la TPS de 5&nbsp;% s'applique. L'alcool, lui, porte une TVP de 10&nbsp;%." },
+    { q: "Les taxes sont-elles plus basses en Colombie-Britannique qu'au Québec?", a: `Oui, d'environ 3 points&nbsp;: 12&nbsp;% contre 14,975&nbsp;%. Sur 1&nbsp;000&nbsp;$, ${money(provTax(BC, 1000).tax, "fr")} contre ${money(provTax(QC, 1000).tax, "fr")} au Québec.` }
+  ],
+  extra: `    <h2>Exceptions à la TVP de 7&nbsp;%</h2>
+    <ul class="benefits">
+      <li>Repas au restaurant&nbsp;: TPS 5&nbsp;% seulement (pas de TVP).</li>
+      <li>Alcool&nbsp;: TVP de 10&nbsp;% + TPS 5&nbsp;%.</li>
+      <li>Vêtements et chaussures pour enfants, épicerie de base, médicaments sur ordonnance&nbsp;: pas de TVP.</li>
+      <li>Véhicules&nbsp;: TVP de 7&nbsp;% à 20&nbsp;% selon le prix.</li>
+    </ul>
+    <p>Le Manitoba (TVD 7&nbsp;%) a le même total de 12&nbsp;%. Pour comparer, voir le <a href="/gst-pst-calculator/">GST PST calculator</a> (anglais).</p>`
+});
+
 
 const BLOG = "/blog/";
 
@@ -3056,6 +3600,16 @@ ${PROV.map((p) => `- ${p.fr}: ${stripTags(provParts(p, "fr"))} = ${stripTags(pct
 - Calcul taxes Canada (toutes les provinces): ${SITE}/calcul-taxes-canada/
 - Canada Sales Tax Calculator (English): ${SITE}/canada-sales-tax-calculator/
 - Calcul taxes Ontario (TVH 13 %): ${SITE}/calcul-taxes-ontario/
+- Calcul taxes Nouveau-Brunswick (TVH 15 %): ${SITE}/calcul-taxes-nouveau-brunswick/
+- Calcul taxes Nouvelle-Écosse (TVH 14 %): ${SITE}/calcul-taxes-nouvelle-ecosse/
+- Calcul taxes Colombie-Britannique (TPS + TVP 12 %): ${SITE}/calcul-taxes-colombie-britannique/
+- Calcul taxes Alberta (TPS 5 %): ${SITE}/calcul-taxes-alberta/
+- Calcul TPS (5 %): ${SITE}/calcul-tps-quebec/
+- Calcul TVQ (9,975 %): ${SITE}/calcul-tvq-quebec/
+- Historique des taux TPS TVQ: ${SITE}/historique-taux-tps-tvq/
+- 1,14975 expliqué: ${SITE}/1-14975-taxes-quebec/
+- Calcul pourboire Québec (avant taxes): ${SITE}/calcul-pourboire-quebec/
+- TPS TVQ Calculator (English): ${SITE}/tps-tvq-calculator/
 - Ontario Sales Tax Calculator (English): ${SITE}/ontario-sales-tax-calculator/
 
 ## Guides (blogue)

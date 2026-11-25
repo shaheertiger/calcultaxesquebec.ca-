@@ -57,6 +57,16 @@
 - Calcul taxes Canada (toutes les provinces): https://www.calcultaxesquebec.ca/calcul-taxes-canada/
 - Canada Sales Tax Calculator (English): https://www.calcultaxesquebec.ca/canada-sales-tax-calculator/
 - Calcul taxes Ontario (TVH 13 %): https://www.calcultaxesquebec.ca/calcul-taxes-ontario/
+- Calcul taxes Nouveau-Brunswick (TVH 15 %): https://www.calcultaxesquebec.ca/calcul-taxes-nouveau-brunswick/
+- Calcul taxes Nouvelle-Écosse (TVH 14 %): https://www.calcultaxesquebec.ca/calcul-taxes-nouvelle-ecosse/
+- Calcul taxes Colombie-Britannique (TPS + TVP 12 %): https://www.calcultaxesquebec.ca/calcul-taxes-colombie-britannique/
+- Calcul taxes Alberta (TPS 5 %): https://www.calcultaxesquebec.ca/calcul-taxes-alberta/
+- Calcul TPS (5 %): https://www.calcultaxesquebec.ca/calcul-tps-quebec/
+- Calcul TVQ (9,975 %): https://www.calcultaxesquebec.ca/calcul-tvq-quebec/
+- Historique des taux TPS TVQ: https://www.calcultaxesquebec.ca/historique-taux-tps-tvq/
+- 1,14975 expliqué: https://www.calcultaxesquebec.ca/1-14975-taxes-quebec/
+- Calcul pourboire Québec (avant taxes): https://www.calcultaxesquebec.ca/calcul-pourboire-quebec/
+- TPS TVQ Calculator (English): https://www.calcultaxesquebec.ca/tps-tvq-calculator/
 - Ontario Sales Tax Calculator (English): https://www.calcultaxesquebec.ca/ontario-sales-tax-calculator/
 
 ## Guides (blogue)

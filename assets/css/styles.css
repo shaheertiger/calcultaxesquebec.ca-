@@ -348,3 +348,8 @@ section.content p { color: var(--muted); margin: 0 0 12px; }
   .data-table.wrap { white-space: normal; } /* text tables (product names) wrap instead of scrolling */
 }
 [data-ca] .field + .field { margin-top: 14px; }
+
+/* Tip calculator (pourboire) */
+[data-tip] .mode-switch { grid-template-columns: repeat(4, 1fr); margin: 0; }
+[data-tip] .field + .field { margin-top: 16px; }
+[data-tip] .people { width: 100%; padding: 12px; font-size: 16px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--card, #fff); color: inherit; }

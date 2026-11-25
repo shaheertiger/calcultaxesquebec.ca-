@@ -44,6 +44,16 @@ instantané et excellents Core Web Vitals.
 | `/gst-pst-calculator/` | gst pst calculator / gst calculator bc, manitoba, saskatchewan (EN) |
 | `/methode-rapide-tps-tvq/` | méthode rapide tps tvq / déclaration et remise tps tvq (moteur : `assets/js/rapide.js`) |
 | `/what-is-the-tax-in-quebec/` | what is the tax in quebec (guide EN, paire de `/taxe-quebec-2026/`) |
+| `/calcul-tps-quebec/` | calcul tps / tps seule / tps incluse |
+| `/calcul-tvq-quebec/` | calcul tvq / taux tvq / tvq incluse |
+| `/calcul-pourboire-quebec/` | calcul pourboire / pourboire avant ou après taxes (moteur : `assets/js/pourboire.js`) |
+| `/historique-taux-tps-tvq/` | tps tvq 2025, 2024, 2023 / historique des taux |
+| `/1-14975-taxes-quebec/` | 1,14975 / multiplicateur des taxes |
+| `/tps-tvq-calculator/` | tps tvq calculator (EN) |
+| `/calcul-taxes-nouveau-brunswick/` | calcul taxes nouveau-brunswick (TVH 15 %) |
+| `/calcul-taxes-nouvelle-ecosse/` | calcul taxes nouvelle-écosse (TVH 14 %) |
+| `/calcul-taxes-alberta/` | calcul taxes alberta (TPS 5 %) |
+| `/calcul-taxes-colombie-britannique/` | calcul taxes colombie-britannique (TPS + TVP 12 %) |
 
 Les tableaux des pages impôt/paie sont calculés au build par le même moteur que la
 calculatrice (`assets/js/salary.js`, exporté pour Node) : modifiez les paramètres
