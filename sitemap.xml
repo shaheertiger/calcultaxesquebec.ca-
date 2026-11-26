@@ -287,7 +287,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/produits-sans-taxes-quebec/</loc>
-    <lastmod>2026-11-17</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -305,7 +305,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/tps-tvq-travailleur-autonome/</loc>
-    <lastmod>2026-11-17</lastmod>
+    <lastmod>2026-11-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -323,6 +323,30 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/calcul-rabais-taxes-quebec/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/taxe-vehicule-occasion-quebec/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/taxes-achats-en-ligne-quebec/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/taxe-hebergement-quebec/</loc>
+    <lastmod>2026-11-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.calcultaxesquebec.ca/recuperer-tps-tvq-cti-rti/</loc>
     <lastmod>2026-11-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

@@ -276,6 +276,7 @@ function internalLinks(lang, currentPath) {
     { href: "/calcul-tps-quebec/", label: "Calcul TPS", sub: "TPS seule 5 %, incluse ou retirée" },
     { href: "/calcul-tvq-quebec/", label: "Calcul TVQ", sub: "TVQ seule 9,975 %" },
     { href: "/calcul-pourboire-quebec/", label: "Calcul pourboire", sub: "Pourboire avant taxes, par personne" },
+    { href: "/taxes-achats-en-ligne-quebec/", label: "Taxes achats en ligne", sub: "Amazon, États-Unis, autres provinces" },
     { href: "/calcul-rabais-taxes-quebec/", label: "Calcul rabais et taxes", sub: "Rabais avant ou après taxes" },
     { href: "/calcul-taxes-canada/", label: "Calcul taxes Canada", sub: "TPS, TVH, TVP par province" },
     { href: "/calcul-taxes-ontario/", label: "Calcul taxes Ontario", sub: "TVH 13 %" },
@@ -1612,7 +1613,7 @@ const CA_FAQ_FR = [
   { q: "Comment calculer les taxes au Canada?", a: "Multipliez le prix avant taxes par le taux total de la province&nbsp;: 1,13 en Ontario, 1,12 en Colombie-Britannique, 1,14975 au Québec, 1,05 en Alberta. Pour retirer les taxes, divisez le total par ce même nombre." },
   { q: "Quelle province a les taxes les plus basses?", a: "L'Alberta, le Yukon, les Territoires du Nord-Ouest et le Nunavut n'ont que la TPS de 5&nbsp;%. Le Québec (14,975&nbsp;%) et les provinces à TVH de 15&nbsp;% sont les plus élevés." },
   { q: "La taxe provinciale est-elle calculée sur la TPS?", a: "Non. Dans les provinces avec TVP, TVD ou TVQ, la taxe provinciale est calculée sur le prix avant taxes, comme la TPS. Les deux taux s'additionnent donc simplement." },
-  { q: "Quelle taxe paie-t-on en achetant en ligne dans une autre province?", a: "En général, la taxe de la province de livraison. Un achat livré en Ontario porte la TVH de 13&nbsp;%, même si le vendeur est au Québec." }
+  { q: "Quelle taxe paie-t-on en achetant en ligne dans une autre province?", a: "En général, la taxe de la province de livraison. Un achat livré en Ontario porte la TVH de 13&nbsp;%, même si le vendeur est au Québec. Voir les <a href=\"/taxes-achats-en-ligne-quebec/\">taxes sur les achats en ligne</a>." }
 ];
 const CA_FAQ_EN = [
   { q: "What is the sales tax rate in Canada?", a: "The 5% federal GST applies everywhere. Depending on the province, a provincial tax (PST, RST or QST) is added, or the GST is replaced by a single HST. Totals range from 5% (Alberta and the territories) to 15% (New Brunswick, Newfoundland and Labrador, Prince Edward Island)." },
@@ -2167,7 +2168,7 @@ ${qmTable("services", QM_SALES)}
 ${qmTable("goods", QM_SALES)}
     <p>Calculs sur une année complète, ventes au Québec, crédit de 1&nbsp;% compris. Le montant conservé n'est pas un profit net&nbsp;: il compense les taxes payées sur vos dépenses, que la méthode rapide ne permet pas de réclamer (sauf les biens immobilisés). C'est surtout vrai en revente, où les taxes payées sur les marchandises sont importantes. Ce montant est imposable.</p>
     <h2>Méthode rapide ou méthode régulière?</h2>
-    <p>Avec la méthode régulière, vous remettez les taxes perçues moins les taxes payées sur vos dépenses (CTI pour la TPS, RTI pour la TVQ). La méthode rapide est avantageuse quand vos dépenses taxables sont faibles par rapport à vos ventes, ce qui est le cas de beaucoup de consultants et de travailleurs autonomes.</p>
+    <p>Avec la méthode régulière, vous remettez les taxes perçues moins les taxes payées sur vos dépenses (CTI pour la TPS, RTI pour la TVQ). La méthode rapide est avantageuse quand vos dépenses taxables sont faibles par rapport à vos ventes, ce qui est le cas de beaucoup de consultants et de travailleurs autonomes. Voir <a href="/recuperer-tps-tvq-cti-rti/">comment récupérer la TPS et la TVQ (CTI et RTI)</a>.</p>
     <p>Exemple&nbsp;: entreprise de services, 100&nbsp;000&nbsp;$ de ventes et 10&nbsp;000&nbsp;$ de dépenses taxables sur l'année. Méthode régulière&nbsp;: <b>${money(QM_EX.regular, "fr")}</b> à remettre. Méthode rapide&nbsp;: <b>${money(QM_EX.quick, "fr")}</b>. Écart&nbsp;: ${money(r2(QM_EX.regular - QM_EX.quick), "fr")} de moins avec la méthode rapide. Entrez vos dépenses dans la calculatrice pour comparer.</p>
     <h2>Qui peut utiliser la méthode rapide?</h2>
     <ul class="benefits">
@@ -2390,7 +2391,7 @@ Prix avant taxes = total ÷ 1,14975</div>
     <h2>Pourquoi 9,975&nbsp;%?</h2>
     <p>Jusqu'en 2012, la TVQ s'appliquait sur le prix plus la TPS&nbsp;: 9,5&nbsp;% × 1,05 = 9,975&nbsp;% du prix. En 2013, le Québec a harmonisé sa taxe avec la TPS&nbsp;: la TVQ se calcule maintenant sur le prix avant taxes, au taux de 9,975&nbsp;%, pour le même total. Voir l'<a href="/historique-taux-tps-tvq/">historique des taux TPS TVQ</a>.</p>
     <h2>Produits sans TVQ</h2>
-    <p>Certains biens sont détaxés ou exonérés de TVQ comme de TPS (épicerie de base, médicaments sur ordonnance). D'autres ne portent que la TPS&nbsp;: par exemple les livres imprimés, exemptés de TVQ. Voir les <a href="/produits-sans-taxes-quebec/">produits sans taxes au Québec</a> et le <a href="/calcul-tps-quebec/">calcul de la TPS seule</a>.</p>
+    <p>Certains biens sont détaxés ou exonérés de TVQ comme de TPS (épicerie de base, médicaments sur ordonnance). D'autres ne portent que la TPS&nbsp;: par exemple les livres imprimés, exemptés de TVQ. À l'inverse, une voiture achetée d'un particulier ne porte que la TVQ, payée à la SAAQ (voir la <a href="/taxe-vehicule-occasion-quebec/">taxe sur un véhicule d'occasion</a>), et une nuitée à l'hôtel ajoute la <a href="/taxe-hebergement-quebec/">taxe sur l'hébergement de 3,5&nbsp;%</a>. Voir les <a href="/produits-sans-taxes-quebec/">produits sans taxes au Québec</a> et le <a href="/calcul-tps-quebec/">calcul de la TPS seule</a>.</p>
   </section>`
 });
 
@@ -2691,7 +2692,7 @@ provincePageFr({
     { q: "Comment calculer les taxes en Alberta?", a: "Multipliez le prix avant taxes par 1,05. Exemple&nbsp;: 80&nbsp;$ × 1,05 = 84,00&nbsp;$, dont 4,00&nbsp;$ de TPS." },
     { q: "Comment retirer la TPS d'un prix en Alberta?", a: "Divisez le prix taxes incluses par 1,05. Exemple&nbsp;: 105&nbsp;$ ÷ 1,05 = 100&nbsp;$ avant taxes." },
     { q: "Combien économise-t-on en Alberta par rapport au Québec?", a: `Sur un achat de 1&nbsp;000&nbsp;$, ${money(provTax(AB, 1000).tax, "fr")} de taxes en Alberta contre ${money(provTax(QC, 1000).tax, "fr")} au Québec. Sur une voiture de 30&nbsp;000&nbsp;$, ${money(AB_CAR.tax, "fr")} contre ${money(QC_CAR.tax, "fr")}.` },
-    { q: "Un Québécois qui achète en Alberta paie-t-il la TVQ?", a: "En magasin en Alberta, on ne paie que la TPS. Un bien livré au Québec par un vendeur inscrit porte la TVQ. Pour un véhicule acheté hors Québec puis immatriculé au Québec, la TVQ est généralement payable à l'immatriculation." }
+    { q: "Un Québécois qui achète en Alberta paie-t-il la TVQ?", a: "En magasin en Alberta, on ne paie que la TPS. Un bien livré au Québec par un vendeur inscrit porte la TVQ. Pour un véhicule acheté hors Québec puis immatriculé au Québec, la TVQ est généralement payable à l'immatriculation (voir la <a href=\"/taxe-vehicule-occasion-quebec/\">taxe sur un véhicule d'occasion</a>)." }
   ],
   extra: `    <h2>Les autres régions à 5&nbsp;%</h2>
     <p>Le Yukon, les Territoires du Nord-Ouest et le Nunavut n'ont, comme l'Alberta, que la TPS de 5&nbsp;%. Ce sont les taxes de vente les plus basses au Canada. Pour la TPS seule, voir aussi le <a href="/calcul-tps-quebec/">calcul de la TPS</a>.</p>`
@@ -2784,6 +2785,30 @@ function postSchema(post) {
   }
   return jsonLd({ "@context": "https://schema.org", "@graph": graph });
 }
+
+/* used vehicle: private sale = QST only (paid at the SAAQ); dealer = GST + QST */
+const CAR_PRICES = [3000, 5000, 8000, 10000, 15000, 20000, 25000, 30000, 40000];
+function carTable(prices) {
+  const rows = prices.map((p) => { const t = addTax(p); return `<tr><td>${money(p, "fr")}</td><td>${money(t.q, "fr")}</td><td>${money(r2(p + t.q), "fr")}</td><td>${money(t.g + t.q, "fr")}</td><td>${money(t.total, "fr")}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Prix du véhicule</th><th>TVQ (vente privée)</th><th>Total vente privée</th><th>TPS + TVQ (concessionnaire)</th><th>Total concessionnaire</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+/* lodging: 3.5 % lodging tax per night, then GST + QST on (price + lodging tax) */
+function lodgingCalc(n) { const lt = r2(n * 0.035), base = n + lt, g = r2(base * 0.05), q = r2(base * 0.09975); return { n, lt, g, q, total: r2(base + g + q) }; }
+function lodgingTable(nights) {
+  const rows = nights.map((n) => { const x = lodgingCalc(n); return `<tr><td>${money(n, "fr")}</td><td>${money(x.lt, "fr")}</td><td>${money(x.g, "fr")}</td><td>${money(x.q, "fr")}</td><td>${money(x.total, "fr")}</td></tr>`; }).join("\n        ");
+  return `    <table class="data-table">
+      <thead><tr><th>Prix de la nuitée</th><th>Taxe d'hébergement 3,5&nbsp;%</th><th>TPS 5&nbsp;%</th><th>TVQ 9,975&nbsp;%</th><th>Total</th></tr></thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>`;
+}
+const LODGE_100 = lodgingCalc(100);
 
 /* raw post data */
 const POSTS_RAW = [
@@ -2993,6 +3018,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
     h1: "Quels produits n'ont pas de TPS/TVQ au Québec?",
     intro: "La liste des biens et services sans taxe, par catégorie.",
     datePublished: "2026-06-12",
+    dateModified: "2026-11-26",
     answer:
       "<p>Plusieurs biens et services ne portent <strong>ni TPS ni TVQ</strong> au Québec. Les principaux sont les <strong>aliments de base</strong> (épicerie), les <strong>médicaments sur ordonnance</strong>, le <strong>loyer résidentiel</strong> et la plupart des <strong>services financiers, de santé et d'enseignement</strong>. Ces biens sont soit détaxés (taxés à 0&nbsp;%), soit exonérés.</p>",
     facts: [
@@ -3042,7 +3068,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
         <tr><td>Médicaments en vente libre</td><td>14,975&nbsp;%</td><td>Généralement taxables</td></tr>
       </tbody>
     </table>
-    <p>Exemple&nbsp;: un café préparé de 2,50&nbsp;$ coûte 2,88&nbsp;$ avec taxes (0,13&nbsp;$ de TPS et 0,25&nbsp;$ de TVQ), alors qu'un sac de café moulu à l'épicerie n'a aucune taxe. Un livre de 20&nbsp;$ coûte 21,00&nbsp;$&nbsp;: seulement la TPS.</p>
+    <p>Exemple&nbsp;: un café préparé de 2,50&nbsp;$ coûte 2,88&nbsp;$ avec taxes (0,13&nbsp;$ de TPS et 0,25&nbsp;$ de TVQ), alors qu'un sac de café moulu à l'épicerie n'a aucune taxe. Un livre de 20&nbsp;$ coûte 21,00&nbsp;$&nbsp;: seulement la TPS. Ces règles valent aussi pour les <a href="/taxes-achats-en-ligne-quebec/">achats en ligne</a>&nbsp;; à l'hôtel, une <a href="/taxe-hebergement-quebec/">taxe sur l'hébergement</a> de 3,5&nbsp;% s'ajoute.</p>
     <h2>La santé et les médicaments</h2>
     <p>Les médicaments sur ordonnance et plusieurs appareils médicaux sont détaxés. Les services d'un médecin ou d'un dentiste sont généralement exonérés. Les produits de santé vendus en vente libre, eux, sont habituellement taxables.</p>
     <h2>Le logement et les services financiers</h2>
@@ -3156,6 +3182,7 @@ TVQ&nbsp;=&nbsp;montant avant taxes&nbsp;×&nbsp;0,09975</div>
     h1: "TPS TVQ pour travailleurs autonomes : guide simple",
     intro: "Quand vous inscrire, quand facturer, comment calculer.",
     datePublished: "2026-06-13",
+    dateModified: "2026-11-26",
     answer:
       "<p>Comme travailleur autonome au Québec, vous devez vous inscrire à la TPS et à la TVQ dès que vos revenus taxables dépassent <strong>30&nbsp;000&nbsp;$</strong> sur quatre trimestres. Une fois inscrit, vous facturez <strong>5&nbsp;% de TPS</strong> et <strong>9,975&nbsp;% de TVQ</strong> sur vos services taxables, puis vous remettez ces montants à Revenu Québec.</p>",
     facts: [
@@ -3184,7 +3211,7 @@ Total facturé&nbsp;=&nbsp;honoraires&nbsp;×&nbsp;1,14975</div>
       </tbody>
     </table>
     <h2>4. Remettre les taxes</h2>
-    <p>Les taxes que vous percevez ne vous appartiennent pas&nbsp;: vous les remettez à Revenu Québec selon la fréquence de vos déclarations. Vous pouvez en déduire les taxes payées sur vos achats d'entreprise (crédits de taxe), ou choisir la <a href="/methode-rapide-tps-tvq/">méthode rapide</a>&nbsp;: un taux fixe de 3,6&nbsp;% (TPS) et de 6,6&nbsp;% (TVQ) sur vos ventes de services taxes comprises. Elle n'est pas offerte aux services comptables, juridiques ou de tenue de livres.</p>
+    <p>Les taxes que vous percevez ne vous appartiennent pas&nbsp;: vous les remettez à Revenu Québec selon la fréquence de vos déclarations. Vous pouvez en déduire les taxes payées sur vos achats d'entreprise (<a href="/recuperer-tps-tvq-cti-rti/">crédits de taxe CTI et RTI</a>), ou choisir la <a href="/methode-rapide-tps-tvq/">méthode rapide</a>&nbsp;: un taux fixe de 3,6&nbsp;% (TPS) et de 6,6&nbsp;% (TVQ) sur vos ventes de services taxes comprises. Elle n'est pas offerte aux services comptables, juridiques ou de tenue de livres.</p>
     <p>Pour bâtir une facture complète, voyez <a href="/calcul-taxes-facture-quebec/">comment calculer les taxes sur une facture</a>. Pour ajouter rapidement les taxes, utilisez la <a href="/">calculatrice TPS TVQ</a>.</p>
     <p class="disclaimer">Information générale seulement, et non un avis fiscal ou comptable. Consultez Revenu Québec ou un professionnel pour votre situation.</p>`,
     faqs: [
@@ -3354,6 +3381,261 @@ ${removeTable("fr", [10, 20, 50, 100, 200, 500, 1000])}
       { q: "Le rabais s'applique-t-il avant ou après les taxes?", a: "Habituellement avant les taxes : on réduit le prix, puis on ajoute la TPS et la TVQ sur le montant rabattu." },
       { q: "Le total change-t-il selon l'ordre?", a: "À peine. Comme les taxes sont proportionnelles au prix, appliquer le rabais avant ou après les taxes donne pratiquement le même total, à un cent près." },
       { q: "Comment calculer 50 $ avec 20 % de rabais plus taxes?", a: "50 $ − 20 % = 40 $, puis 40 $ × 1,14975 = 45,99 $ taxes incluses." }
+    ]
+  },
+
+  /* Nov 2026 — used-car tax (private sale vs dealer), the biggest taxe-de-vente question outside the checkout. */
+  {
+    url: "/taxe-vehicule-occasion-quebec/",
+    short: "Taxe sur un véhicule d'occasion",
+    title: "Taxe sur une voiture usagée au Québec : vente privée vs concessionnaire",
+    desc: "Voiture usagée au Québec : vente privée = TVQ 9,975 % payée à la SAAQ, sans TPS; chez un concessionnaire = TPS + TVQ (14,975 %). Tableau, valeur estimative et échange.",
+    h1: "Combien de taxes sur une voiture usagée au Québec?",
+    intro: "Vente privée ou concessionnaire : qui paie quoi, où et sur quel montant.",
+    datePublished: "2026-11-26",
+    answer:
+      "<p>Entre particuliers, une voiture usagée porte <strong>seulement la TVQ de 9,975&nbsp;%</strong>, payée à la <strong>SAAQ</strong> au moment du transfert d'immatriculation&nbsp;; il n'y a pas de TPS. Chez un concessionnaire, on paie la <strong>TPS et la TVQ (14,975&nbsp;%)</strong>, calculées sur le prix moins la valeur du véhicule échangé. Sur une auto de 15&nbsp;000&nbsp;$&nbsp;: 1&nbsp;496,25&nbsp;$ en vente privée, 2&nbsp;246,25&nbsp;$ chez un commerçant.</p>",
+    facts: [
+      { k: "Vente privée", v: "TVQ 9,975 %" },
+      { k: "Payée à", v: "SAAQ" },
+      { k: "Concessionnaire", v: "TPS + TVQ 14,975 %" },
+      { k: "Échange", v: "Déduit avant taxes" },
+      { k: "15 000 $ (privé)", v: "1 496,25 $" },
+      { k: "15 000 $ (commerçant)", v: "2 246,25 $" }
+    ],
+    cta: postCta("/", "Calculer TPS et TVQ sur un véhicule", "Entrez le prix du véhicule pour voir la TPS, la TVQ et le total chez un concessionnaire."),
+    howto: {
+      name: "Calculer la taxe sur une voiture usagée achetée d'un particulier",
+      steps: [
+        { name: "Déterminer la base", text: "Prenez le prix payé, ou la valeur estimative du véhicule si elle est plus élevée." },
+        { name: "Multiplier par 0,09975", text: "Le résultat est la TVQ (9,975 %). Il n'y a pas de TPS dans une vente entre particuliers." },
+        { name: "Payer à la SAAQ", text: "La TVQ est payée à la SAAQ lors du transfert de propriété, avec les frais d'immatriculation." }
+      ]
+    },
+    sections: `    <h2>Vente privée : TVQ seulement, payée à la SAAQ</h2>
+    <p>Un particulier qui vend sa voiture n'est pas inscrit aux fichiers de taxes&nbsp;: il ne facture ni TPS ni TVQ. C'est l'acheteur qui paie la <strong>TVQ de 9,975&nbsp;%</strong> directement à la SAAQ lorsqu'il fait transférer l'immatriculation à son nom. La TPS ne s'applique pas.</p>
+    <p>La SAAQ calcule la TVQ sur le <strong>plus élevé</strong> de deux montants&nbsp;: le prix inscrit au contrat, ou la valeur estimative du véhicule (établie d'après un guide d'évaluation reconnu, selon la marque, le modèle et l'année). Inscrire un prix plus bas que le prix réel ne réduit donc pas la taxe et constitue une fausse déclaration.</p>
+    <p>Si vous avez réellement payé moins que la valeur estimative (accident, kilométrage élevé, réparations importantes), vous pouvez fournir une évaluation écrite d'un évaluateur reconnu pour que la taxe soit calculée sur le prix réel. Vérifiez les conditions auprès de la SAAQ avant le rendez-vous.</p>
+    <h2>Chez un concessionnaire : TPS + TVQ</h2>
+    <p>Un commerçant inscrit facture la <strong>TPS (5&nbsp;%) et la TVQ (9,975&nbsp;%)</strong> sur le prix de vente, comme pour tout autre bien. Les taxes figurent sur le contrat et sont payées au concessionnaire, pas à la SAAQ. Les frais d'administration, de préparation ou les garanties prolongées vendus avec le véhicule sont aussi taxables.</p>
+    <h2>Tableau : vente privée vs concessionnaire</h2>
+${carTable(CAR_PRICES)}
+    <p>Sur le même véhicule, la vente privée évite la TPS, soit 5&nbsp;% du prix&nbsp;: 750&nbsp;$ sur une voiture de 15&nbsp;000&nbsp;$. Un prix de concessionnaire souvent plus élevé, la garantie et l'échange peuvent toutefois compenser cet écart.</p>
+    <h2>L'échange réduit les taxes chez un concessionnaire</h2>
+    <p>Quand vous donnez votre ancien véhicule en échange, sa valeur est <strong>soustraite du prix avant le calcul des taxes</strong>. Vous ne payez la TPS et la TVQ que sur la différence.</p>
+    <table class="data-table">
+      <thead><tr><th>Élément</th><th>Sans échange</th><th>Avec échange de 10&nbsp;000&nbsp;$</th></tr></thead>
+      <tbody>
+        <tr><td>Prix du véhicule</td><td>25&nbsp;000,00&nbsp;$</td><td>25&nbsp;000,00&nbsp;$</td></tr>
+        <tr><td>Valeur d'échange</td><td>—</td><td>−10&nbsp;000,00&nbsp;$</td></tr>
+        <tr><td>Montant taxable</td><td>25&nbsp;000,00&nbsp;$</td><td>15&nbsp;000,00&nbsp;$</td></tr>
+        <tr><td>TPS (5&nbsp;%)</td><td>1&nbsp;250,00&nbsp;$</td><td>750,00&nbsp;$</td></tr>
+        <tr><td>TVQ (9,975&nbsp;%)</td><td>2&nbsp;493,75&nbsp;$</td><td>1&nbsp;496,25&nbsp;$</td></tr>
+        <tr><td>Total des taxes</td><td>3&nbsp;743,75&nbsp;$</td><td>2&nbsp;246,25&nbsp;$</td></tr>
+      </tbody>
+    </table>
+    <p>L'échange fait économiser 1&nbsp;497,50&nbsp;$ de taxes dans cet exemple. Vendre votre ancienne voiture vous-même peut rapporter plus, mais sans cette économie de taxes&nbsp;: comparez les deux montants nets.</p>
+    <h2>Cas particuliers</h2>
+    <ul>
+      <li><strong>Don ou vente entre proches&nbsp;:</strong> certains transferts entre membres de la famille immédiate (conjoint, parents, enfants, etc.) ou par succession peuvent être exemptés de TVQ. La SAAQ confirme l'exemption au moment du transfert.</li>
+      <li><strong>Véhicule acheté hors Québec&nbsp;:</strong> un véhicule acheté d'un particulier dans une autre province est généralement soumis à la TVQ lors de son immatriculation au Québec.</li>
+      <li><strong>Location (leasing)&nbsp;:</strong> la TPS et la TVQ s'appliquent sur chaque paiement mensuel plutôt que sur le prix total.</li>
+      <li><strong>Entreprise inscrite&nbsp;:</strong> une entreprise qui achète un véhicule pour ses activités peut, selon le cas, récupérer les taxes payées par des crédits de taxe (voir <a href="/tps-tvq-travailleur-autonome/">TPS TVQ pour travailleur autonome</a>).</li>
+    </ul>
+    <h2>Les autres frais à prévoir</h2>
+    <p>La taxe n'est pas le seul coût&nbsp;: la SAAQ perçoit aussi des frais de transfert et l'immatriculation annuelle (droits et contribution d'assurance). Pour un budget complet, ajoutez l'inspection mécanique et l'assurance. Pour calculer les taxes sur un autre montant, utilisez la <a href="/">calculatrice TPS TVQ</a>&nbsp;; pour isoler la TVQ seule, voyez <a href="/calcul-tvq-quebec/">comment calculer la TVQ</a>.</p>
+    <p>Information générale&nbsp;; les règles d'application et les exemptions sont établies par Revenu Québec et la SAAQ.</p>`,
+    faqs: [
+      { q: "Paie-t-on la TPS sur une voiture usagée achetée d'un particulier?", a: "Non. Dans une vente entre particuliers, seule la TVQ de 9,975 % s'applique, payée à la SAAQ lors du transfert." },
+      { q: "Combien de taxes sur une voiture usagée de 10 000 $ au Québec?", a: "997,50 $ de TVQ si vous l'achetez d'un particulier. Chez un concessionnaire, 1 497,50 $ (TPS 500 $ + TVQ 997,50 $)." },
+      { q: "Sur quel montant la SAAQ calcule-t-elle la taxe?", a: "Sur le plus élevé du prix payé ou de la valeur estimative du véhicule. Une évaluation écrite peut justifier un prix réel plus bas." },
+      { q: "L'échange réduit-il les taxes?", a: "Oui, chez un concessionnaire : la valeur du véhicule échangé est soustraite du prix avant le calcul de la TPS et de la TVQ." },
+      { q: "Où paie-t-on la taxe sur un véhicule d'occasion?", a: "À la SAAQ pour une vente privée, au moment du transfert d'immatriculation. Chez un concessionnaire, les taxes sont payées au commerçant." }
+    ]
+  },
+
+  /* Nov 2026 — online shopping: Amazon, US, other provinces, de minimis (no page covered it; only a Canada FAQ line). */
+  {
+    url: "/taxes-achats-en-ligne-quebec/",
+    short: "Taxes sur les achats en ligne",
+    title: "Taxes sur les achats en ligne au Québec : Amazon, États-Unis, autres provinces",
+    desc: "Achat en ligne livré au Québec : TPS + TVQ (14,975 %), même d'un vendeur de l'Ontario ou de l'étranger. Seuils de 40 $ et 150 $ (États-Unis), Netflix, Amazon et douanes.",
+    h1: "Paie-t-on la TPS et la TVQ sur les achats en ligne au Québec?",
+    intro: "Ce qui est taxé selon le pays ou la province du vendeur, et quand des frais de douane s'ajoutent.",
+    datePublished: "2026-11-26",
+    answer:
+      "<p>Oui. Un achat en ligne <strong>livré au Québec</strong> porte normalement la <strong>TPS (5&nbsp;%) et la TVQ (9,975&nbsp;%)</strong>, même si le vendeur est en Ontario, aux États-Unis ou ailleurs&nbsp;: c'est le lieu de livraison qui compte, pas l'adresse du vendeur. Pour un colis importé, la TPS et la TVQ sont perçues à la frontière si le vendeur ne les a pas facturées, sauf sous certains seuils (40&nbsp;$ pour un envoi par messager des États-Unis ou du Mexique).</p>",
+    facts: [
+      { k: "Livré au Québec", v: "TPS + TVQ" },
+      { k: "Taux", v: "14,975 %" },
+      { k: "Règle", v: "Lieu de livraison" },
+      { k: "É.-U. par messager", v: "Sans taxes ≤ 40 $" },
+      { k: "É.-U. par messager", v: "Sans droits ≤ 150 $" },
+      { k: "Netflix, Spotify…", v: "TPS + TVQ" }
+    ],
+    cta: postCta("/", "Calculer les taxes d'un achat en ligne", "Entrez le prix affiché pour voir la TPS, la TVQ et le total livré au Québec."),
+    sections: `    <h2>La règle : la taxe du lieu de livraison</h2>
+    <p>Au Canada, la taxe de vente se calcule selon la province où le bien est <strong>livré</strong> (ou, pour un service numérique, où vit le client). Une boutique de Toronto qui expédie au Québec facture donc la TPS et la TVQ, pas la TVH de l'Ontario. À l'inverse, un achat fait chez un marchand québécois et livré en Ontario porte la TVH de 13&nbsp;% (voir le <a href="/calcul-taxes-ontario/">calcul des taxes en Ontario</a>).</p>
+    <h2>Selon la provenance du vendeur</h2>
+    <table class="data-table">
+      <thead><tr><th>Vendeur</th><th>Taxes sur un achat livré au Québec</th></tr></thead>
+      <tbody>
+        <tr><td>Commerce du Québec</td><td>TPS + TVQ (14,975&nbsp;%)</td></tr>
+        <tr><td>Commerce d'une autre province</td><td>TPS + TVQ, s'il est inscrit à la TVQ (obligatoire au-delà de 30&nbsp;000&nbsp;$ de ventes au Québec)</td></tr>
+        <tr><td>Plateforme ou vendeur étranger inscrit (Amazon, etc.)</td><td>TPS + TVQ facturées au paiement</td></tr>
+        <tr><td>Vendeur étranger non inscrit</td><td>Taxes perçues à la frontière, plus droits de douane s'il y a lieu</td></tr>
+        <tr><td>Services numériques (Netflix, Spotify, applications)</td><td>TPS + TVQ sur l'abonnement</td></tr>
+      </tbody>
+    </table>
+    <p>Depuis 2019, le Québec oblige les entreprises de l'extérieur du Québec, y compris les entreprises étrangères et les plateformes numériques, à s'inscrire et à percevoir la TVQ sur leurs ventes aux consommateurs québécois. Ottawa a fait de même pour la TPS en 2021. C'est pourquoi un abonnement de 16,99&nbsp;$ coûte 19,53&nbsp;$ taxes incluses.</p>
+    <h2>Exemples d'achats en ligne livrés au Québec</h2>
+${addTable("fr", [16.99, 25, 50, 100, 250, 500, 1000])}
+    <h2>Achats aux États-Unis : les seuils de 40 $ et 150 $</h2>
+    <p>Quand un vendeur étranger ne facture pas les taxes canadiennes, elles sont perçues à l'arrivée du colis, souvent par le messager qui ajoute des frais de courtage. Pour un envoi <strong>par messager</strong> en provenance des États-Unis ou du Mexique (accord ACEUM)&nbsp;:</p>
+    <ul>
+      <li><strong>40&nbsp;$ CA ou moins&nbsp;:</strong> aucune taxe ni droit de douane.</li>
+      <li><strong>De 40,01&nbsp;$ à 150&nbsp;$ CA&nbsp;:</strong> les taxes s'appliquent, mais pas les droits de douane.</li>
+      <li><strong>Plus de 150&nbsp;$ CA&nbsp;:</strong> taxes et droits de douane (selon le produit et son origine).</li>
+    </ul>
+    <p>Pour un envoi postal ou en provenance d'un autre pays, le seuil d'exemption est de 20&nbsp;$ CA. Un cadeau d'une personne à l'étranger est exempté jusqu'à 60&nbsp;$. Les seuils sont calculés en dollars canadiens, sur la valeur des biens.</p>
+    <h2>Prix affiché en dollars américains</h2>
+    <p>Convertissez d'abord le prix en dollars canadiens au taux de change du jour, puis ajoutez les taxes. Si la plateforme affiche déjà un total en dollars canadiens « taxes incluses », retrouvez le prix avant taxes avec le <a href="/calcul-taxe-inverse-quebec/">calcul taxes inversé</a> (total ÷ 1,14975).</p>
+    <h2>Et si le vendeur n'a pas facturé la TVQ?</h2>
+    <p>Si un vendeur canadien d'une autre province facture seulement la TPS (ou la TVH de sa province) sur un bien livré au Québec, la facture est probablement erronée. Un particulier n'a généralement rien à déclarer lui-même pour un petit achat, mais une entreprise inscrite doit autocotiser la TVQ dans certains cas. Pour la part de chaque taxe sur une facture, voyez le <a href="/calcul-tvq-quebec/">calcul de la TVQ</a> et le <a href="/calcul-tps-quebec/">calcul de la TPS</a>.</p>
+    <h2>Les achats non taxables restent non taxables</h2>
+    <p>Acheter en ligne ne change pas la nature du produit&nbsp;: l'épicerie de base livrée à domicile reste détaxée, et un livre imprimé ne porte que la TPS. La liste complète est dans les <a href="/produits-sans-taxes-quebec/">produits sans taxes au Québec</a>.</p>
+    <p>Information générale&nbsp;; les seuils et règles douanières sont établis par l'Agence des services frontaliers du Canada.</p>`,
+    faqs: [
+      { q: "Paie-t-on la TVQ sur un achat Amazon au Québec?", a: "Oui. Amazon et les plateformes inscrites facturent la TPS et la TVQ sur les achats livrés au Québec, soit 14,975 % au total." },
+      { q: "Un achat en ligne en Ontario livré au Québec est-il taxé à 13 %?", a: "Non. La taxe dépend du lieu de livraison : un bien livré au Québec porte la TPS et la TVQ (14,975 %), pas la TVH de l'Ontario." },
+      { q: "Paie-t-on des taxes sur un colis des États-Unis?", a: "Par messager, aucune taxe jusqu'à 40 $ CA; les taxes s'appliquent au-delà, et les droits de douane au-delà de 150 $ CA. Par la poste, le seuil est de 20 $ CA." },
+      { q: "Netflix et Spotify sont-ils taxés au Québec?", a: "Oui. Depuis 2019 (TVQ) et 2021 (TPS), les fournisseurs étrangers de services numériques perçoivent les deux taxes sur les abonnements des Québécois." },
+      { q: "Les frais de livraison sont-ils taxables?", a: "Oui, en général : les frais d'expédition facturés avec un bien taxable suivent le même traitement fiscal que le bien et portent la TPS et la TVQ." }
+    ]
+  },
+
+  /* Nov 2026 — lodging tax (hotel, Airbnb): 3.5 % + GST/QST on top. */
+  {
+    url: "/taxe-hebergement-quebec/",
+    short: "Taxe sur l'hébergement",
+    title: "Taxe d'hébergement Québec 3,5 % + TPS TVQ : calcul hôtel et Airbnb",
+    desc: "Au Québec, une nuitée à l'hôtel ou en Airbnb porte la taxe sur l'hébergement de 3,5 %, puis la TPS et la TVQ sur ce montant. 100 $ la nuit = 119,00 $. Tableau et exemples.",
+    h1: "Taxe sur l'hébergement au Québec : comment se calcule une nuitée?",
+    intro: "Hôtel, gîte, chalet ou Airbnb : les trois taxes d'une nuitée, dans le bon ordre.",
+    datePublished: "2026-11-26",
+    answer:
+      `<p>Une nuitée au Québec porte trois taxes&nbsp;: la <strong>taxe sur l'hébergement de 3,5&nbsp;%</strong> du prix de la chambre, puis la <strong>TPS (5&nbsp;%) et la TVQ (9,975&nbsp;%)</strong>, calculées sur le prix <em>plus</em> la taxe d'hébergement. Une chambre à 100&nbsp;$ coûte donc <strong>${money(LODGE_100.total, "fr")}</strong>&nbsp;: ${money(LODGE_100.lt, "fr")} de taxe d'hébergement, ${money(LODGE_100.g, "fr")} de TPS et ${money(LODGE_100.q, "fr")} de TVQ. Le raccourci&nbsp;: prix × 1,035 × 1,14975.</p>`,
+    facts: [
+      { k: "Taxe d'hébergement", v: "3,5 %" },
+      { k: "TPS + TVQ", v: "14,975 %" },
+      { k: "Calculées sur", v: "Prix + 3,5 %" },
+      { k: "Multiplicateur", v: "× 1,19" },
+      { k: "100 $ la nuit", v: stripTags(money(LODGE_100.total, "fr")) },
+      { k: "Airbnb", v: "Mêmes taxes" }
+    ],
+    cta: postCta("/", "Calculer TPS et TVQ", "Entrez le prix de la nuitée plus 3,5 % pour voir la TPS, la TVQ et le total."),
+    howto: {
+      name: "Calculer les taxes d'une nuitée au Québec",
+      steps: [
+        { name: "Taxe sur l'hébergement", text: "Multipliez le prix de la nuitée par 0,035 (3,5 %) et ajoutez-le au prix." },
+        { name: "TPS et TVQ", text: "Multipliez ce nouveau montant par 0,05 (TPS) et par 0,09975 (TVQ)." },
+        { name: "Additionner", text: "Prix + taxe d'hébergement + TPS + TVQ. Raccourci : prix × 1,035 × 1,14975 (environ × 1,19)." }
+      ]
+    },
+    sections: `    <h2>Les trois taxes d'une nuitée</h2>
+    <p>La <strong>taxe sur l'hébergement</strong> est une taxe spécifique du Québec dont les revenus financent la promotion touristique des régions. Elle s'élève à 3,5&nbsp;% du prix de chaque nuitée dans toutes les régions touristiques. Comme elle fait partie du prix payé, la TPS et la TVQ s'appliquent par-dessus&nbsp;: c'est l'un des rares cas où une taxe est calculée sur une autre.</p>
+    <div class="formula">Taxe&nbsp;d'hébergement&nbsp;=&nbsp;prix&nbsp;×&nbsp;0,035
+TPS&nbsp;=&nbsp;(prix&nbsp;+&nbsp;taxe&nbsp;d'hébergement)&nbsp;×&nbsp;0,05
+TVQ&nbsp;=&nbsp;(prix&nbsp;+&nbsp;taxe&nbsp;d'hébergement)&nbsp;×&nbsp;0,09975
+
+Total&nbsp;=&nbsp;prix&nbsp;×&nbsp;1,035&nbsp;×&nbsp;1,14975&nbsp;(≈&nbsp;prix&nbsp;×&nbsp;1,19)</div>
+    <h2>Tableau des taxes par nuitée</h2>
+${lodgingTable([80, 100, 125, 150, 200, 250, 300, 400])}
+    <p>Pour un séjour de plusieurs nuits, multipliez le prix d'une nuit par le nombre de nuits, puis appliquez les mêmes calculs. Trois nuits à 150&nbsp;$&nbsp;: 450&nbsp;$ × 1,035 × 1,14975 = ${money(lodgingCalc(450).total, "fr")}.</p>
+    <h2>Airbnb, chalets et résidences de tourisme</h2>
+    <p>Les locations de courte durée (Airbnb, chalets, résidences de tourisme) sont soumises à la même taxe d'hébergement de 3,5&nbsp;%. Les plateformes numériques perçoivent généralement la taxe d'hébergement, la TPS et la TVQ pour le compte des hôtes et les affichent au paiement. Un hôte qui loue directement, sans plateforme, doit percevoir la taxe d'hébergement lui-même, et la TPS et la TVQ s'il est inscrit (obligatoire au-delà de 30&nbsp;000&nbsp;$ de revenus, voir le <a href="/seuil-inscription-tps-tvq-quebec/">seuil d'inscription TPS TVQ</a>).</p>
+    <h2>Ce qui n'est pas visé</h2>
+    <ul>
+      <li><strong>Le loyer résidentiel&nbsp;:</strong> un logement loué au mois ou à l'année est exonéré de TPS et de TVQ et n'est pas un hébergement touristique.</li>
+      <li><strong>Les repas et services&nbsp;:</strong> le restaurant de l'hôtel, le stationnement ou le spa portent la TPS et la TVQ, mais pas la taxe d'hébergement.</li>
+      <li><strong>Les frais de plateforme&nbsp;:</strong> les frais de service d'Airbnb sont taxables (TPS et TVQ) mais ne portent pas la taxe d'hébergement.</li>
+    </ul>
+    <h2>Prix « taxes incluses » d'un hôtel</h2>
+    <p>Si un site affiche un total tout compris, divisez-le par 1,19 (plus précisément 1,035 × 1,14975 = 1,18999) pour retrouver le prix de la chambre. Un total de 238&nbsp;$ correspond à une nuitée d'environ 200&nbsp;$. Pour un total qui n'inclut que la TPS et la TVQ, utilisez le <a href="/calcul-taxe-inverse-quebec/">calcul taxes inversé</a> (÷ 1,14975).</p>
+    <h2>Les entreprises peuvent-elles récupérer ces taxes?</h2>
+    <p>Une entreprise inscrite qui paie une chambre pour un déplacement d'affaires peut réclamer la TPS et la TVQ payées en crédits de taxe (voir <a href="/recuperer-tps-tvq-cti-rti/">récupérer la TPS et la TVQ</a>). La taxe sur l'hébergement, elle, ne se récupère pas. Pour d'autres provinces, comparez avec le <a href="/calcul-taxes-canada/">calcul des taxes au Canada</a>.</p>
+    <p>Information générale&nbsp;; la taxe sur l'hébergement est administrée par Revenu Québec.</p>`,
+    faqs: [
+      { q: "Quel est le taux de la taxe sur l'hébergement au Québec?", a: "3,5 % du prix de chaque nuitée, dans toutes les régions touristiques du Québec, en plus de la TPS et de la TVQ." },
+      { q: "La TPS et la TVQ s'appliquent-elles sur la taxe d'hébergement?", a: "Oui. La TPS et la TVQ se calculent sur le prix de la nuitée plus la taxe d'hébergement de 3,5 %." },
+      { q: "Combien coûte une nuit à 100 $ avec les taxes au Québec?", a: "119,00 $ : 3,50 $ de taxe d'hébergement, 5,18 $ de TPS et 10,32 $ de TVQ." },
+      { q: "Airbnb perçoit-il la taxe d'hébergement?", a: "Oui. Les plateformes comme Airbnb perçoivent généralement la taxe d'hébergement, la TPS et la TVQ pour les hôtes et les affichent au paiement." },
+      { q: "Comment retirer les taxes d'un prix d'hôtel tout compris?", a: "Divisez le total par 1,19 (1,035 × 1,14975). Un total de 119 $ correspond à une nuitée de 100 $." }
+    ]
+  },
+
+  /* Nov 2026 — ITC/ITR guide for the travailleur-autonome / méthode-rapide cluster. */
+  {
+    url: "/recuperer-tps-tvq-cti-rti/",
+    short: "Récupérer la TPS et la TVQ (CTI/RTI)",
+    title: "Récupérer la TPS et la TVQ sur ses dépenses : CTI et RTI expliqués",
+    desc: "Une entreprise inscrite récupère la TPS (CTI) et la TVQ (RTI) payées sur ses achats. Calcul de la taxe nette, repas à 50 %, usage personnel, délais et exemple chiffré.",
+    h1: "Comment récupérer la TPS et la TVQ payées sur ses dépenses?",
+    intro: "Crédits de taxe sur les intrants (CTI) et remboursements de taxe sur les intrants (RTI), pour travailleurs autonomes et PME.",
+    datePublished: "2026-11-26",
+    answer:
+      "<p>Une entreprise <strong>inscrite</strong> aux fichiers de la TPS et de la TVQ récupère les taxes payées sur ses achats d'entreprise&nbsp;: la TPS par des <strong>crédits de taxe sur les intrants (CTI)</strong> et la TVQ par des <strong>remboursements de taxe sur les intrants (RTI)</strong>. Dans sa déclaration, elle remet les taxes perçues <strong>moins</strong> ses CTI et RTI. Les repas et frais de représentation ne donnent droit qu'à <strong>50&nbsp;%</strong> des taxes.</p>",
+    facts: [
+      { k: "TPS récupérée", v: "CTI" },
+      { k: "TVQ récupérée", v: "RTI" },
+      { k: "Taxe nette", v: "Perçue − CTI/RTI" },
+      { k: "Repas d'affaires", v: "50 %" },
+      { k: "Condition", v: "Être inscrit" },
+      { k: "Méthode rapide", v: "Biens immobilisés seul." }
+    ],
+    cta: postCta("/", "Calculer la TPS et la TVQ d'un reçu", "Séparez la TPS et la TVQ d'une dépense pour inscrire vos CTI et RTI."),
+    howto: {
+      name: "Calculer la TPS et la TVQ à remettre avec les CTI et RTI",
+      steps: [
+        { name: "Additionner les taxes perçues", text: "Faites le total de la TPS et de la TVQ facturées à vos clients pendant la période." },
+        { name: "Additionner les taxes payées", text: "Faites le total de la TPS (CTI) et de la TVQ (RTI) payées sur vos dépenses d'entreprise, à 50 % pour les repas et la représentation." },
+        { name: "Soustraire", text: "TPS perçue − CTI = TPS à remettre; TVQ perçue − RTI = TVQ à remettre. Un résultat négatif donne droit à un remboursement." }
+      ]
+    },
+    sections: `    <h2>Qui peut récupérer les taxes?</h2>
+    <p>Seules les entreprises <strong>inscrites</strong> à la TPS et à la TVQ peuvent réclamer des CTI et des RTI. Un petit fournisseur non inscrit (moins de 30&nbsp;000&nbsp;$ de ventes taxables sur quatre trimestres) ne facture pas les taxes et ne peut pas non plus récupérer celles qu'il paie. L'inscription volontaire est permise, ce qui peut être avantageux si vous avez beaucoup de dépenses (voir le <a href="/seuil-inscription-tps-tvq-quebec/">seuil d'inscription TPS TVQ</a>).</p>
+    <p>Les taxes doivent avoir été payées sur des biens ou services utilisés pour des <strong>activités commerciales taxables</strong>. Une entreprise qui vend des fournitures exonérées (par exemple des services financiers ou de santé) ne récupère pas les taxes sur ces activités (voir <a href="/taxable-detaxe-exonere-quebec/">taxable, détaxé ou exonéré</a>).</p>
+    <h2>Exemple : un consultant sur une année</h2>
+    <table class="data-table">
+      <thead><tr><th>Élément</th><th>Montant</th><th>TPS</th><th>TVQ</th></tr></thead>
+      <tbody>
+        <tr><td>Honoraires facturés</td><td>60&nbsp;000,00&nbsp;$</td><td>3&nbsp;000,00&nbsp;$</td><td>5&nbsp;985,00&nbsp;$</td></tr>
+        <tr><td>Ordinateur et logiciels</td><td>3&nbsp;000,00&nbsp;$</td><td>−150,00&nbsp;$</td><td>−299,25&nbsp;$</td></tr>
+        <tr><td>Cellulaire et Internet (part affaires)</td><td>1&nbsp;200,00&nbsp;$</td><td>−60,00&nbsp;$</td><td>−119,70&nbsp;$</td></tr>
+        <tr><td>Fournitures et abonnements</td><td>1&nbsp;800,00&nbsp;$</td><td>−90,00&nbsp;$</td><td>−179,55&nbsp;$</td></tr>
+        <tr><td>Repas d'affaires (50&nbsp;%)</td><td>1&nbsp;000,00&nbsp;$</td><td>−25,00&nbsp;$</td><td>−49,88&nbsp;$</td></tr>
+        <tr><td><strong>À remettre</strong></td><td></td><td><strong>2&nbsp;675,00&nbsp;$</strong></td><td><strong>5&nbsp;336,62&nbsp;$</strong></td></tr>
+      </tbody>
+    </table>
+    <p>Les 7&nbsp;000&nbsp;$ de dépenses taxables font récupérer 325,00&nbsp;$ de TPS et 648,38&nbsp;$ de TVQ, soit 973,38&nbsp;$ de moins à remettre. Comparez avec la <a href="/methode-rapide-tps-tvq/">méthode rapide</a>&nbsp;: quand les dépenses sont faibles, elle est souvent plus avantageuse.</p>
+    <h2>Les règles à connaître</h2>
+    <ul>
+      <li><strong>Repas et représentation&nbsp;:</strong> seulement 50&nbsp;% de la TPS et de la TVQ payées sont récupérables, comme pour la déduction d'impôt.</li>
+      <li><strong>Usage mixte&nbsp;:</strong> pour un téléphone, un véhicule ou un bureau à domicile, ne réclamez que la part utilisée pour l'entreprise.</li>
+      <li><strong>Pièces justificatives&nbsp;:</strong> conservez les factures. Pour les achats plus importants, elles doivent indiquer le nom du fournisseur et ses numéros d'inscription à la TPS et à la TVQ.</li>
+      <li><strong>Achats sans taxes&nbsp;:</strong> rien à récupérer sur un achat détaxé ou exonéré, ni sur un achat d'un fournisseur non inscrit (par exemple une <a href="/taxe-vehicule-occasion-quebec/">voiture achetée d'un particulier</a>).</li>
+      <li><strong>Délais&nbsp;:</strong> les CTI et RTI peuvent généralement être réclamés dans une déclaration ultérieure, jusqu'à quatre ans après la période de l'achat.</li>
+      <li><strong>Grandes entreprises&nbsp;:</strong> au Québec, les entreprises dont les ventes dépassent 10&nbsp;millions&nbsp;$ ont des restrictions de RTI sur certaines dépenses (énergie, télécommunications, véhicules routiers). Les PME et travailleurs autonomes n'y sont pas soumis.</li>
+    </ul>
+    <h2>Trouver la TPS et la TVQ d'un reçu</h2>
+    <p>Si un reçu n'affiche qu'un total taxes incluses, la TPS représente 4,349&nbsp;% du total et la TVQ 8,676&nbsp;%. Le <a href="/calcul-taxe-inverse-quebec/">calcul taxes inversé</a> sépare les deux, et les pages <a href="/calcul-tps-quebec/">calcul de la TPS</a> et <a href="/calcul-tvq-quebec/">calcul de la TVQ</a> détaillent chaque taxe. Pour facturer correctement vos clients, voyez <a href="/calcul-taxes-facture-quebec/">les taxes sur une facture</a> et le guide <a href="/tps-tvq-travailleur-autonome/">TPS TVQ pour travailleur autonome</a>.</p>
+    <p>Information générale&nbsp;; au Québec, Revenu Québec administre la TPS et la TVQ pour la plupart des entreprises.</p>`,
+    faqs: [
+      { q: "Qu'est-ce qu'un CTI et un RTI?", a: "Le crédit de taxe sur les intrants (CTI) permet de récupérer la TPS payée sur les achats d'entreprise; le remboursement de taxe sur les intrants (RTI) fait de même pour la TVQ." },
+      { q: "Peut-on récupérer les taxes sans être inscrit?", a: "Non. Seules les entreprises inscrites à la TPS et à la TVQ peuvent réclamer des CTI et des RTI." },
+      { q: "Les repas d'affaires donnent-ils droit aux CTI et RTI?", a: "Oui, mais seulement à 50 % de la TPS et de la TVQ payées." },
+      { q: "Que se passe-t-il si mes CTI dépassent la TPS perçue?", a: "La taxe nette est négative : Revenu Québec vous rembourse la différence, après traitement de la déclaration." },
+      { q: "Peut-on réclamer des CTI avec la méthode rapide?", a: "Seulement sur les biens immobilisés (ordinateur, véhicule, mobilier) et les immeubles. Les taxes sur les dépenses courantes ne sont pas réclamées." }
     ]
   },
 

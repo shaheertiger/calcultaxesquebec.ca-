@@ -43,6 +43,10 @@ instantané et excellents Core Web Vitals.
 | `/hst-calculator/` | hst calculator / reverse hst calculator, 13-14-15 % (EN) |
 | `/gst-pst-calculator/` | gst pst calculator / gst calculator bc, manitoba, saskatchewan (EN) |
 | `/methode-rapide-tps-tvq/` | méthode rapide tps tvq / déclaration et remise tps tvq (moteur : `assets/js/rapide.js`) |
+| `/taxe-vehicule-occasion-quebec/` | taxe voiture usagée, vente privée SAAQ |
+| `/taxes-achats-en-ligne-quebec/` | taxes achat en ligne, amazon, colis états-unis |
+| `/taxe-hebergement-quebec/` | taxe d'hébergement 3,5 %, hôtel, airbnb |
+| `/recuperer-tps-tvq-cti-rti/` | CTI RTI, récupérer tps tvq |
 | `/what-is-the-tax-in-quebec/` | what is the tax in quebec (guide EN, paire de `/taxe-quebec-2026/`) |
 | `/calcul-tps-quebec/` | calcul tps / tps seule / tps incluse |
 | `/calcul-tvq-quebec/` | calcul tvq / taux tvq / tvq incluse |
