@@ -1,0 +1,9 @@
+# Live redirect check, 2026-11-28 (before deploy)
+https://calcultaxesquebec.ca/  ->  308 https://www.calcultaxesquebec.ca/
+http://calcultaxesquebec.ca/  ->  308 https://calcultaxesquebec.ca/
+http://www.calcultaxesquebec.ca/  ->  308 https://www.calcultaxesquebec.ca/
+https://www.calcultaxesquebec.ca/calculateur-de-taxes-quebec/  ->  308 https://www.calcultaxesquebec.ca/
+https://www.calcultaxesquebec.ca/calculateur-de-taxes-quebec  ->  308 https://www.calcultaxesquebec.ca/
+https://www.calcultaxesquebec.ca/tps-tvq-en-ligne/  ->  308 https://www.calcultaxesquebec.ca/
+https://www.calcultaxesquebec.ca/tps-tvq-en-ligne  ->  308 https://www.calcultaxesquebec.ca/
+https://calcultaxesquebec.ca/calculateur-de-taxes-quebec/  ->  308 https://www.calcultaxesquebec.ca/calculateur-de-taxes-quebec/
