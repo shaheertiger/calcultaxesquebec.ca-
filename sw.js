@@ -1,5 +1,5 @@
 /* Calcul Taxes Québec — service worker (offline-ready, cache-first for assets) */
-const CACHE = "ctq-v11";
+const CACHE = "ctq-v12";
 const ASSETS = [
   "/",
   "/calcul-taxe-inverse-quebec/",

@@ -103,8 +103,10 @@
       var amount = parseAmount(input.value);
       var sub, tps, tvq, total;
       if (mode === "remove") {
+        // Same rule as the static tables (build.js removeTax): round the amount before tax to the
+        // cent first, then TPS and TVQ on that rounded amount, so the three shown figures agree.
         total = amount;
-        sub = amount / COMBINED;
+        sub = round2(amount / COMBINED);
         tps = sub * GST;
         tvq = sub * QST;
       } else {

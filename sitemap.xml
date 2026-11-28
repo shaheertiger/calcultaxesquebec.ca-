@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://www.calcultaxesquebec.ca/</loc>
-    <lastmod>2026-11-25</lastmod>
+    <lastmod>2026-11-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/"/>
@@ -11,7 +11,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/calcul-taxe-inverse-quebec/</loc>
-    <lastmod>2026-11-25</lastmod>
+    <lastmod>2026-11-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxe-inverse-quebec/"/>
@@ -47,7 +47,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/reverse-tax-calculator-quebec/</loc>
-    <lastmod>2026-11-25</lastmod>
+    <lastmod>2026-11-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr-CA" href="https://www.calcultaxesquebec.ca/calcul-taxe-inverse-quebec/"/>
@@ -266,7 +266,7 @@
   </url>
   <url>
     <loc>https://www.calcultaxesquebec.ca/comment-retirer-taxes-prix-quebec/</loc>
-    <lastmod>2026-11-17</lastmod>
+    <lastmod>2026-11-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

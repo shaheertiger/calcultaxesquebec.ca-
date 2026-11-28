@@ -4,7 +4,7 @@ Calculatrice TPS/TVQ rapide, mobile-first et optimisée SEO pour le Québec.
 Site statique (HTML/CSS/JS vanille, zéro framework au runtime) — chargement
 instantané et excellents Core Web Vitals.
 
-**Live :** https://calcultaxesquebec.ca
+**Live :** https://www.calcultaxesquebec.ca/
 
 ## Fonctionnalités
 
